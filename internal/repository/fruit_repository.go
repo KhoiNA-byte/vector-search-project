@@ -65,8 +65,9 @@ func (r *fruitRepository) CreateFruit(ctx context.Context, fruit *model.Fruit) e
 }
 
 func (r *fruitRepository) SearchFruits(ctx context.Context, embedding pgvector.Vector, limit int) ([]model.Fruit, error) {
+	// (1 - (embedding <=> $1)) converts cosine distance to cosine similarity
 	query := `
-		SELECT id, name, origin, bestFor, texture, flavor, season, color, price, embedding
+		SELECT id, name, origin, bestFor, texture, flavor, season, color, price, embedding, (1 - (embedding <=> $1)) as similarity
 		FROM fruits
 		ORDER BY embedding <=> $1
 		LIMIT $2
@@ -80,7 +81,7 @@ func (r *fruitRepository) SearchFruits(ctx context.Context, embedding pgvector.V
 	var fruits []model.Fruit
 	for rows.Next() {
 		var f model.Fruit
-		err := rows.Scan(&f.ID, &f.Name, &f.Origin, &f.BestFor, &f.Texture, &f.Flavor, &f.Season, &f.Color, &f.Price, &f.Embedding)
+		err := rows.Scan(&f.ID, &f.Name, &f.Origin, &f.BestFor, &f.Texture, &f.Flavor, &f.Season, &f.Color, &f.Price, &f.Embedding, &f.Similarity)
 		if err != nil {
 			return nil, fmt.Errorf("scan fruit failed: %w", err)
 		}

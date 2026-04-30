@@ -6,6 +6,8 @@ import (
 	"vector-search-project/internal/database"
 	"vector-search-project/internal/model"
 	"vector-search-project/internal/repository"
+
+	"github.com/pgvector/pgvector-go"
 )
 
 type FruitService interface {
@@ -59,9 +61,15 @@ func (s *fruitService) Search(ctx context.Context, query string) ([]model.Fruit,
 	if err != nil {
 		return nil, fmt.Errorf("failed to embed search query: %w", err)
 	}
-	results, err := s.repo.SearchFruits(ctx, promptEmbedding, 3)
+
+	results, err := s.repo.SearchFruits(ctx, promptEmbedding, 4)
 	if err != nil {
 		return nil, fmt.Errorf("search failed: %w", err)
+	}
+
+	for i := range results {
+		// Clear embedding to keep response slim
+		results[i].Embedding = pgvector.Vector{}
 	}
 
 	return results, nil
