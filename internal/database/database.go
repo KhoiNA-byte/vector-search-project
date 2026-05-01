@@ -25,17 +25,13 @@ type service struct {
 }
 
 var (
-	dsn        = os.Getenv("DATABASE_URL")
 	dbInstance *service
 	once       sync.Once
 )
 
 func New() Service {
 	once.Do(func() {
-		if dsn == "" {
-			dsn = "postgres://postgres:admin@localhost:5433/test_db?sslmode=disable"
-		}
-
+		dsn := os.Getenv("DATABASE_URL")
 		ctx := context.Background()
 		config, err := pgxpool.ParseConfig(dsn)
 		if err != nil {

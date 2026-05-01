@@ -1,4 +1,7 @@
+import { useState } from "react";
 import FruitCard from "./FruitCard";
+import { Button } from "./ui/Button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const SkeletonCard = () => (
   <div className="bg-card rounded-2xl p-6 shadow-soft border border-border/60 animate-pulse">
@@ -13,6 +16,16 @@ const SkeletonCard = () => (
 );
 
 const ResultsList = ({ results, loading, error, hasSearched }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+
+  // Reset to first page when results change
+  const [prevResults, setPrevResults] = useState(results);
+  if (results !== prevResults) {
+    setPrevResults(results);
+    setCurrentPage(1);
+  }
+
   if (loading) {
     return (
       <div className="grid gap-5 sm:grid-cols-2">
@@ -44,16 +57,60 @@ const ResultsList = ({ results, loading, error, hasSearched }) => {
 
   if (!hasSearched) return null;
 
+  const totalPages = Math.ceil(results.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentResults = results.slice(startIndex, startIndex + itemsPerPage);
+
   return (
-    <div className="grid gap-5 sm:grid-cols-2">
-      {results.map((fruit, idx) => (
-        <FruitCard 
-          key={fruit.id || idx} 
-          fruit={fruit} 
-          rank={idx + 1}
-          similarity={fruit.similarity} 
-        />
-      ))}
+    <div className="space-y-8">
+      <div className="grid gap-5 sm:grid-cols-2">
+        {currentResults.map((fruit, idx) => (
+          <FruitCard 
+            key={fruit.id || startIndex + idx} 
+            fruit={fruit} 
+            rank={startIndex + idx + 1}
+            similarity={fruit.similarity}
+          />
+        ))}
+      </div>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-4 mt-8">
+          <Button
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            variant="outline"
+            className="flex items-center gap-2 rounded-full px-4"
+          >
+            <ChevronLeft className="h-4 w-4" /> Previous
+          </Button>
+          
+          <div className="flex items-center gap-2">
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i + 1}
+                onClick={() => setCurrentPage(i + 1)}
+                className={`h-8 w-8 rounded-full text-sm font-medium transition-all ${
+                  currentPage === i + 1 
+                    ? "bg-primary text-primary-foreground shadow-glow" 
+                    : "bg-card border border-border hover:bg-accent"
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
+
+          <Button
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            variant="outline"
+            className="flex items-center gap-2 rounded-full px-4"
+          >
+            Next <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

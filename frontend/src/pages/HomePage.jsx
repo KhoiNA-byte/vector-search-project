@@ -1,6 +1,7 @@
 import { useState } from "react";
 import SearchBar from "../components/SearchBar";
 import ResultsList from "../components/ResultsList";
+import { fruitService } from "../services/fruitService";
 
 const SUGGESTIONS = [
   "sweet yellow fruit",
@@ -9,14 +10,29 @@ const SUGGESTIONS = [
   "exotic tropical fruit",
 ];
 
-const API_BASE = import.meta.env.VITE_BASE_URL;
-
 const HomePage = () => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [hasSearched, setHasSearched] = useState(false);
+
+  const fetchAllFruits = async () => {
+    setLoading(true);
+    setError(null);
+    setHasSearched(true);
+    setQuery("");
+
+    try {
+      const data = await fruitService.getAllFruits();
+      setResults(data);
+    } catch (e) {
+      setError(e?.message?.includes("fetch") ? "Couldn't reach the backend service." : `Something went wrong: ${e.message}`);
+      setResults([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const runSearch = async (q) => {
     const searchTerm = (q ?? query).trim();
@@ -28,11 +44,8 @@ const HomePage = () => {
     setHasSearched(true);
 
     try {
-      const res = await fetch(`${API_BASE}/search?q=${encodeURIComponent(searchTerm)}`);
-      if (!res.ok) throw new Error(`Request failed (${res.status})`);
-      const data = await res.json();
-      const list = Array.isArray(data) ? data : data.results ?? data.fruits ?? [];
-      setResults(list);
+      const data = await fruitService.searchFruits(searchTerm);
+      setResults(data);
     } catch (e) {
       setError(e?.message?.includes("fetch") ? "Couldn't reach the search service." : `Something went wrong: ${e.message}`);
       setResults([]);
@@ -59,7 +72,18 @@ const HomePage = () => {
         </header>
 
         {/* Search */}
-        <SearchBar value={query} onChange={setQuery} onSearch={() => runSearch()} loading={loading} />
+        <div className="flex flex-col gap-4">
+          <SearchBar value={query} onChange={setQuery} onSearch={() => runSearch()} loading={loading} />
+          <div className="flex justify-center">
+            <button
+              onClick={fetchAllFruits}
+              disabled={loading}
+              className="text-sm font-medium text-primary hover:text-primary-glow underline-offset-4 hover:underline transition-all"
+            >
+              Explore all available fruits
+            </button>
+          </div>
+        </div>
 
         {/* Suggestions */}
         <div className="flex flex-wrap items-center justify-center gap-2 mt-5 max-w-2xl mx-auto">

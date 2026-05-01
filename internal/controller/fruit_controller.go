@@ -31,3 +31,13 @@ func (c *FruitController) Search(w http.ResponseWriter, r *http.Request) {
 
 	webutil.RespondWithJSON(w, http.StatusOK, results)
 }
+
+func (c *FruitController) GetAll(w http.ResponseWriter, r *http.Request) {
+	results, err := c.fruitSvc.GetAll(r.Context())
+	if err != nil {
+		webutil.RespondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	webutil.RespondWithJSON(w, http.StatusOK, results)
+}

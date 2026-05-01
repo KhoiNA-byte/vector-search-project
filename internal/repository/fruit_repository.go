@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"vector-search-project/internal/model"
+	"vector-search-project/internal/model/response"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/pgvector/pgvector-go"
@@ -13,8 +14,8 @@ import (
 type FruitRepository interface {
 	Migrate(ctx context.Context) error
 	CreateFruit(ctx context.Context, fruit *model.Fruit) error
-	SearchFruits(ctx context.Context, embedding pgvector.Vector, limit int) ([]model.Fruit, error)
-	GetAllFruits(ctx context.Context) ([]model.Fruit, error)
+	SearchFruits(ctx context.Context, embedding pgvector.Vector, limit int) ([]response.FruitRes, error)
+	GetAllFruits(ctx context.Context) ([]response.FruitRes, error)
 	DeleteFruit(ctx context.Context) error
 	Count(ctx context.Context) (int64, error)
 }
@@ -28,9 +29,6 @@ func NewFruitRepository(pool *pgxpool.Pool) FruitRepository {
 }
 
 func (r *fruitRepository) Migrate(ctx context.Context) error {
-	// Re-dropping to ensure we have the new schema with 'season'
-	_, _ = r.pool.Exec(ctx, "DROP TABLE IF EXISTS fruits CASCADE")
-
 	setupSQL := `
 		CREATE TABLE IF NOT EXISTS fruits (
 			id bigserial PRIMARY KEY,
@@ -64,10 +62,10 @@ func (r *fruitRepository) CreateFruit(ctx context.Context, fruit *model.Fruit) e
 	return nil
 }
 
-func (r *fruitRepository) SearchFruits(ctx context.Context, embedding pgvector.Vector, limit int) ([]model.Fruit, error) {
-	// (1 - (embedding <=> $1)) converts cosine distance to cosine similarity
+func (r *fruitRepository) SearchFruits(ctx context.Context, embedding pgvector.Vector, limit int) ([]response.FruitRes, error) {
 	query := `
-		SELECT id, name, origin, bestFor, texture, flavor, season, color, price, embedding, (1 - (embedding <=> $1)) as similarity
+		SELECT name, origin, bestFor, texture, flavor, season, color, price, 
+		       ROUND((1 - (embedding <=> $1))::numeric * 100, 0) as similarity
 		FROM fruits
 		ORDER BY embedding <=> $1
 		LIMIT $2
@@ -78,10 +76,10 @@ func (r *fruitRepository) SearchFruits(ctx context.Context, embedding pgvector.V
 	}
 	defer rows.Close()
 
-	var fruits []model.Fruit
+	var fruits []response.FruitRes
 	for rows.Next() {
-		var f model.Fruit
-		err := rows.Scan(&f.ID, &f.Name, &f.Origin, &f.BestFor, &f.Texture, &f.Flavor, &f.Season, &f.Color, &f.Price, &f.Embedding, &f.Similarity)
+		var f response.FruitRes
+		err := rows.Scan(&f.Name, &f.Origin, &f.BestFor, &f.Texture, &f.Flavor, &f.Season, &f.Color, &f.Price, &f.Similarity)
 		if err != nil {
 			return nil, fmt.Errorf("scan fruit failed: %w", err)
 		}
@@ -101,9 +99,9 @@ func (r *fruitRepository) Count(ctx context.Context) (int64, error) {
 	return count, err
 }
 
-func (r *fruitRepository) GetAllFruits(ctx context.Context) ([]model.Fruit, error) {
+func (r *fruitRepository) GetAllFruits(ctx context.Context) ([]response.FruitRes, error) {
 	query := `
-		SELECT id, name, origin, bestFor, texture, flavor, season, color, price, embedding
+		SELECT name, origin, bestFor, texture, flavor, season, color, price
 		FROM fruits
 	`
 	rows, err := r.pool.Query(ctx, query)
@@ -112,10 +110,10 @@ func (r *fruitRepository) GetAllFruits(ctx context.Context) ([]model.Fruit, erro
 	}
 	defer rows.Close()
 
-	var fruits []model.Fruit
+	var fruits []response.FruitRes
 	for rows.Next() {
-		var f model.Fruit
-		err := rows.Scan(&f.ID, &f.Name, &f.Origin, &f.BestFor, &f.Texture, &f.Flavor, &f.Season, &f.Color, &f.Price, &f.Embedding)
+		var f response.FruitRes
+		err := rows.Scan(&f.Name, &f.Origin, &f.BestFor, &f.Texture, &f.Flavor, &f.Season, &f.Color, &f.Price)
 		if err != nil {
 			return nil, fmt.Errorf("scan fruit failed: %w", err)
 		}

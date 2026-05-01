@@ -31,17 +31,12 @@ func NewEmbeddingService() *EmbeddingService {
 
 func (s *EmbeddingService) EmbedDescription(ctx context.Context, description string) (pgvector.Vector, error) {
 	modelName := os.Getenv("GEMINI_MODEL")
-	if modelName == "" {
-		modelName = "gemini-embedding-2"
-	}
+	model1 := s.client.EmbeddingModel(modelName)
 
-	model := s.client.EmbeddingModel(modelName)
-
-	res, err := model.EmbedContent(ctx, genai.Text(description))
+	res, err := model1.EmbedContent(ctx, genai.Text(description))
 	if err != nil {
 		return pgvector.Vector{}, fmt.Errorf("gemini embedding failed: %w", err)
 	}
-
 	return pgvector.NewVector(res.Embedding.Values), nil
 }
 

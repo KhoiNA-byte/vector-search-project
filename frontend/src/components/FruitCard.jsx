@@ -15,8 +15,8 @@ const Row = ({ icon: Icon, label, value }) => {
 };
 
 const FruitCard = ({ fruit, rank, similarity }) => {
-  const pct = Math.round(similarity * 100);
-  const isTop = rank === 1;
+  const hasSimilarity = typeof similarity === 'number' && similarity > 0;
+  const isTop = rank === 1 && hasSimilarity;
 
   return (
     <div
@@ -25,16 +25,18 @@ const FruitCard = ({ fruit, rank, similarity }) => {
       }`}
     >
       {/* Rank badge */}
-      <div
-        className={`absolute -top-3 -left-3 flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold shadow-card ${
-          isTop
-            ? "bg-gradient-to-r from-primary to-primary-glow text-primary-foreground"
-            : "bg-card border border-border text-foreground"
-        }`}
-      >
-        {isTop && <Trophy className="h-3 w-3" />}
-        #{rank}
-      </div>
+      {hasSimilarity && (
+        <div
+          className={`absolute -top-3 -left-3 flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold shadow-card ${
+            isTop
+              ? "bg-gradient-to-r from-primary to-primary-glow text-primary-foreground"
+              : "bg-card border border-border text-foreground"
+          }`}
+        >
+          {isTop && <Trophy className="h-3 w-3" />}
+          #{rank}
+        </div>
+      )}
 
       <div className="flex items-start justify-between mb-2 gap-3">
         <h3 className="font-display text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
@@ -48,13 +50,15 @@ const FruitCard = ({ fruit, rank, similarity }) => {
       </div>
 
       {/* Similarity */}
-      <div className="mb-4">
-        <div className="flex items-center justify-between mb-1.5">
-          <span className="text-xs uppercase tracking-wider text-muted-foreground">Match</span>
-          <span className={`text-sm font-bold ${isTop ? "text-primary" : "text-foreground"}`}>{pct}%</span>
+      {hasSimilarity && (
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-xs uppercase tracking-wider text-muted-foreground">Match</span>
+            <span className={`text-sm font-bold ${isTop ? "text-primary" : "text-foreground"}`}>{similarity}%</span>
+          </div>
+          <SimilarityBar value={similarity} highlight={isTop} />
         </div>
-        <SimilarityBar value={similarity} highlight={isTop} />
-      </div>
+      )}
 
       <div className="space-y-2.5">
         <Row icon={MapPin} label="Origin" value={fruit.origin} />

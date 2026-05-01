@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"vector-search-project/internal/controller"
@@ -21,12 +22,10 @@ type Server struct {
 
 func NewServer() *http.Server {
 	portStr := os.Getenv("PORT")
-	if portStr == "" {
-		portStr = "8080"
+	port, err := strconv.Atoi(portStr)
+	if err != nil {
+		log.Fatalf("failed to parse PORT environment variable: %v", err)
 	}
-	port := 8080
-	fmt.Sscanf(portStr, "%d", &port)
-
 	db := database.New()
 
 	newServer := &Server{

@@ -16,9 +16,9 @@ func (s *Server) RegisterRoutes(fruitCtrl *controller.FruitController) http.Hand
 	// Apply CORS middleware
 	r.Use(s.corsMiddleware)
 
-	r.HandleFunc("/", s.HelloWorldHandler).Methods(http.MethodGet)
 	r.HandleFunc("/health", s.healthHandler).Methods(http.MethodGet)
 	r.HandleFunc("/search", fruitCtrl.Search).Methods(http.MethodGet)
+	r.HandleFunc("/fruits", fruitCtrl.GetAll).Methods(http.MethodGet)
 
 	// Additional route configuration
 	r.PathPrefix("/public/").Handler(http.StripPrefix("/public", http.FileServer(http.Dir("./public"))))
@@ -41,21 +41,6 @@ func (s *Server) corsMiddleware(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
-}
-
-func (s *Server) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
-	resp := make(map[string]string)
-	resp["message"] = "Hello World"
-
-	jsonResp, err := json.Marshal(resp)
-	if err != nil {
-		log.Printf("error handling JSON marshal. Err: %v", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonResp)
 }
 
 func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {

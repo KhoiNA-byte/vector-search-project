@@ -4,15 +4,14 @@ import (
 	"context"
 	"fmt"
 	"vector-search-project/internal/database"
-	"vector-search-project/internal/model"
+	"vector-search-project/internal/model/response"
 	"vector-search-project/internal/repository"
-
-	"github.com/pgvector/pgvector-go"
 )
 
 type FruitService interface {
 	Seed(ctx context.Context) error
-	Search(ctx context.Context, query string) ([]model.Fruit, error)
+	Search(ctx context.Context, query string) ([]response.FruitRes, error)
+	GetAll(ctx context.Context) ([]response.FruitRes, error)
 }
 
 type fruitService struct {
@@ -51,7 +50,7 @@ func (s *fruitService) Seed(ctx context.Context) error {
 	return nil
 }
 
-func (s *fruitService) Search(ctx context.Context, query string) ([]model.Fruit, error) {
+func (s *fruitService) Search(ctx context.Context, query string) ([]response.FruitRes, error) {
 	if query == "" {
 		return nil, fmt.Errorf("query is required")
 	}
@@ -67,10 +66,13 @@ func (s *fruitService) Search(ctx context.Context, query string) ([]model.Fruit,
 		return nil, fmt.Errorf("search failed: %w", err)
 	}
 
-	for i := range results {
-		// Clear embedding to keep response slim
-		results[i].Embedding = pgvector.Vector{}
-	}
+	return results, nil
+}
 
+func (s *fruitService) GetAll(ctx context.Context) ([]response.FruitRes, error) {
+	results, err := s.repo.GetAllFruits(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get all fruits: %w", err)
+	}
 	return results, nil
 }
