@@ -10,15 +10,17 @@ import (
 	"vector-search-project/internal/controller"
 )
 
-func (s *Server) RegisterRoutes(fruitCtrl *controller.FruitController) http.Handler {
+func (s *Server) RegisterRoutes(fruitCtrl *controller.FruitController, visualEntityCtrl *controller.VisualEntityController) http.Handler {
 	r := mux.NewRouter()
 
 	// Apply CORS middleware
 	r.Use(s.corsMiddleware)
 
 	r.HandleFunc("/health", s.healthHandler).Methods(http.MethodGet)
-	r.HandleFunc("/search", fruitCtrl.Search).Methods(http.MethodGet)
+	r.HandleFunc("/fruits/search", fruitCtrl.Search).Methods(http.MethodGet)
 	r.HandleFunc("/fruits", fruitCtrl.GetAll).Methods(http.MethodGet)
+	r.HandleFunc("/visual-entities/search", visualEntityCtrl.Search).Methods(http.MethodGet)
+	r.HandleFunc("/visual-entities", visualEntityCtrl.GetAll).Methods(http.MethodGet)
 
 	// Additional route configuration
 	r.PathPrefix("/public/").Handler(http.StripPrefix("/public", http.FileServer(http.Dir("./public"))))

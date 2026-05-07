@@ -16,7 +16,6 @@ type FruitRepository interface {
 	CreateFruit(ctx context.Context, fruit *model.Fruit) error
 	SearchFruits(ctx context.Context, embedding pgvector.Vector, limit int) ([]response.FruitRes, error)
 	GetAllFruits(ctx context.Context) ([]response.FruitRes, error)
-	DeleteFruit(ctx context.Context) error
 	Count(ctx context.Context) (int64, error)
 }
 
@@ -86,11 +85,6 @@ func (r *fruitRepository) SearchFruits(ctx context.Context, embedding pgvector.V
 		fruits = append(fruits, f)
 	}
 	return fruits, nil
-}
-
-func (r *fruitRepository) DeleteFruit(ctx context.Context) error {
-	_, err := r.pool.Exec(ctx, "DELETE FROM fruits")
-	return err
 }
 
 func (r *fruitRepository) Count(ctx context.Context) (int64, error) {

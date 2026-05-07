@@ -34,6 +34,10 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
 
+  --background-image-gradient-fruit: linear-gradient(135deg, hsl(142 55% 32%), hsl(88 65% 50%));
+  --background-image-gradient-visual: linear-gradient(135deg, #22d3ee, #a855f7, #ec4899);
+  --background-image-gradient-gray: linear-gradient(90deg, #94a3b8, #cbd5e1);
+
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
 
@@ -80,11 +84,7 @@
 
     --radius: 1rem;
 
-    --gradient-hero: linear-gradient(135deg, hsl(88 70% 96%) 0%, hsl(48 96% 92%) 100%);
-    --gradient-primary: linear-gradient(135deg, hsl(142 55% 32%), hsl(88 65% 50%));
-    --shadow-soft: 0 4px 20px -4px hsl(142 30% 20% / 0.08);
-    --shadow-card: 0 8px 30px -8px hsl(142 30% 20% / 0.12);
-    --shadow-glow: 0 10px 40px -10px hsl(142 55% 40% / 0.35);
+    --color-primary-rgb: 34, 197, 94;
   }
 }
 
@@ -103,12 +103,4 @@
     font-family: 'Fraunces', Georgia, serif;
     font-feature-settings: "ss01";
   }
-}
-
-@layer utilities {
-  .bg-hero { background: var(--gradient-hero); }
-  .bg-gradient-primary { background: var(--gradient-primary); }
-  .shadow-soft { box-shadow: var(--shadow-soft); }
-  .shadow-card { box-shadow: var(--shadow-card); }
-  .shadow-glow { box-shadow: var(--shadow-glow); }
 }

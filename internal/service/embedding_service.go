@@ -4,14 +4,14 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 	"vector-search-project/internal/model"
 
-	"github.com/google/generative-ai-go/genai"
 	"github.com/pgvector/pgvector-go"
-	"google.golang.org/api/option"
+	"google.golang.org/genai"
 )
 
-// EmbeddingService converts a description into a vector representation using Gemini.
 type EmbeddingService struct {
 	client *genai.Client
 }
@@ -19,7 +19,13 @@ type EmbeddingService struct {
 func NewEmbeddingService() *EmbeddingService {
 	apiKey := os.Getenv("GEMINI_API_KEY")
 	ctx := context.Background()
-	client, err := genai.NewClient(ctx, option.WithAPIKey(apiKey))
+
+	// Create client using the new SDK pattern
+	client, err := genai.NewClient(ctx, &genai.ClientConfig{
+		APIKey:  apiKey,
+		Backend: genai.BackendGeminiAPI,
+	})
+
 	if err != nil {
 		fmt.Printf("Failed to create Gemini client: %v\n", err)
 		return nil
@@ -30,17 +36,76 @@ func NewEmbeddingService() *EmbeddingService {
 }
 
 func (s *EmbeddingService) EmbedDescription(ctx context.Context, description string) (pgvector.Vector, error) {
-	modelName := os.Getenv("GEMINI_MODEL")
-	model1 := s.client.EmbeddingModel(modelName)
+	modelName := os.Getenv("GEMINI_MODEL") // e.g., "gemini-embedding-2"
 
-	res, err := model1.EmbedContent(ctx, genai.Text(description))
+	// Follow the result pattern from your snippet
+	contents := []*genai.Content{
+		genai.NewContentFromText(description, "user"),
+	}
+
+	result, err := s.client.Models.EmbedContent(ctx,
+		modelName,
+		contents,
+		nil,
+	)
+
 	if err != nil {
 		return pgvector.Vector{}, fmt.Errorf("gemini embedding failed: %w", err)
 	}
-	return pgvector.NewVector(res.Embedding.Values), nil
+
+	// Extract values from the embeddings in the result
+	if len(result.Embeddings) == 0 || len(result.Embeddings[0].Values) == 0 {
+		return pgvector.Vector{}, fmt.Errorf("no embeddings returned")
+	}
+
+	return pgvector.NewVector(result.Embeddings[0].Values), nil
 }
 
 func (s *EmbeddingService) EmbedFruit(ctx context.Context, f *model.Fruit) (pgvector.Vector, error) {
 	description := fmt.Sprintf("A %s %s fruit from %s, available during %s. Best for %s. It has a %s texture and a %s flavor profile.", f.Color, f.Name, f.Origin, f.Season, f.BestFor, f.Texture, f.Flavor)
 	return s.EmbedDescription(ctx, description)
+}
+
+func (s *EmbeddingService) EmbedVisualEntity(ctx context.Context, v *model.VisualEntity, description string) (pgvector.Vector, error) {
+	modelName := os.Getenv("GEMINI_MODEL")
+
+	// Read image file
+	imagePath := filepath.Join("frontend", "public", v.ImageURL)
+	imageData, err := os.ReadFile(imagePath)
+	if err != nil {
+		return pgvector.Vector{}, fmt.Errorf("failed to read image file %s: %w", imagePath, err)
+	}
+
+	// Detect MIME type based on extension
+	ext := strings.ToLower(filepath.Ext(imagePath))
+	mimeType := "image/jpeg"
+	switch ext {
+	case ".png":
+		mimeType = "image/png"
+	case ".webp":
+		mimeType = "image/webp"
+	}
+
+	contents := []*genai.Content{
+		genai.NewContentFromParts([]*genai.Part{
+			genai.NewPartFromText(description),
+			genai.NewPartFromBytes(imageData, mimeType),
+		}, genai.RoleUser),
+	}
+
+	result, err := s.client.Models.EmbedContent(ctx,
+		modelName,
+		contents,
+		nil,
+	)
+
+	if err != nil {
+		return pgvector.Vector{}, fmt.Errorf("gemini multimodal embedding failed: %w", err)
+	}
+
+	if len(result.Embeddings) == 0 || len(result.Embeddings[0].Values) == 0 {
+		return pgvector.Vector{}, fmt.Errorf("no embeddings returned")
+	}
+
+	return pgvector.NewVector(result.Embeddings[0].Values), nil
 }

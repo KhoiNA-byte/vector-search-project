@@ -1,5 +1,5 @@
 import { MapPin, Calendar, Sparkles, Utensils, Tag, Trophy } from "lucide-react";
-import SimilarityBar from "./SimilarityBar";
+import SimilarityBar from "../SimilarityBar.jsx";
 
 const Row = ({ icon: Icon, label, value }) => {
   if (!value) return null;
@@ -29,7 +29,7 @@ const FruitCard = ({ fruit, rank, similarity }) => {
         <div
           className={`absolute -top-3 -left-3 flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold shadow-card ${
             isTop
-              ? "bg-gradient-to-r from-primary to-primary-glow text-primary-foreground"
+              ? "bg-linear-to-r from-primary to-primary-glow text-primary-foreground"
               : "bg-card border border-border text-foreground"
           }`}
         >

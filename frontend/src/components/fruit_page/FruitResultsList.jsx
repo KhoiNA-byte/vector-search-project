@@ -1,6 +1,6 @@
 import { useState } from "react";
-import FruitCard from "./FruitCard";
-import { Button } from "./ui/Button";
+import FruitCard from "./FruitCard.jsx";
+import { Button } from "../ui/Button.jsx";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const SkeletonCard = () => (
@@ -15,7 +15,7 @@ const SkeletonCard = () => (
   </div>
 );
 
-const ResultsList = ({ results, loading, error, hasSearched }) => {
+const FruitResultsList = ({ results, loading, error, hasSearched }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
@@ -115,4 +115,4 @@ const ResultsList = ({ results, loading, error, hasSearched }) => {
   );
 };
 
-export default ResultsList;
+export default FruitResultsList;

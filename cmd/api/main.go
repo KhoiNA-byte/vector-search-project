@@ -52,8 +52,7 @@ func main() {
 	// Run graceful shutdown in a separate goroutine
 	go gracefulShutdown(apiServer, done)
 
-	fmt.Printf("Server starting on http://localhost%s\n", apiServer.Addr)
-	fmt.Printf("Example query: http://localhost%s/search?q=sweet+yellow+fruit\n", apiServer.Addr)
+	fmt.Printf("Server starting BE on http://localhost%s\n", apiServer.Addr)
 
 	err := apiServer.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {

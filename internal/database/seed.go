@@ -1,6 +1,12 @@
 package database
 
-import "vector-search-project/internal/model"
+import (
+	"log"
+	"os"
+	"path/filepath"
+	"strings"
+	"vector-search-project/internal/model"
+)
 
 func GetFruitsToSeed() []*model.Fruit {
 	return []*model.Fruit{
@@ -50,4 +56,33 @@ func GetFruitsToSeed() []*model.Fruit {
 		{Name: "Pomelo", Origin: "East Asia", BestFor: "Fresh snacks", Texture: "Coarse", Flavor: "Sweet and bitter", Season: "Winter", Color: "Green/Yellow", Price: 4.00},
 		{Name: "Dates", Origin: "Middle East", BestFor: "Baking and snacks", Texture: "Chewy", Flavor: "Very sweet", Season: "All Season", Color: "Brown", Price: 5.00},
 	}
+}
+
+func GetVisualEntitiesToSeed() []*model.VisualEntity {
+	var entities []*model.VisualEntity
+
+	// Path relative to the root of the project where CMD is run
+	dir := "frontend/public/visualEntities"
+
+	files, err := os.ReadDir(dir)
+	if err != nil {
+		log.Printf("Warning: could not read visualEntities directory: %v", err)
+		return entities
+	}
+
+	for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
+
+		name := file.Name()
+		ext := strings.ToLower(filepath.Ext(name))
+		if ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".webp" || ext == ".svg" {
+			entities = append(entities, &model.VisualEntity{
+				ImageURL: "/visualEntities/" + name,
+			})
+		}
+	}
+
+	return entities
 }
