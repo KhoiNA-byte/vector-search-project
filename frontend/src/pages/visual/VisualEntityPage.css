@@ -1,0 +1,84 @@
+@import "tailwindcss";
+@reference "../../style.css";
+
+/* Scoped styles for Visual Entity Page */
+.visual-page-glow {
+  @apply pointer-events-none absolute rounded-full blur-[120px] w-80 h-80;
+}
+
+.visual-page-glow-purple {
+  @apply pointer-events-none absolute rounded-full blur-[120px] w-80 h-80 -top-40 -left-40;
+  background-color: rgba(147, 51, 234, 0.2);
+}
+
+.visual-page-glow-blue {
+  @apply pointer-events-none absolute rounded-full blur-[120px] w-80 h-80 top-20 -right-40;
+  background-color: rgba(37, 99, 235, 0.2);
+}
+
+@layer utilities {
+  .visual-page-container {
+    @apply min-h-screen pt-32 pb-12 overflow-x-hidden selection:bg-primary/30;
+    background-color: #050505;
+  }
+
+  .visual-hero-badge {
+    @apply inline-flex items-center gap-2 border border-white/10 rounded-full px-4 py-1.5 text-xs font-medium text-white/60 backdrop-blur-md mb-8;
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .visual-hero-badge-dot {
+    @apply h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)];
+  }
+
+  .visual-hero-title {
+    font-family: 'Fraunces', Georgia, serif;
+    font-feature-settings: "ss01";
+    @apply text-6xl md:text-[88px] font-bold tracking-tight text-white leading-[0.95] mb-6;
+  }
+
+  .visual-hero-vibe {
+    @apply italic bg-linear-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent opacity-90;
+  }
+
+  .visual-hero-subtitle {
+    @apply mt-8 text-xl text-white/50 max-w-2xl mx-auto leading-relaxed font-light;
+  }
+
+  .visual-searchbar-container {
+    @apply bg-black/20 border border-white/20 text-white backdrop-blur-xl;
+    box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.4);
+  }
+
+  .visual-searchbar-container input {
+    color: white !important;
+  }
+
+  .visual-searchbar-button {
+    @apply bg-linear-to-r from-cyan-400 via-purple-400 to-pink-400 text-white;
+  }
+
+  .visual-suggestion-btn {
+    @apply text-[13px] px-5 py-2.5 rounded-full border border-white/10 text-white/70 transition-all duration-300;
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .visual-suggestion-btn:hover {
+    @apply border-white/20;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  /* .bg-gradient-primary is now handled in style.css as bg-gradient-visual */
+
+  .visual-explore-btn {
+    @apply flex items-center gap-2 text-[13px] px-5 py-2.5 rounded-full bg-linear-to-r from-[#59D1F5] via-[#A855F7] to-[#EC4899] text-white font-semibold transition-all shadow-lg;
+  }
+
+  .visual-explore-btn:hover {
+    @apply opacity-90 shadow-purple-500/20;
+  }
+
+  .shadow-glow {
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+  }
+}
