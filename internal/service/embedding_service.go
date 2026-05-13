@@ -36,7 +36,7 @@ func NewEmbeddingService() *EmbeddingService {
 }
 
 func (s *EmbeddingService) EmbedDescription(ctx context.Context, description string) (pgvector.Vector, error) {
-	modelName := os.Getenv("GEMINI_MODEL") // e.g., "gemini-embedding-2"
+	modelName := os.Getenv("GEMINI_EMBEDDING_MODEL")
 
 	// Follow the result pattern from your snippet
 	contents := []*genai.Content{
@@ -67,7 +67,7 @@ func (s *EmbeddingService) EmbedFruit(ctx context.Context, f *model.Fruit) (pgve
 }
 
 func (s *EmbeddingService) EmbedVisualEntity(ctx context.Context, v *model.VisualEntity, description string) (pgvector.Vector, error) {
-	modelName := os.Getenv("GEMINI_MODEL")
+	modelName := os.Getenv("GEMINI_EMBEDDING_MODEL")
 
 	// Read image file
 	imagePath := filepath.Join("frontend", "public", v.ImageURL)

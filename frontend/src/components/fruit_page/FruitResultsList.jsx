@@ -92,7 +92,7 @@ const FruitResultsList = ({ results, loading, error, hasSearched }) => {
                 onClick={() => setCurrentPage(i + 1)}
                 className={`h-8 w-8 rounded-full text-sm font-medium transition-all ${
                   currentPage === i + 1 
-                    ? "bg-primary text-primary-foreground shadow-glow" 
+                    ? "bg-primary text-primary-foreground shadow-glow-fruit" 
                     : "bg-card border border-border hover:bg-accent"
                 }`}
               >

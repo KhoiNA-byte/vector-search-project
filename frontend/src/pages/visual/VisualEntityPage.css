@@ -78,7 +78,7 @@
     @apply opacity-90 shadow-purple-500/20;
   }
 
-  .shadow-glow {
+  .shadow-glow-visual {
     box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
   }
 }

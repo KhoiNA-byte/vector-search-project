@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"vector-search-project/internal/database"
+	"vector-search-project/internal/model"
+	"vector-search-project/internal/model/request"
 	"vector-search-project/internal/model/response"
 	"vector-search-project/internal/repository"
 )
@@ -12,6 +14,10 @@ type FruitService interface {
 	Seed(ctx context.Context) error
 	Search(ctx context.Context, query string) ([]response.FruitRes, error)
 	GetAll(ctx context.Context) ([]response.FruitRes, error)
+	GetFruit(ctx context.Context, id int64) (*response.FruitRes, error)
+	CreateFruit(ctx context.Context, fruitReq *request.FruitReq) (int64, error)
+	UpdateFruit(ctx context.Context, fruitReq *request.FruitReq) error
+	DeleteFruit(ctx context.Context, id int64) error
 }
 
 type fruitService struct {
@@ -75,4 +81,64 @@ func (s *fruitService) GetAll(ctx context.Context) ([]response.FruitRes, error) 
 		return nil, fmt.Errorf("failed to get all fruits: %w", err)
 	}
 	return results, nil
+}
+
+func (s *fruitService) GetFruit(ctx context.Context, id int64) (*response.FruitRes, error) {
+	result, err := s.repo.GetFruit(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get fruit with id %d: %w", id, err)
+	}
+	return result, nil
+}
+
+func (s *fruitService) CreateFruit(ctx context.Context, fruitReq *request.FruitReq) (int64, error) {
+	fruitModel := &model.Fruit{
+		Name:    fruitReq.Name,
+		Origin:  fruitReq.Origin,
+		BestFor: fruitReq.BestFor,
+		Texture: fruitReq.Texture,
+		Flavor:  fruitReq.Flavor,
+		Season:  fruitReq.Season,
+		Color:   fruitReq.Color,
+		Price:   fruitReq.Price,
+	}
+
+	embedding, err := s.embedSvc.EmbedFruit(ctx, fruitModel)
+	if err != nil {
+		return 0, fmt.Errorf("failed to generate embedding for new fruit: %w", err)
+	}
+	fruitModel.Embedding = embedding
+
+	if err := s.repo.CreateFruit(ctx, fruitModel); err != nil {
+		return 0, err
+	}
+
+	return fruitModel.ID, nil
+}
+
+func (s *fruitService) UpdateFruit(ctx context.Context, fruitReq *request.FruitReq) error {
+	// Map request to model
+	fruitModel := &model.Fruit{
+		ID:      fruitReq.ID,
+		Name:    fruitReq.Name,
+		Origin:  fruitReq.Origin,
+		BestFor: fruitReq.BestFor,
+		Texture: fruitReq.Texture,
+		Flavor:  fruitReq.Flavor,
+		Season:  fruitReq.Season,
+		Color:   fruitReq.Color,
+		Price:   fruitReq.Price,
+	}
+
+	// Re-generate embedding using the model
+	newEmbedding, err := s.embedSvc.EmbedFruit(ctx, fruitModel)
+	if err != nil {
+		return fmt.Errorf("failed to generate new embedding for update: %w", err)
+	}
+
+	return s.repo.UpdateFruit(ctx, fruitReq, newEmbedding)
+}
+
+func (s *fruitService) DeleteFruit(ctx context.Context, id int64) error {
+	return s.repo.DeleteFruit(ctx, id)
 }

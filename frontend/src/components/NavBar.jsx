@@ -4,8 +4,8 @@ import { Apple, Image as ImageIcon } from "lucide-react";
 const NavBar = () => {
   const location = useLocation();
 
-  const isFruitPage = location.pathname === "/fruit" || location.pathname === "/";
-  const isVisualPage = location.pathname === "/visual-entity";
+  const isFruitPage = location.pathname.startsWith("/fruit");
+  const isVisualPage = location.pathname.startsWith("/visual-entity");
 
   const navItems = [
     { name: "Fruits", path: "/fruit", icon: Apple },

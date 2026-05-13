@@ -61,7 +61,7 @@ func (s *visualEntityService) Search(ctx context.Context, query string) ([]respo
 		return nil, fmt.Errorf("failed to embed search query: %w", err)
 	}
 
-	results, err := s.repo.SearchVisualEntity(ctx, promptEmbedding, 4)
+	results, err := s.repo.SearchVisualEntity(ctx, promptEmbedding)
 	if err != nil {
 		return nil, fmt.Errorf("search failed: %w", err)
 	}

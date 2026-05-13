@@ -13,7 +13,7 @@ import (
 type VisualEntityRepository interface {
 	Migrate(ctx context.Context) error
 	CreateVisualEntity(ctx context.Context, visualEntity *model.VisualEntity) error
-	SearchVisualEntity(ctx context.Context, embedding pgvector.Vector, limit int) ([]response.VisualEntityRes, error)
+	SearchVisualEntity(ctx context.Context, embedding pgvector.Vector) ([]response.VisualEntityRes, error)
 	GetAllVisualEntity(ctx context.Context) ([]response.VisualEntityRes, error)
 	Count(ctx context.Context) (int64, error)
 }
@@ -53,14 +53,13 @@ func (r *visualEntityRepository) CreateVisualEntity(ctx context.Context, visualE
 	return nil
 }
 
-func (r *visualEntityRepository) SearchVisualEntity(ctx context.Context, embedding pgvector.Vector, limit int) ([]response.VisualEntityRes, error) {
+func (r *visualEntityRepository) SearchVisualEntity(ctx context.Context, embedding pgvector.Vector) ([]response.VisualEntityRes, error) {
 	query := `
 		SELECT image_url, ROUND((1 - (embedding <=> $1))::numeric * 100, 0) as similarity
 		FROM visual_entities
 		ORDER BY embedding <=> $1
-		LIMIT $2
 	`
-	rows, err := r.pool.Query(ctx, query, embedding, limit)
+	rows, err := r.pool.Query(ctx, query, embedding)
 	if err != nil {
 		return nil, fmt.Errorf("visual entity search failed: %w", err)
 	}

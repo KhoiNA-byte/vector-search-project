@@ -1,4 +1,5 @@
 import { MapPin, Calendar, Sparkles, Utensils, Tag, Trophy } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import SimilarityBar from "../SimilarityBar.jsx";
 
 const Row = ({ icon: Icon, label, value }) => {
@@ -15,12 +16,14 @@ const Row = ({ icon: Icon, label, value }) => {
 };
 
 const FruitCard = ({ fruit, rank, similarity }) => {
+  const navigate = useNavigate();
   const hasSimilarity = typeof similarity === 'number' && similarity > 0;
   const isTop = rank === 1 && hasSimilarity;
 
   return (
     <div
-      className={`group relative bg-card rounded-2xl p-6 pt-7 shadow-soft hover:shadow-card border transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] ${
+      onClick={() => navigate(`/fruit/${fruit.id}`)}
+      className={`group relative bg-card rounded-2xl p-6 pt-7 shadow-soft hover:shadow-card border transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] cursor-pointer ${
         isTop ? "border-primary/40 ring-2 ring-primary/20" : "border-border/60"
       }`}
     >
@@ -72,4 +75,3 @@ const FruitCard = ({ fruit, rank, similarity }) => {
 };
 
 export default FruitCard;
-

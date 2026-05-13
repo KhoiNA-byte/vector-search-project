@@ -4,7 +4,16 @@ import { Button } from "../ui/Button.jsx";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const SkeletonCard = () => (
-  <div className="aspect-square bg-white/5 animate-pulse rounded-2xl border border-white/5" />
+  <div className="aspect-square bg-[#121212] rounded-3xl overflow-hidden border border-white/5 animate-pulse flex flex-col">
+    <div className="flex-1 bg-white/5" />
+    <div className="p-6 space-y-3">
+      <div className="flex justify-between">
+        <div className="h-2 w-10 bg-white/10 rounded" />
+        <div className="h-2 w-8 bg-white/10 rounded" />
+      </div>
+      <div className="h-1.5 w-full bg-white/10 rounded-full" />
+    </div>
+  </div>
 );
 
 const VisualEntityResultsList = ({ results, loading, error, hasSearched }) => {
@@ -78,7 +87,7 @@ const VisualEntityResultsList = ({ results, loading, error, hasSearched }) => {
                 onClick={() => setCurrentPage(i + 1)}
                 className={`h-9 w-9 rounded-full text-sm font-medium transition-all ${
                   currentPage === i + 1 
-                    ? "bg-gradient-visual text-white shadow-[0_0_15px_rgba(168,85,247,0.4)]" 
+                    ? "bg-gradient-visual text-white shadow-glow-visual" 
                     : "bg-white/5 border border-white/10 text-white/50 hover:border-white/20 hover:text-white"
                 }`}
               >

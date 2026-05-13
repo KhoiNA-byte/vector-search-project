@@ -1,6 +1,7 @@
 package response
 
 type FruitRes struct {
+	ID         int64   `json:"id"`
 	Name       string  `json:"name"`
 	Origin     string  `json:"origin"`
 	BestFor    string  `json:"bestFor"`

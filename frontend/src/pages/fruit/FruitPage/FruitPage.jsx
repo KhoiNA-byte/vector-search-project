@@ -1,7 +1,9 @@
 import { useState } from "react";
-import SearchBar from "../../components/SearchBar";
-import FruitResultsList from "../../components/fruit_page/FruitResultsList.jsx";
-import { fruitService } from "../../services/fruitService";
+import SearchBar from "../../../components/SearchBar.jsx";
+import FruitResultsList from "../../../components/fruit_page/FruitResultsList.jsx";
+import { fruitService } from "../../../services/fruitService.js";
+import { useNavigate } from "react-router-dom";
+
 import "./FruitPage.css";
 
 const SUGGESTIONS = [
@@ -12,6 +14,7 @@ const SUGGESTIONS = [
 ];
 
 const FruitPage = () => {
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -90,6 +93,13 @@ const FruitPage = () => {
               className="fruit-explore-btn"
             >
               Explore all available fruits
+            </button>
+            <button
+                onClick={() => navigate(`/fruit/create`)}
+                disabled={loading}
+                className="fruit-explore-btn"
+            >
+              Add Fruit
             </button>
           </div>
         </div>

@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"vector-search-project/internal/model/request"
 
 	"vector-search-project/internal/model"
 	"vector-search-project/internal/model/response"
@@ -16,6 +17,9 @@ type FruitRepository interface {
 	CreateFruit(ctx context.Context, fruit *model.Fruit) error
 	SearchFruits(ctx context.Context, embedding pgvector.Vector, limit int) ([]response.FruitRes, error)
 	GetAllFruits(ctx context.Context) ([]response.FruitRes, error)
+	GetFruit(ctx context.Context, id int64) (*response.FruitRes, error)
+	UpdateFruit(ctx context.Context, fruit *request.FruitReq, embedding pgvector.Vector) error
+	DeleteFruit(ctx context.Context, id int64) error
 	Count(ctx context.Context) (int64, error)
 }
 
@@ -63,7 +67,7 @@ func (r *fruitRepository) CreateFruit(ctx context.Context, fruit *model.Fruit) e
 
 func (r *fruitRepository) SearchFruits(ctx context.Context, embedding pgvector.Vector, limit int) ([]response.FruitRes, error) {
 	query := `
-		SELECT name, origin, bestFor, texture, flavor, season, color, price, 
+		SELECT id, name, origin, bestFor, texture, flavor, season, color, price, 
 		       ROUND((1 - (embedding <=> $1))::numeric * 100, 0) as similarity
 		FROM fruits
 		ORDER BY embedding <=> $1
@@ -78,7 +82,7 @@ func (r *fruitRepository) SearchFruits(ctx context.Context, embedding pgvector.V
 	var fruits []response.FruitRes
 	for rows.Next() {
 		var f response.FruitRes
-		err := rows.Scan(&f.Name, &f.Origin, &f.BestFor, &f.Texture, &f.Flavor, &f.Season, &f.Color, &f.Price, &f.Similarity)
+		err := rows.Scan(&f.ID, &f.Name, &f.Origin, &f.BestFor, &f.Texture, &f.Flavor, &f.Season, &f.Color, &f.Price, &f.Similarity)
 		if err != nil {
 			return nil, fmt.Errorf("scan fruit failed: %w", err)
 		}
@@ -95,7 +99,7 @@ func (r *fruitRepository) Count(ctx context.Context) (int64, error) {
 
 func (r *fruitRepository) GetAllFruits(ctx context.Context) ([]response.FruitRes, error) {
 	query := `
-		SELECT name, origin, bestFor, texture, flavor, season, color, price
+		SELECT id, name, origin, bestFor, texture, flavor, season, color, price
 		FROM fruits
 	`
 	rows, err := r.pool.Query(ctx, query)
@@ -107,7 +111,7 @@ func (r *fruitRepository) GetAllFruits(ctx context.Context) ([]response.FruitRes
 	var fruits []response.FruitRes
 	for rows.Next() {
 		var f response.FruitRes
-		err := rows.Scan(&f.Name, &f.Origin, &f.BestFor, &f.Texture, &f.Flavor, &f.Season, &f.Color, &f.Price)
+		err := rows.Scan(&f.ID, &f.Name, &f.Origin, &f.BestFor, &f.Texture, &f.Flavor, &f.Season, &f.Color, &f.Price)
 		if err != nil {
 			return nil, fmt.Errorf("scan fruit failed: %w", err)
 		}
@@ -119,4 +123,45 @@ func (r *fruitRepository) GetAllFruits(ctx context.Context) ([]response.FruitRes
 	}
 
 	return fruits, nil
+}
+
+func (r *fruitRepository) GetFruit(ctx context.Context, id int64) (*response.FruitRes, error) {
+	query := `
+		SELECT id, name, origin, bestFor, texture, flavor, season, color, price
+		FROM fruits
+		WHERE id = $1
+	`
+	row := r.pool.QueryRow(ctx, query, id)
+	var fruit response.FruitRes
+	err := row.Scan(&fruit.ID, &fruit.Name, &fruit.Origin, &fruit.BestFor, &fruit.Texture, &fruit.Flavor, &fruit.Season, &fruit.Color, &fruit.Price)
+	if err != nil {
+		return nil, fmt.Errorf("get fruit failed: %w", err)
+	}
+	return &fruit, nil
+}
+
+func (r *fruitRepository) UpdateFruit(ctx context.Context, fruitReq *request.FruitReq, embedding pgvector.Vector) error {
+	query := `
+		UPDATE fruits
+		SET name = $1, origin = $2, bestFor = $3, texture = $4, flavor = $5, season = $6, color = $7, price = $8, embedding = $9
+		WHERE id = $10
+		RETURNING id
+	`
+	err := r.pool.QueryRow(ctx, query, fruitReq.Name, fruitReq.Origin, fruitReq.BestFor, fruitReq.Texture, fruitReq.Flavor, fruitReq.Season, fruitReq.Color, fruitReq.Price, embedding, fruitReq.ID).Scan(&fruitReq.ID)
+	if err != nil {
+		return fmt.Errorf("update fruit failed: %w", err)
+	}
+	return nil
+}
+
+func (r *fruitRepository) DeleteFruit(ctx context.Context, id int64) error {
+	query := `
+		DELETE FROM fruits
+		WHERE id = $1
+	`
+	_, err := r.pool.Exec(ctx, query, id)
+	if err != nil {
+		return fmt.Errorf("delete fruit failed: %w", err)
+	}
+	return nil
 }
