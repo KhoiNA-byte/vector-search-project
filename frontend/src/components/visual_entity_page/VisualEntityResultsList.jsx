@@ -16,7 +16,7 @@ const SkeletonCard = () => (
   </div>
 );
 
-const VisualEntityResultsList = ({ results, loading, error, hasSearched }) => {
+const VisualEntityResultsList = ({ results, loading, error, hasSearched, onEntityClick }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
 
@@ -61,10 +61,11 @@ const VisualEntityResultsList = ({ results, loading, error, hasSearched }) => {
     <div className="space-y-12">
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {currentResults.map((item, idx) => (
-          <VisualEntityCard 
-            key={item.id || startIndex + idx} 
-            entity={item} 
-            rank={startIndex + idx + 1} 
+          <VisualEntityCard
+            key={item.id || startIndex + idx}
+            entity={item}
+            rank={startIndex + idx + 1}
+            onClick={onEntityClick}
           />
         ))}
       </div>

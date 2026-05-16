@@ -1,59 +1,49 @@
 @import "tailwindcss";
 @reference "../../style.css";
+
 @layer utilities {
-  .shadow-soft {
-    box-shadow: 0 4px 20px -4px hsl(142 30% 20% / 0.08);
-  }
-  .shadow-card {
-    box-shadow: 0 10px 40px -6px hsl(142 30% 20% / 0.12);
-  }
-  .shadow-glow {
-    box-shadow: 0 0 20px hsl(var(--primary-glow) / 0.3);
-  }
+
   .fruit-page-container {
-    --gradient-hero: linear-gradient(135deg, hsl(88 70% 96%) 0%, hsl(48 96% 92%) 100%);
-    @apply min-h-screen pt-32 pb-12;
-    background: var(--gradient-hero);
+    @apply min-h-screen pt-32 pb-12 bg-gradient-to-br from-lime-50 to-amber-100;
   }
+
   .fruit-hero-badge {
-    @apply inline-flex items-center gap-2 border border-border rounded-full px-4 py-1.5 text-xs font-medium text-muted-foreground mb-6;
-    background-color: hsl(var(--card));
-    box-shadow: 0 4px 20px -4px hsl(142 30% 20% / 0.08);
+    @apply inline-flex items-center gap-2 border border-lime-200 rounded-full px-4 py-1.5 text-xs font-medium text-lime-700 mb-6 bg-white shadow-soft;
   }
+
   .fruit-hero-title {
-    font-family: 'Fraunces', Georgia, serif;
-    font-feature-settings: "ss01";
-    @apply text-5xl md:text-7xl font-black tracking-tight text-foreground leading-[1.05];
+    @apply text-5xl md:text-7xl font-black tracking-tight text-lime-950 leading-[1.05] font-serif;
   }
+
   .fruit-hero-subtitle {
-    @apply mt-5 text-lg text-muted-foreground max-w-xl mx-auto;
+    @apply mt-5 text-lg text-lime-700 max-w-xl mx-auto;
   }
+
   .fruit-explore-btn {
-    @apply flex items-center gap-2 text-sm px-6 py-2.5 rounded-full text-white font-semibold transition-all shadow-lg ml-2;
-    background: linear-gradient(135deg, hsl(142 55% 32%), hsl(88 65% 50%));
-    color: white;
+    @apply flex items-center gap-2 text-sm px-6 py-2.5 rounded-full text-white font-semibold transition-all shadow-lg ml-2 bg-gradient-to-br from-emerald-700 to-lime-500;
   }
+
   .fruit-explore-btn:hover {
-    @apply opacity-90 no-underline shadow-green-500/20;
-    color: white;
+    @apply opacity-90 no-underline shadow-lime-500/20 text-white;
   }
+
   .fruit-searchbar-container {
-    @apply bg-white border border-border/60 text-foreground;
-    box-shadow: 0 4px 20px -4px hsl(142 30% 20% / 0.1);
+    @apply bg-white border border-lime-200 text-lime-950 shadow-soft;
   }
+
   .fruit-searchbar-container input {
-    color: hsl(140 30% 12%) !important;
+    @apply text-lime-950;
   }
+
   .fruit-searchbar-button {
-    background: linear-gradient(135deg, hsl(142 55% 32%), hsl(88 65% 50%));
-    @apply text-primary-foreground;
+    @apply text-white bg-gradient-to-br from-emerald-700 to-lime-500;
   }
+
   .fruit-suggestion-btn {
-    @apply text-sm px-3.5 py-1.5 rounded-full border border-border hover:border-primary/40 text-foreground transition-all;
-    background-color: hsl(var(--card));
-    box-shadow: 0 4px 20px -4px hsl(142 30% 20% / 0.08);
+    @apply text-sm px-3.5 py-1.5 rounded-full border border-lime-200 hover:border-lime-400 text-lime-900 transition-all bg-white shadow-soft;
   }
+
   .fruit-suggestion-btn:hover {
-    background-color: hsl(var(--accent));
+    @apply bg-lime-100;
   }
 }

@@ -94,9 +94,8 @@ func (c *FruitController) UpdateFruit(w http.ResponseWriter, r *http.Request) {
 		webutil.RespondWithError(w, http.StatusBadRequest, "Invalid request body")
 		return
 	}
-	fruitReq.ID = id
 
-	if err := c.fruitSvc.UpdateFruit(r.Context(), &fruitReq); err != nil {
+	if err := c.fruitSvc.UpdateFruit(r.Context(), id, &fruitReq); err != nil {
 		webutil.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}

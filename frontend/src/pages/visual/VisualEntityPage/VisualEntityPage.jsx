@@ -1,7 +1,9 @@
 import { useState } from "react";
-import SearchBar from "../../components/SearchBar";
-import VisualEntityResultsList from "../../components/visual_entity_page/VisualEntityResultsList.jsx";
-import { visualEntityService } from "../../services/visualEntityService";
+import { useNavigate } from "react-router-dom";
+import SearchBar from "../../../components/SearchBar.jsx";
+import VisualEntityResultsList from "../../../components/visual_entity_page/VisualEntityResultsList.jsx";
+import VisualEntityModal from "../../../components/visual_entity_page/VisualEntityModal.jsx";
+import { visualEntityService } from "../../../services/visualEntityService.js";
 import "./VisualEntityPage.css";
 
 const SUGGESTIONS = [
@@ -13,11 +15,13 @@ const SUGGESTIONS = [
 ];
 
 const VisualEntityPage = () => {
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [hasSearched, setHasSearched] = useState(false);
+  const [selectedEntity, setSelectedEntity] = useState(null);
 
   const fetchAll = async () => {
     setLoading(true);
@@ -53,6 +57,18 @@ const VisualEntityPage = () => {
       setResults([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this image?")) {
+      try {
+        await visualEntityService.deleteVisualEntity(id);
+        setResults(results.filter(r => r.id !== id));
+        setSelectedEntity(null);
+      } catch (e) {
+        alert("Delete failed: " + e.message);
+      }
     }
   };
 
@@ -92,13 +108,20 @@ const VisualEntityPage = () => {
               className="visual-searchbar-container"
               buttonClassName="visual-searchbar-button"
             />
-            <div className="flex justify-center">
+            <div className="flex justify-center gap-4">
               <button
                 onClick={fetchAll}
                 disabled={loading}
                 className="visual-explore-btn"
               >
                 Explore all available visuals
+              </button>
+              <button
+                onClick={() => navigate("/visual-entity/create")}
+                disabled={loading}
+                className="visual-explore-btn"
+              >
+                Add Visual
               </button>
             </div>
           </div>
@@ -119,17 +142,24 @@ const VisualEntityPage = () => {
 
         {/* Results */}
         <section className="mt-12">
-          <VisualEntityResultsList 
+          <VisualEntityResultsList
             results={results}
             loading={loading}
             error={error}
             hasSearched={hasSearched}
+            onEntityClick={setSelectedEntity}
           />
         </section>
       </div>
+
+      {/* Modal - extracted to component */}
+      <VisualEntityModal
+        entity={selectedEntity}
+        onClose={() => setSelectedEntity(null)}
+        onDelete={handleDelete}
+      />
     </main>
   );
 };
 
 export default VisualEntityPage;
-

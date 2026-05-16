@@ -1,0 +1,98 @@
+@import "tailwindcss";
+@reference "../../style.css";
+
+/* Scoped styles for Visual Entity Page */
+.visual-page-glow {
+  @apply pointer-events-none absolute rounded-full blur-[120px] w-80 h-80;
+}
+
+.visual-page-glow-purple {
+  @apply pointer-events-none absolute rounded-full blur-[120px] w-80 h-80 -top-40 -left-40 bg-purple-500/20;
+}
+
+.visual-page-glow-blue {
+  @apply pointer-events-none absolute rounded-full blur-[120px] w-80 h-80 top-20 -right-40 bg-blue-600/20;
+}
+
+@layer utilities {
+  .visual-page-container {
+    @apply min-h-screen pt-32 pb-12 overflow-x-hidden selection:bg-purple-500/30 bg-zinc-950;
+  }
+
+  .visual-hero-badge {
+    @apply inline-flex items-center gap-2 border border-white/10 rounded-full px-4 py-1.5 text-xs font-medium text-white/60 backdrop-blur-md mb-8 bg-white/5;
+  }
+
+  .visual-hero-badge-dot {
+    @apply h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgb(34_211_238_/0.8)];
+  }
+
+  .visual-hero-title {
+    @apply text-6xl md:text-[88px] font-bold tracking-tight text-white leading-[0.95] mb-6 font-serif;
+  }
+
+  .visual-hero-vibe {
+    @apply italic bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent opacity-90;
+  }
+
+  .visual-hero-subtitle {
+    @apply mt-8 text-xl text-white/50 max-w-2xl mx-auto leading-relaxed font-light;
+  }
+
+  .visual-searchbar-container {
+    @apply bg-black/20 border border-white/20 text-white backdrop-blur-xl shadow-[0_8px_32px_-4px_rgb(0_0_0_/0.4)];
+  }
+
+  .visual-searchbar-container input {
+    @apply text-white;
+  }
+
+  .visual-searchbar-button {
+    @apply bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 text-white;
+  }
+
+  .visual-suggestion-btn {
+    @apply text-[13px] px-5 py-2.5 rounded-full border border-white/10 text-white/70 transition-all duration-300 bg-white/5;
+  }
+
+  .visual-suggestion-btn:hover {
+    @apply border-white/20 bg-white/10;
+  }
+
+  .visual-explore-btn {
+    @apply flex items-center gap-2 text-[13px] px-5 py-2.5 rounded-full bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 text-white font-semibold transition-all shadow-lg;
+  }
+
+  .visual-explore-btn:hover {
+    @apply opacity-90 shadow-purple-500/20;
+  }
+
+  .shadow-glow-visual {
+    @apply shadow-[0_0_20px_rgb(168_85_247_/0.4)];
+  }
+}
+
+/* Modal Styles - Shared with Create Page */
+.modal-overlay {
+  @apply fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[1000];
+}
+
+.modal-content {
+  @apply bg-zinc-900 border border-white/10 p-8 rounded-[2rem] max-w-2xl w-[90%] shadow-2xl relative overflow-hidden;
+}
+
+.detail-view {
+  @apply flex flex-col gap-6 mb-8;
+}
+
+.detail-img {
+  @apply w-full max-h-[400px] object-contain rounded-xl bg-black/40 border border-white/5;
+}
+
+.entity-info p {
+  @apply m-1 text-white/50 text-sm font-light break-all;
+}
+
+.modal-actions {
+  @apply flex justify-end gap-3;
+}

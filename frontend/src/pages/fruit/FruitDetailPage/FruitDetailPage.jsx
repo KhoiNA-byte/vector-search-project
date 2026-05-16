@@ -128,7 +128,7 @@ const FruitDetailPage = () => {
 
           {/* Details Grid */}
           <div className="fruit-detail-grid">
-            <DetailItem 
+            <DetailItem
               icon={Tag} 
               label="Flavor Profile" 
               name="flavor" 

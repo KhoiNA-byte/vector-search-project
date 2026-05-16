@@ -3,8 +3,6 @@ package repository
 import (
 	"context"
 	"fmt"
-	"vector-search-project/internal/model/request"
-
 	"vector-search-project/internal/model"
 	"vector-search-project/internal/model/response"
 
@@ -18,7 +16,7 @@ type FruitRepository interface {
 	SearchFruits(ctx context.Context, embedding pgvector.Vector, limit int) ([]response.FruitRes, error)
 	GetAllFruits(ctx context.Context) ([]response.FruitRes, error)
 	GetFruit(ctx context.Context, id int64) (*response.FruitRes, error)
-	UpdateFruit(ctx context.Context, fruit *request.FruitReq, embedding pgvector.Vector) error
+	UpdateFruit(ctx context.Context, fruit *model.Fruit, embedding pgvector.Vector) error
 	DeleteFruit(ctx context.Context, id int64) error
 	Count(ctx context.Context) (int64, error)
 }
@@ -140,14 +138,13 @@ func (r *fruitRepository) GetFruit(ctx context.Context, id int64) (*response.Fru
 	return &fruit, nil
 }
 
-func (r *fruitRepository) UpdateFruit(ctx context.Context, fruitReq *request.FruitReq, embedding pgvector.Vector) error {
+func (r *fruitRepository) UpdateFruit(ctx context.Context, fruit *model.Fruit, embedding pgvector.Vector) error {
 	query := `
 		UPDATE fruits
 		SET name = $1, origin = $2, bestFor = $3, texture = $4, flavor = $5, season = $6, color = $7, price = $8, embedding = $9
 		WHERE id = $10
-		RETURNING id
 	`
-	err := r.pool.QueryRow(ctx, query, fruitReq.Name, fruitReq.Origin, fruitReq.BestFor, fruitReq.Texture, fruitReq.Flavor, fruitReq.Season, fruitReq.Color, fruitReq.Price, embedding, fruitReq.ID).Scan(&fruitReq.ID)
+	_, err := r.pool.Exec(ctx, query, fruit.Name, fruit.Origin, fruit.BestFor, fruit.Texture, fruit.Flavor, fruit.Season, fruit.Color, fruit.Price, embedding, fruit.ID)
 	if err != nil {
 		return fmt.Errorf("update fruit failed: %w", err)
 	}

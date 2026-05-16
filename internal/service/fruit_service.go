@@ -16,7 +16,7 @@ type FruitService interface {
 	GetAll(ctx context.Context) ([]response.FruitRes, error)
 	GetFruit(ctx context.Context, id int64) (*response.FruitRes, error)
 	CreateFruit(ctx context.Context, fruitReq *request.FruitReq) (int64, error)
-	UpdateFruit(ctx context.Context, fruitReq *request.FruitReq) error
+	UpdateFruit(ctx context.Context, id int64, fruitReq *request.FruitReq) error
 	DeleteFruit(ctx context.Context, id int64) error
 }
 
@@ -116,10 +116,10 @@ func (s *fruitService) CreateFruit(ctx context.Context, fruitReq *request.FruitR
 	return fruitModel.ID, nil
 }
 
-func (s *fruitService) UpdateFruit(ctx context.Context, fruitReq *request.FruitReq) error {
+func (s *fruitService) UpdateFruit(ctx context.Context, id int64, fruitReq *request.FruitReq) error {
 	// Map request to model
 	fruitModel := &model.Fruit{
-		ID:      fruitReq.ID,
+		ID:      id,
 		Name:    fruitReq.Name,
 		Origin:  fruitReq.Origin,
 		BestFor: fruitReq.BestFor,
@@ -136,7 +136,7 @@ func (s *fruitService) UpdateFruit(ctx context.Context, fruitReq *request.FruitR
 		return fmt.Errorf("failed to generate new embedding for update: %w", err)
 	}
 
-	return s.repo.UpdateFruit(ctx, fruitReq, newEmbedding)
+	return s.repo.UpdateFruit(ctx, fruitModel, newEmbedding)
 }
 
 func (s *fruitService) DeleteFruit(ctx context.Context, id int64) error {

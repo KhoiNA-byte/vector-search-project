@@ -15,6 +15,8 @@ type VisualEntityRepository interface {
 	CreateVisualEntity(ctx context.Context, visualEntity *model.VisualEntity) error
 	SearchVisualEntity(ctx context.Context, embedding pgvector.Vector) ([]response.VisualEntityRes, error)
 	GetAllVisualEntity(ctx context.Context) ([]response.VisualEntityRes, error)
+	GetVisualEntity(ctx context.Context, id int64) (*response.VisualEntityRes, error)
+	DeleteVisualEntity(ctx context.Context, id int64) error
 	Count(ctx context.Context) (int64, error)
 }
 
@@ -55,7 +57,7 @@ func (r *visualEntityRepository) CreateVisualEntity(ctx context.Context, visualE
 
 func (r *visualEntityRepository) SearchVisualEntity(ctx context.Context, embedding pgvector.Vector) ([]response.VisualEntityRes, error) {
 	query := `
-		SELECT image_url, ROUND((1 - (embedding <=> $1))::numeric * 100, 0) as similarity
+		SELECT id, image_url, ROUND((1 - (embedding <=> $1))::numeric * 100, 0) as similarity
 		FROM visual_entities
 		ORDER BY embedding <=> $1
 	`
@@ -68,7 +70,7 @@ func (r *visualEntityRepository) SearchVisualEntity(ctx context.Context, embeddi
 	var visualEntities []response.VisualEntityRes
 	for rows.Next() {
 		var item response.VisualEntityRes
-		err := rows.Scan(&item.ImageURL, &item.Similarity)
+		err := rows.Scan(&item.ID, &item.ImageURL, &item.Similarity)
 		if err != nil {
 			return nil, fmt.Errorf("scan visual entity failed: %w", err)
 		}
@@ -85,7 +87,7 @@ func (r *visualEntityRepository) Count(ctx context.Context) (int64, error) {
 
 func (r *visualEntityRepository) GetAllVisualEntity(ctx context.Context) ([]response.VisualEntityRes, error) {
 	query := `
-		SELECT image_url, 0 as similarity
+		SELECT id, image_url
 		FROM visual_entities
 	`
 	rows, err := r.pool.Query(ctx, query)
@@ -96,7 +98,7 @@ func (r *visualEntityRepository) GetAllVisualEntity(ctx context.Context) ([]resp
 	var visualEntities []response.VisualEntityRes
 	for rows.Next() {
 		var v response.VisualEntityRes
-		err := rows.Scan(&v.ImageURL, &v.Similarity)
+		err := rows.Scan(&v.ID, &v.ImageURL)
 		if err != nil {
 			return nil, fmt.Errorf("scan visual entity failed: %w", err)
 		}
@@ -108,4 +110,31 @@ func (r *visualEntityRepository) GetAllVisualEntity(ctx context.Context) ([]resp
 	}
 
 	return visualEntities, nil
+}
+
+func (r *visualEntityRepository) GetVisualEntity(ctx context.Context, id int64) (*response.VisualEntityRes, error) {
+	query := `
+		SELECT id, image_url
+		FROM visual_entities
+		WHERE id = $1
+	`
+	row := r.pool.QueryRow(ctx, query, id)
+	var v response.VisualEntityRes
+	err := row.Scan(&v.ID, &v.ImageURL)
+	if err != nil {
+		return nil, fmt.Errorf("get visual entity failed: %w", err)
+	}
+	return &v, nil
+}
+
+func (r *visualEntityRepository) DeleteVisualEntity(ctx context.Context, id int64) error {
+	query := `
+		DELETE FROM visual_entities
+		WHERE id = $1
+	`
+	_, err := r.pool.Exec(ctx, query, id)
+	if err != nil {
+		return fmt.Errorf("delete visual entity failed: %w", err)
+	}
+	return nil
 }

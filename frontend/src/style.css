@@ -38,23 +38,16 @@
   --background-image-gradient-visual: linear-gradient(135deg, #22d3ee, #a855f7, #ec4899);
   --background-image-gradient-gray: linear-gradient(90deg, #94a3b8, #cbd5e1);
 
-  --animate-accordion-down: accordion-down 0.2s ease-out;
-  --animate-accordion-up: accordion-up 0.2s ease-out;
-
-  @keyframes accordion-down {
-    from { height: 0; }
-    to { height: var(--radix-accordion-content-height); }
-  }
-  @keyframes accordion-up {
-    from { height: var(--radix-accordion-content-height); }
-    to { height: 0; }
-  }
+  --shadow-soft: 0 4px 20px -4px rgb(20 83 45 / 0.08);
+  --shadow-card: 0 10px 40px -6px rgb(20 83 45 / 0.12);
+  --shadow-glow: 0 0 20px rgb(132 204 22 / 0.3);
 }
 
 @layer base {
   :root {
     --background: 60 30% 98%;
     --foreground: 140 30% 12%;
+
 
     --card: 0 0% 100%;
     --card-foreground: 140 30% 12%;

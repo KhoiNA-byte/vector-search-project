@@ -1,0 +1,66 @@
+@import "tailwindcss";
+@reference "../../style.css";
+
+/* Inherit styles from VisualEntityPage.css via shared class names */
+
+.upload-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    position: relative;
+    z-index: 20;
+}
+
+.dropzone {
+    @apply bg-black/20 border border-white/10 rounded-2xl p-8 text-center cursor-pointer backdrop-blur-xl transition-all duration-300 min-h-[400px] flex items-center justify-center overflow-hidden;
+    box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.4);
+}
+
+.dropzone:hover {
+    @apply border-white/20 bg-white/5;
+}
+
+.preview-img {
+    @apply max-w-full max-h-[500px] rounded-lg object-contain shadow-2xl;
+}
+
+.upload-placeholder {
+    @apply text-white/40 font-light tracking-wide;
+}
+
+.form-actions {
+    @apply flex gap-4;
+}
+
+.error-message {
+    @apply text-pink-500/90 text-sm font-medium text-center mt-2;
+}
+
+/* Modal Styles - matching the vibe */
+.modal-overlay {
+    @apply fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[1000];
+}
+
+.modal-content {
+    @apply bg-zinc-900 border border-white/10 p-8 rounded-[2rem] max-w-2xl w-[90%] shadow-2xl relative overflow-hidden;
+}
+
+.modal-content h2 {
+    @apply text-2xl font-serif text-white mb-6;
+}
+
+.detail-view {
+    @apply flex flex-col gap-6 mb-8;
+}
+
+.detail-img {
+    @apply w-full max-h-[400px] object-contain rounded-xl bg-black/40 border border-white/5;
+}
+
+.entity-info p {
+    @apply m-1 text-white/50 text-sm font-light break-all;
+}
+
+.modal-actions {
+    @apply flex justify-end gap-3;
+}

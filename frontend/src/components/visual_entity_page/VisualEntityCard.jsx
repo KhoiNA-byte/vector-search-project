@@ -1,14 +1,15 @@
 import { Trophy } from "lucide-react";
 import SimilarityBar from "../SimilarityBar.jsx";
 
-const VisualEntityCard = ({ entity, rank }) => {
+const VisualEntityCard = ({ entity, rank, onClick }) => {
   const similarity = entity.similarity;
   const hasSimilarity = typeof similarity === 'number' && similarity > 0;
   const isTop = rank === 1 && hasSimilarity;
 
   return (
     <div
-      className={`group relative bg-[#121212] rounded-3xl overflow-hidden border transition-all duration-500 hover:-translate-y-2 ${
+      onClick={() => onClick?.(entity)}
+      className={`group relative bg-[#121212] rounded-3xl overflow-hidden border transition-all duration-500 hover:-translate-y-2 cursor-pointer ${
         isTop ? "border-white/20 shadow-[0_20px_40px_rgba(0,0,0,0.4)]" : "border-white/5"
       }`}
     >
