@@ -5,21 +5,24 @@ import FruitDetailPage from './pages/fruit/FruitDetailPage/FruitDetailPage.jsx'
 import VisualEntityPage from './pages/visual/VisualEntityPage/VisualEntityPage.jsx'
 import VisualEntityCreatePage from './pages/visual/VisualEntityCreatePage/VisualEntityCreatePage.jsx'
 import NavBar from './components/NavBar.jsx'
+import { ToastProvider } from './hooks/useToast.jsx'
 
 function App() {
   return (
-    <Router>
-      <NavBar />
-      <Routes>
-        <Route path="/" element={<Navigate to="/fruit" replace />} />
-        <Route path="/fruit" element={<FruitPage />} />
-          <Route path="/fruit/create" element={<FruitCreatePage />} />
-        <Route path="/fruit/:id" element={<FruitDetailPage />} />
-        <Route path="/visual-entity" element={<VisualEntityPage />} />
-          <Route path="/visual-entity/create" element={<VisualEntityCreatePage />} />
-          {/*<Route path="/visual-entity/:id" element={<VisualEntityDetailPage />} />*/}
-      </Routes>
-    </Router>
+    <ToastProvider>
+      <Router>
+        <NavBar />
+        <Routes>
+          <Route path="/" element={<Navigate to="/fruit" replace />} />
+          <Route path="/fruit" element={<FruitPage />} />
+            <Route path="/fruit/create" element={<FruitCreatePage />} />
+          <Route path="/fruit/:id" element={<FruitDetailPage />} />
+          <Route path="/visual-entity" element={<VisualEntityPage />} />
+            <Route path="/visual-entity/create" element={<VisualEntityCreatePage />} />
+            {/*<Route path="/visual-entity/:id" element={<VisualEntityDetailPage />} />*/}
+        </Routes>
+      </Router>
+    </ToastProvider>
   )
 }
 

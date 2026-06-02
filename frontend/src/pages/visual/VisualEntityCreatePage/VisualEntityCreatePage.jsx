@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast, Toaster } from 'react-hot-toast';
+import { useToast } from '../../../hooks/useToast.jsx';
 import { visualEntityService } from '../../../services/visualEntityService';
 import { Button } from '../../../components/ui/Button';
 import './VisualEntityCreatePage.css';
@@ -12,6 +12,7 @@ const VisualEntityCreatePage = () => {
     const [error, setError] = useState(null);
     const fileInputRef = useRef(null);
     const navigate = useNavigate();
+    const toast = useToast();
 
     // Clean up preview URL on unmount
     useEffect(() => {
@@ -56,7 +57,7 @@ const VisualEntityCreatePage = () => {
     const handleUpload = async (e) => {
         e.preventDefault();
         if (!file) {
-            toast.error("Please select an image first.");
+            toast.warning("No Image Selected", "Please select an image first.");
             return;
         }
 
@@ -68,11 +69,11 @@ const VisualEntityCreatePage = () => {
 
         try {
             await visualEntityService.createVisualEntity(formData);
-            toast.success("Visual entity created successfully!");
+            toast.success("Visual Added", "Your image has been successfully added to the collection.");
             setTimeout(() => navigate('/visual-entity'), 1500);
         } catch (err) {
             console.error("Upload error:", err);
-            toast.error(err.message || "Failed to upload image.");
+            toast.error("Upload Failed", "The image could not be uploaded. Please try again.");
             setError(err.message || "Failed to upload image.");
         } finally {
             setUploading(false);
@@ -81,7 +82,6 @@ const VisualEntityCreatePage = () => {
 
     return (
         <div className="visual-page-container">
-            <Toaster position="top-center" reverseOrder={false} />
             <div className="container mx-auto px-4 relative">
                 {/* Glow Effects */}
                 <div className="visual-page-glow-purple" />

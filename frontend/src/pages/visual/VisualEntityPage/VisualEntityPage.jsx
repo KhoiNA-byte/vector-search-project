@@ -4,6 +4,7 @@ import SearchBar from "../../../components/SearchBar.jsx";
 import VisualEntityResultsList from "../../../components/visual_entity_page/VisualEntityResultsList.jsx";
 import VisualEntityModal from "../../../components/visual_entity_page/VisualEntityModal.jsx";
 import { visualEntityService } from "../../../services/visualEntityService.js";
+import { useToast } from "../../../hooks/useToast.jsx";
 import "./VisualEntityPage.css";
 
 const SUGGESTIONS = [
@@ -16,6 +17,7 @@ const SUGGESTIONS = [
 
 const VisualEntityPage = () => {
   const navigate = useNavigate();
+  const toast = useToast();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -61,14 +63,13 @@ const VisualEntityPage = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this image?")) {
-      try {
-        await visualEntityService.deleteVisualEntity(id);
-        setResults(results.filter(r => r.id !== id));
-        setSelectedEntity(null);
-      } catch (e) {
-        alert("Delete failed: " + e.message);
-      }
+    try {
+      await visualEntityService.deleteVisualEntity(id);
+      setResults(results.filter(r => r.id !== id));
+      setSelectedEntity(null);
+      toast.success("Visual Deleted", "The image has been successfully removed.");
+    } catch (e) {
+      toast.error("Delete Failed", "We couldn't delete the image. Please try again.");
     }
   };
 
