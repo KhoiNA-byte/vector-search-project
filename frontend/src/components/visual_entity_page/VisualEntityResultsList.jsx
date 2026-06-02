@@ -3,19 +3,6 @@ import VisualEntityCard from "./VisualEntityCard.jsx";
 import { Button } from "../ui/Button.jsx";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const SkeletonCard = () => (
-  <div className="aspect-square bg-[#121212] rounded-3xl overflow-hidden border border-white/5 animate-pulse flex flex-col">
-    <div className="flex-1 bg-white/5" />
-    <div className="p-6 space-y-3">
-      <div className="flex justify-between">
-        <div className="h-2 w-10 bg-white/10 rounded" />
-        <div className="h-2 w-8 bg-white/10 rounded" />
-      </div>
-      <div className="h-1.5 w-full bg-white/10 rounded-full" />
-    </div>
-  </div>
-);
-
 const VisualEntityResultsList = ({ results, loading, error, hasSearched, onEntityClick }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
@@ -30,7 +17,7 @@ const VisualEntityResultsList = ({ results, loading, error, hasSearched, onEntit
   if (loading) {
     return (
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
+        {[...Array(6)].map((_, i) => <VisualEntityCard key={i} loading />)}
       </div>
     );
   }

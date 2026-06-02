@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"path/filepath"
-	"strings"
 	"vector-search-project/internal/model"
 
 	"github.com/pgvector/pgvector-go"
@@ -66,25 +64,8 @@ func (s *EmbeddingService) EmbedFruit(ctx context.Context, f *model.Fruit) (pgve
 	return s.EmbedDescription(ctx, description)
 }
 
-func (s *EmbeddingService) EmbedVisualEntity(ctx context.Context, v *model.VisualEntity, description string) (pgvector.Vector, error) {
+func (s *EmbeddingService) EmbedVisualEntity(ctx context.Context, imageData []byte, mimeType string, description string) (pgvector.Vector, error) {
 	modelName := os.Getenv("GEMINI_EMBEDDING_MODEL")
-
-	// Read image file
-	imagePath := filepath.Join("frontend", "public", v.ImageURL)
-	imageData, err := os.ReadFile(imagePath)
-	if err != nil {
-		return pgvector.Vector{}, fmt.Errorf("failed to read image file %s: %w", imagePath, err)
-	}
-
-	// Detect MIME type based on extension
-	ext := strings.ToLower(filepath.Ext(imagePath))
-	mimeType := "image/jpeg"
-	switch ext {
-	case ".png":
-		mimeType = "image/png"
-	case ".webp":
-		mimeType = "image/webp"
-	}
 
 	contents := []*genai.Content{
 		genai.NewContentFromParts([]*genai.Part{

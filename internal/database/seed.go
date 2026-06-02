@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"vector-search-project/internal/model"
 )
@@ -78,7 +79,16 @@ func GetVisualEntitiesToSeed() []*model.VisualEntity {
 		name := file.Name()
 		ext := strings.ToLower(filepath.Ext(name))
 		if ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".webp" || ext == ".svg" {
+			var id int64
+			baseName := strings.TrimSuffix(name, filepath.Ext(name))
+			if strings.HasPrefix(baseName, "visual_entity_") {
+				numStr := strings.TrimPrefix(baseName, "visual_entity_")
+				if parsedID, err := strconv.ParseInt(numStr, 10, 64); err == nil {
+					id = parsedID
+				}
+			}
 			entities = append(entities, &model.VisualEntity{
+				ID:       id,
 				ImageURL: "/visualEntities/" + name,
 			})
 		}

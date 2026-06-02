@@ -1,7 +1,25 @@
 import { Trophy } from "lucide-react";
+import { useState } from "react";
 import SimilarityBar from "../SimilarityBar.jsx";
 
-const VisualEntityCard = ({ entity, rank, onClick }) => {
+const VisualEntityCard = ({ entity, rank, onClick, loading }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  if (loading) {
+    return (
+      <div className="group relative bg-[#121212] rounded-3xl overflow-hidden border border-white/5 animate-pulse">
+        <div className="aspect-4/3 bg-white/5" />
+        <div className="p-6 pt-2 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="h-2 w-10 bg-white/10 rounded" />
+            <div className="h-2 w-8 bg-white/10 rounded" />
+          </div>
+          <div className="h-2 w-full bg-white/10 rounded-full" />
+        </div>
+      </div>
+    );
+  }
+
   const similarity = entity.similarity;
   const hasSimilarity = typeof similarity === 'number' && similarity > 0;
   const isTop = rank === 1 && hasSimilarity;
@@ -28,12 +46,20 @@ const VisualEntityCard = ({ entity, rank, onClick }) => {
       )}
 
       {/* Image Container */}
-      <div className="relative aspect-4/3 overflow-hidden">
+      <div className="relative aspect-4/3 overflow-hidden bg-white/5">
         <img
           src={entity.img}
           alt={`Visual entity ${rank}`}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          onLoad={() => setImageLoaded(true)}
+          className={`w-full h-full object-cover transition-all duration-700 group-hover:scale-110 ${
+            imageLoaded ? "opacity-100" : "opacity-0"
+          }`}
         />
+        {!imageLoaded && (
+          <div className="absolute inset-0 flex items-center justify-center">
+             <div className="w-8 h-8 border-2 border-white/10 border-t-white/30 rounded-full animate-spin" />
+          </div>
+        )}
         <div className="absolute inset-0 bg-linear-to-t from-[#121212] via-transparent to-transparent opacity-80" />
       </div>
 

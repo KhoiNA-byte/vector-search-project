@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@reference "../../style.css";
+@reference "../../../style.css";
 
 /* Scoped styles for Visual Entity Page */
 .visual-page-glow {

@@ -13,11 +13,13 @@ import (
 type VisualEntityRepository interface {
 	Migrate(ctx context.Context) error
 	CreateVisualEntity(ctx context.Context, visualEntity *model.VisualEntity) error
+	UpdateVisualEntityURL(ctx context.Context, id int64, imageURL string) error
 	SearchVisualEntity(ctx context.Context, embedding pgvector.Vector) ([]response.VisualEntityRes, error)
 	GetAllVisualEntity(ctx context.Context) ([]response.VisualEntityRes, error)
 	GetVisualEntity(ctx context.Context, id int64) (*response.VisualEntityRes, error)
 	DeleteVisualEntity(ctx context.Context, id int64) error
 	Count(ctx context.Context) (int64, error)
+	GetMaxID(ctx context.Context) (int64, error)
 }
 
 type visualEntityRepository struct {
@@ -43,14 +45,41 @@ func (r *visualEntityRepository) Migrate(ctx context.Context) error {
 }
 
 func (r *visualEntityRepository) CreateVisualEntity(ctx context.Context, visualEntity *model.VisualEntity) error {
-	query := `
-		INSERT INTO visual_entities (image_url, embedding) 
-		VALUES ($1, $2)
-		RETURNING id
-	`
-	err := r.pool.QueryRow(ctx, query, visualEntity.ImageURL, visualEntity.Embedding).Scan(&visualEntity.ID)
+	var err error
+	if visualEntity.ID != 0 {
+		query := `
+			INSERT INTO visual_entities (id, image_url, embedding) 
+			VALUES ($1, $2, $3)
+			RETURNING id
+		`
+		err = r.pool.QueryRow(ctx, query, visualEntity.ID, visualEntity.ImageURL, visualEntity.Embedding).Scan(&visualEntity.ID)
+		if err == nil {
+			// Reset sequence to maximum id in table
+			_, _ = r.pool.Exec(ctx, "SELECT setval(pg_get_serial_sequence('visual_entities', 'id'), coalesce(max(id), 1)) FROM visual_entities")
+		}
+	} else {
+		query := `
+			INSERT INTO visual_entities (image_url, embedding) 
+			VALUES ($1, $2)
+			RETURNING id
+		`
+		err = r.pool.QueryRow(ctx, query, visualEntity.ImageURL, visualEntity.Embedding).Scan(&visualEntity.ID)
+	}
 	if err != nil {
 		return fmt.Errorf("create visual entity failed: %w", err)
+	}
+	return nil
+}
+
+func (r *visualEntityRepository) UpdateVisualEntityURL(ctx context.Context, id int64, imageURL string) error {
+	query := `
+		UPDATE visual_entities
+		SET image_url = $1
+		WHERE id = $2
+	`
+	_, err := r.pool.Exec(ctx, query, imageURL, id)
+	if err != nil {
+		return fmt.Errorf("update visual entity URL failed: %w", err)
 	}
 	return nil
 }
@@ -137,4 +166,10 @@ func (r *visualEntityRepository) DeleteVisualEntity(ctx context.Context, id int6
 		return fmt.Errorf("delete visual entity failed: %w", err)
 	}
 	return nil
+}
+
+func (r *visualEntityRepository) GetMaxID(ctx context.Context) (int64, error) {
+	var maxID int64
+	err := r.pool.QueryRow(ctx, "SELECT COALESCE(MAX(id), 0) FROM visual_entities").Scan(&maxID)
+	return maxID, err
 }

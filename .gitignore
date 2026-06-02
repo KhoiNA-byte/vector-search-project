@@ -24,6 +24,7 @@ tmp/
 
 # Node.js dependencies
 node_modules/
+.pnpm-store/
 
 # pnpm
 pnpm-lock.yaml

@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@reference "../../style.css";
+@reference "../../../style.css";
 
 /* Inherit styles from VisualEntityPage.css via shared class names */
 
