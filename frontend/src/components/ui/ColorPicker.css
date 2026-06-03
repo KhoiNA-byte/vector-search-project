@@ -1,0 +1,52 @@
+@import "tailwindcss";
+@reference "../../style.css";
+
+.color-picker-root {
+  @apply flex flex-col gap-2.5 mb-5 w-full;
+}
+
+.color-picker-label {
+  @apply text-sm font-bold uppercase tracking-wider text-green-800;
+}
+
+.color-picker-grid {
+  @apply grid grid-cols-5 md:grid-cols-10 gap-2;
+}
+
+.color-picker-swatch {
+  @apply flex flex-col items-center gap-1.5 p-2 rounded-xl bg-white border border-stone-200
+  transition-all duration-200 cursor-pointer shadow-sm
+  hover:-translate-y-0.5 hover:shadow-md hover:border-green-300;
+}
+
+.color-picker-swatch--selected {
+  @apply border-2 border-green-500 bg-green-50 shadow-md ring-2 ring-green-100;
+}
+
+.color-picker-swatch--disabled {
+  @apply opacity-40 cursor-not-allowed hover:translate-y-0 hover:shadow-none hover:border-stone-200;
+}
+
+.color-picker-circle {
+  @apply w-7 h-7 rounded-full flex items-center justify-center shadow-inner border border-black/5;
+}
+
+.color-picker-check {
+  @apply h-4 w-4 drop-shadow-sm;
+}
+
+.color-picker-name {
+  @apply text-[0.65rem] font-semibold text-stone-500 capitalize;
+}
+
+.color-picker-preview {
+  @apply flex items-center gap-2 mt-2 px-3 py-2 bg-white rounded-lg border border-stone-100 shadow-sm self-start;
+}
+
+.color-picker-chip {
+  @apply w-4 h-4 rounded-full shadow-sm border border-black/10;
+}
+
+.color-picker-preview-label {
+  @apply text-xs font-semibold text-stone-600 capitalize ml-1;
+}

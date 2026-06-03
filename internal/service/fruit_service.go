@@ -93,14 +93,15 @@ func (s *fruitService) GetFruit(ctx context.Context, id int64) (*response.FruitR
 
 func (s *fruitService) CreateFruit(ctx context.Context, fruitReq *request.FruitReq) (int64, error) {
 	fruitModel := &model.Fruit{
-		Name:    fruitReq.Name,
-		Origin:  fruitReq.Origin,
-		BestFor: fruitReq.BestFor,
-		Texture: fruitReq.Texture,
-		Flavor:  fruitReq.Flavor,
-		Season:  fruitReq.Season,
-		Color:   fruitReq.Color,
-		Price:   fruitReq.Price,
+		Name:         fruitReq.Name,
+		Origin:       fruitReq.Origin,
+		BestFor:      fruitReq.BestFor,
+		Texture:      fruitReq.Texture,
+		Flavor:       fruitReq.Flavor,
+		Season:       fruitReq.Season,
+		ColorOutside: fruitReq.ColorOutside,
+		ColorInside:  fruitReq.ColorInside,
+		Price:        fruitReq.Price,
 	}
 
 	embedding, err := s.embedSvc.EmbedFruit(ctx, fruitModel)
@@ -119,15 +120,16 @@ func (s *fruitService) CreateFruit(ctx context.Context, fruitReq *request.FruitR
 func (s *fruitService) UpdateFruit(ctx context.Context, id int64, fruitReq *request.FruitReq) error {
 	// Map request to model
 	fruitModel := &model.Fruit{
-		ID:      id,
-		Name:    fruitReq.Name,
-		Origin:  fruitReq.Origin,
-		BestFor: fruitReq.BestFor,
-		Texture: fruitReq.Texture,
-		Flavor:  fruitReq.Flavor,
-		Season:  fruitReq.Season,
-		Color:   fruitReq.Color,
-		Price:   fruitReq.Price,
+		ID:           id,
+		Name:         fruitReq.Name,
+		Origin:       fruitReq.Origin,
+		BestFor:      fruitReq.BestFor,
+		Texture:      fruitReq.Texture,
+		Flavor:       fruitReq.Flavor,
+		Season:       fruitReq.Season,
+		ColorOutside: fruitReq.ColorOutside,
+		ColorInside:  fruitReq.ColorInside,
+		Price:        fruitReq.Price,
 	}
 
 	// Re-generate embedding using the model

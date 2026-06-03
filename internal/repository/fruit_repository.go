@@ -32,16 +32,17 @@ func NewFruitRepository(pool *pgxpool.Pool) FruitRepository {
 func (r *fruitRepository) Migrate(ctx context.Context) error {
 	setupSQL := `
 		CREATE TABLE IF NOT EXISTS fruits (
-			id bigserial PRIMARY KEY,
-			name text NOT NULL,
-			origin text,
-			bestFor text,
-			texture text,
-			flavor text,
-			season text,
-			color text,
-			price double precision,
-			embedding vector(3072)
+			id            bigserial PRIMARY KEY,
+			name          text NOT NULL,
+			origin        text,
+			bestFor       text,
+			texture       text,
+			flavor        text,
+			season        text,
+			color_outside text,
+			color_inside  text,
+			price         double precision,
+			embedding     vector(3072)
 		);
 	`
 	if _, err := r.pool.Exec(ctx, setupSQL); err != nil {
@@ -52,11 +53,14 @@ func (r *fruitRepository) Migrate(ctx context.Context) error {
 
 func (r *fruitRepository) CreateFruit(ctx context.Context, fruit *model.Fruit) error {
 	query := `
-		INSERT INTO fruits (name, origin, bestFor, texture, flavor, season, color, price, embedding)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+		INSERT INTO fruits (name, origin, bestFor, texture, flavor, season, color_outside, color_inside, price, embedding)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 		RETURNING id
 	`
-	err := r.pool.QueryRow(ctx, query, fruit.Name, fruit.Origin, fruit.BestFor, fruit.Texture, fruit.Flavor, fruit.Season, fruit.Color, fruit.Price, fruit.Embedding).Scan(&fruit.ID)
+	err := r.pool.QueryRow(ctx, query,
+		fruit.Name, fruit.Origin, fruit.BestFor, fruit.Texture, fruit.Flavor, fruit.Season,
+		fruit.ColorOutside, fruit.ColorInside, fruit.Price, fruit.Embedding,
+	).Scan(&fruit.ID)
 	if err != nil {
 		return fmt.Errorf("create fruit failed: %w", err)
 	}
@@ -65,7 +69,7 @@ func (r *fruitRepository) CreateFruit(ctx context.Context, fruit *model.Fruit) e
 
 func (r *fruitRepository) SearchFruits(ctx context.Context, embedding pgvector.Vector, limit int) ([]response.FruitRes, error) {
 	query := `
-		SELECT id, name, origin, bestFor, texture, flavor, season, color, price, 
+		SELECT id, name, origin, bestFor, texture, flavor, season, color_outside, color_inside, price,
 		       ROUND((1 - (embedding <=> $1))::numeric * 100, 0) as similarity
 		FROM fruits
 		ORDER BY embedding <=> $1
@@ -80,7 +84,8 @@ func (r *fruitRepository) SearchFruits(ctx context.Context, embedding pgvector.V
 	var fruits []response.FruitRes
 	for rows.Next() {
 		var f response.FruitRes
-		err := rows.Scan(&f.ID, &f.Name, &f.Origin, &f.BestFor, &f.Texture, &f.Flavor, &f.Season, &f.Color, &f.Price, &f.Similarity)
+		err := rows.Scan(&f.ID, &f.Name, &f.Origin, &f.BestFor, &f.Texture, &f.Flavor, &f.Season,
+			&f.ColorOutside, &f.ColorInside, &f.Price, &f.Similarity)
 		if err != nil {
 			return nil, fmt.Errorf("scan fruit failed: %w", err)
 		}
@@ -97,7 +102,7 @@ func (r *fruitRepository) Count(ctx context.Context) (int64, error) {
 
 func (r *fruitRepository) GetAllFruits(ctx context.Context) ([]response.FruitRes, error) {
 	query := `
-		SELECT id, name, origin, bestFor, texture, flavor, season, color, price
+		SELECT id, name, origin, bestFor, texture, flavor, season, color_outside, color_inside, price
 		FROM fruits
 	`
 	rows, err := r.pool.Query(ctx, query)
@@ -109,7 +114,8 @@ func (r *fruitRepository) GetAllFruits(ctx context.Context) ([]response.FruitRes
 	var fruits []response.FruitRes
 	for rows.Next() {
 		var f response.FruitRes
-		err := rows.Scan(&f.ID, &f.Name, &f.Origin, &f.BestFor, &f.Texture, &f.Flavor, &f.Season, &f.Color, &f.Price)
+		err := rows.Scan(&f.ID, &f.Name, &f.Origin, &f.BestFor, &f.Texture, &f.Flavor, &f.Season,
+			&f.ColorOutside, &f.ColorInside, &f.Price)
 		if err != nil {
 			return nil, fmt.Errorf("scan fruit failed: %w", err)
 		}
@@ -125,13 +131,14 @@ func (r *fruitRepository) GetAllFruits(ctx context.Context) ([]response.FruitRes
 
 func (r *fruitRepository) GetFruit(ctx context.Context, id int64) (*response.FruitRes, error) {
 	query := `
-		SELECT id, name, origin, bestFor, texture, flavor, season, color, price
+		SELECT id, name, origin, bestFor, texture, flavor, season, color_outside, color_inside, price
 		FROM fruits
 		WHERE id = $1
 	`
 	row := r.pool.QueryRow(ctx, query, id)
 	var fruit response.FruitRes
-	err := row.Scan(&fruit.ID, &fruit.Name, &fruit.Origin, &fruit.BestFor, &fruit.Texture, &fruit.Flavor, &fruit.Season, &fruit.Color, &fruit.Price)
+	err := row.Scan(&fruit.ID, &fruit.Name, &fruit.Origin, &fruit.BestFor, &fruit.Texture, &fruit.Flavor, &fruit.Season,
+		&fruit.ColorOutside, &fruit.ColorInside, &fruit.Price)
 	if err != nil {
 		return nil, fmt.Errorf("get fruit failed: %w", err)
 	}
@@ -141,10 +148,13 @@ func (r *fruitRepository) GetFruit(ctx context.Context, id int64) (*response.Fru
 func (r *fruitRepository) UpdateFruit(ctx context.Context, fruit *model.Fruit, embedding pgvector.Vector) error {
 	query := `
 		UPDATE fruits
-		SET name = $1, origin = $2, bestFor = $3, texture = $4, flavor = $5, season = $6, color = $7, price = $8, embedding = $9
-		WHERE id = $10
+		SET name = $1, origin = $2, bestFor = $3, texture = $4, flavor = $5, season = $6,
+		    color_outside = $7, color_inside = $8, price = $9, embedding = $10
+		WHERE id = $11
 	`
-	_, err := r.pool.Exec(ctx, query, fruit.Name, fruit.Origin, fruit.BestFor, fruit.Texture, fruit.Flavor, fruit.Season, fruit.Color, fruit.Price, embedding, fruit.ID)
+	_, err := r.pool.Exec(ctx, query,
+		fruit.Name, fruit.Origin, fruit.BestFor, fruit.Texture, fruit.Flavor, fruit.Season,
+		fruit.ColorOutside, fruit.ColorInside, fruit.Price, embedding, fruit.ID)
 	if err != nil {
 		return fmt.Errorf("update fruit failed: %w", err)
 	}

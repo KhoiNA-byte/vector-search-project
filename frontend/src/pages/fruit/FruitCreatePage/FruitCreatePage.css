@@ -2,7 +2,19 @@
 @reference "../../../style.css";
 
 .fruit-create-container {
-    @apply min-h-screen pt-32 pb-12 bg-gradient-to-br from-lime-50 to-amber-100;
+    min-height: 100vh;
+    padding-top: 8rem;
+    padding-bottom: 3rem;
+    background: linear-gradient(
+      170deg,
+      #d4f5e0 0%,
+      #c8eecc 12%,
+      #e8f5d0 28%,
+      #f5f0d8 50%,
+      #f7f3e8 68%,
+      #edf2eb 84%,
+      #e8eeea 100%
+    );
 }
 
 .fruit-create-card {

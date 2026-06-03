@@ -60,7 +60,7 @@ func (s *EmbeddingService) EmbedDescription(ctx context.Context, description str
 }
 
 func (s *EmbeddingService) EmbedFruit(ctx context.Context, f *model.Fruit) (pgvector.Vector, error) {
-	description := fmt.Sprintf("A %s %s fruit from %s, available during %s. Best for %s. It has a %s texture and a %s flavor profile.", f.Color, f.Name, f.Origin, f.Season, f.BestFor, f.Texture, f.Flavor)
+	description := fmt.Sprintf("A %s (outside) and %s (inside) %s fruit from %s, available during %s. Best for %s. It has a %s texture and a %s flavor profile.", f.ColorOutside, f.ColorInside, f.Name, f.Origin, f.Season, f.BestFor, f.Texture, f.Flavor)
 	return s.EmbedDescription(ctx, description)
 }
 

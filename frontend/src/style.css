@@ -1,6 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&display=swap');
 @import "tailwindcss";
 
+/*
+ * Safelist: dynamically assembled gradient classes from colorUtils.js.
+ * Tailwind's scanner cannot find template-literal class names, so we
+ * enumerate every combination here via @source inline().
+ */
+@source inline("{bg-gradient-to-br,from,via,to,hover:from,hover:via,hover:to}-{red,orange,yellow,green,purple,pink,blue,stone,amber}-{100,200,300}");
+
+
 @theme {
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));

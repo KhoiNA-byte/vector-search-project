@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { fruitService } from "../../../services/fruitService.js";
-import { ArrowLeft, MapPin, Calendar, Sparkles, Tag, Utensils, DollarSign, Plus, Save } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Sparkles, Tag, Utensils, DollarSign, Save } from "lucide-react";
+import ColorPicker from "../../../components/ui/ColorPicker.jsx";
+import { joinColors } from "../../../lib/colorUtils.js";
 import "./FruitCreatePage.css";
 
 const FruitCreatePage = () => {
@@ -13,16 +15,17 @@ const FruitCreatePage = () => {
     texture: "",
     season: "",
     bestFor: "",
-    color: "",
     price: 0,
   });
+  const [outsideColors, setOutsideColors] = useState([]);
+  const [insideColors, setInsideColors] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ 
-      ...formData, 
-      [name]: name === "price" ? parseFloat(value) || 0 : value 
+    setFormData({
+      ...formData,
+      [name]: name === "price" ? parseFloat(value) || 0 : value,
     });
   };
 
@@ -30,7 +33,11 @@ const FruitCreatePage = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await fruitService.createFruit(formData);
+      await fruitService.createFruit({
+        ...formData,
+        colorOutside: joinColors(outsideColors),
+        colorInside:  joinColors(insideColors),
+      });
       navigate("/fruit");
     } catch (err) {
       alert("Creation failed: " + err.message);
@@ -42,7 +49,7 @@ const FruitCreatePage = () => {
   return (
     <main className="fruit-create-container">
       <div className="container mx-auto px-4 max-w-4xl">
-        <button 
+        <button
           onClick={() => navigate("/fruit")}
           className="flex items-center gap-2 text-[#4a5d4a] hover:text-[#1a2e1a] transition-colors mb-8 group font-medium"
         >
@@ -52,100 +59,109 @@ const FruitCreatePage = () => {
 
         <div className="fruit-create-card">
           <h1 className="fruit-create-title">Add New Fruit</h1>
-          
+
           <form onSubmit={handleSubmit}>
             <div className="fruit-create-grid">
-              <CreateField 
-                icon={Plus} 
-                label="Fruit Name" 
-                name="name" 
-                value={formData.name} 
-                onChange={handleInputChange} 
+              <CreateField
+                icon={Tag}
+                label="Fruit Name"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
                 placeholder="e.g. Persimmon"
                 required
               />
-              <CreateField 
-                icon={MapPin} 
-                label="Region of Origin" 
-                name="origin" 
-                value={formData.origin} 
-                onChange={handleInputChange} 
+              <CreateField
+                icon={MapPin}
+                label="Region of Origin"
+                name="origin"
+                value={formData.origin}
+                onChange={handleInputChange}
                 placeholder="e.g. East Asia"
               />
-              <CreateField 
-                icon={Tag} 
-                label="Flavor Profile" 
-                name="flavor" 
-                value={formData.flavor} 
-                onChange={handleInputChange} 
+              <CreateField
+                icon={Tag}
+                label="Flavor Profile"
+                name="flavor"
+                value={formData.flavor}
+                onChange={handleInputChange}
                 placeholder="e.g. Sweet and honey-like"
               />
-              <CreateField 
-                icon={Sparkles} 
-                label="Texture" 
-                name="texture" 
-                value={formData.texture} 
-                onChange={handleInputChange} 
+              <CreateField
+                icon={Sparkles}
+                label="Texture"
+                name="texture"
+                value={formData.texture}
+                onChange={handleInputChange}
                 placeholder="e.g. Soft"
               />
-              <CreateField 
-                icon={Calendar} 
-                label="Best Season" 
-                name="season" 
-                value={formData.season} 
-                onChange={handleInputChange} 
+              <CreateField
+                icon={Calendar}
+                label="Best Season"
+                name="season"
+                value={formData.season}
+                onChange={handleInputChange}
                 placeholder="e.g. Fall, Winter"
               />
-              <CreateField 
-                icon={Utensils} 
-                label="Perfect For" 
-                name="bestFor" 
-                value={formData.bestFor} 
-                onChange={handleInputChange} 
+              <CreateField
+                icon={Utensils}
+                label="Perfect For"
+                name="bestFor"
+                value={formData.bestFor}
+                onChange={handleInputChange}
                 placeholder="e.g. Baking and snacks"
               />
-              <CreateField 
-                icon={Sparkles} 
-                label="Fruit Color" 
-                name="color" 
-                value={formData.color} 
-                onChange={handleInputChange} 
-                placeholder="e.g. Orange"
-              />
-              <CreateField 
-                icon={DollarSign} 
-                label="Estimated Price" 
-                name="price" 
-                value={formData.price} 
-                onChange={handleInputChange} 
+              <CreateField
+                icon={DollarSign}
+                label="Estimated Price"
+                name="price"
+                value={formData.price}
+                onChange={handleInputChange}
                 type="number"
                 step="0.01"
                 placeholder="2.50"
               />
             </div>
 
+            {/* ── Color pickers ───────────────────────────────────── */}
+            <div className="fruit-create-colors">
+              <ColorPicker
+                label="Outside Color (skin / peel)"
+                selected={outsideColors}
+                onChange={setOutsideColors}
+                max={3}
+              />
+              <ColorPicker
+                label="Inside Color (flesh / pulp)"
+                selected={insideColors}
+                onChange={setInsideColors}
+                max={3}
+              />
+            </div>
+
             <div className="mt-12 flex flex-col md:flex-row gap-4 items-center justify-end relative z-10">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={() => navigate("/fruit")}
                 className="btn-cancel-create w-full md:w-auto"
               >
                 Cancel
               </button>
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={isSubmitting}
                 className="btn-submit-create w-full md:w-auto flex items-center justify-center gap-2"
-              ><Save />
+              >
+                <Save />
                 {isSubmitting ? "Creating..." : "Create Fruit"}
               </button>
             </div>
           </form>
 
           {/* Ambient Background Element */}
-          <div 
+          <div
             className="absolute -right-20 -bottom-20 w-80 h-80 rounded-full blur-[100px] opacity-10 pointer-events-none"
-            style={{ backgroundColor: '#88a070' }}
+            style={{ backgroundColor: "#88a070" }}
           />
         </div>
       </div>

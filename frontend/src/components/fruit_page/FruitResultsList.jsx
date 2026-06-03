@@ -65,9 +65,9 @@ const FruitResultsList = ({ results, loading, error, hasSearched }) => {
     <div className="space-y-8">
       <div className="grid gap-5 sm:grid-cols-2">
         {currentResults.map((fruit, idx) => (
-          <FruitCard 
-            key={fruit.id || startIndex + idx} 
-            fruit={fruit} 
+          <FruitCard
+            key={fruit.id || startIndex + idx}
+            fruit={fruit}
             rank={startIndex + idx + 1}
             similarity={fruit.similarity}
           />
@@ -84,17 +84,16 @@ const FruitResultsList = ({ results, loading, error, hasSearched }) => {
           >
             <ChevronLeft className="h-4 w-4" /> Previous
           </Button>
-          
+
           <div className="flex items-center gap-2">
             {[...Array(totalPages)].map((_, i) => (
               <button
                 key={i + 1}
                 onClick={() => setCurrentPage(i + 1)}
-                className={`h-8 w-8 rounded-full text-sm font-medium transition-all ${
-                  currentPage === i + 1 
-                    ? "bg-primary text-primary-foreground shadow-glow-fruit" 
+                className={`h-8 w-8 rounded-full text-sm font-medium transition-all ${currentPage === i + 1
+                    ? "bg-primary text-primary-foreground shadow-glow-fruit"
                     : "bg-card border border-border hover:bg-accent"
-                }`}
+                  }`}
               >
                 {i + 1}
               </button>
