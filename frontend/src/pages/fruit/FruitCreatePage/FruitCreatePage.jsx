@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { fruitService } from "../../../services/fruitService.js";
-import { ArrowLeft, MapPin, Calendar, Sparkles, Tag, Utensils, DollarSign, Save } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Sparkles, Tag, Utensils, DollarSign, Check } from "lucide-react";
 import ColorPicker from "../../../components/ui/ColorPicker.jsx";
 import { joinColors } from "../../../lib/colorUtils.js";
 import "./FruitCreatePage.css";
@@ -51,142 +51,203 @@ const FruitCreatePage = () => {
       <div className="container mx-auto px-4 max-w-4xl">
         <button
           onClick={() => navigate("/fruit")}
-          className="flex items-center gap-2 text-[#4a5d4a] hover:text-[#1a2e1a] transition-colors mb-8 group font-medium"
+          className="back-pill-button"
         >
-          <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-          Back to list
+          <ArrowLeft className="h-4 w-4 transition-transform" />
+          <span>Back to Fruits</span>
         </button>
 
-        <div className="fruit-create-card">
-          <h1 className="fruit-create-title">Add New Fruit</h1>
-
+        <div className="fruit-create-card-container">
           <form onSubmit={handleSubmit}>
-            <div className="fruit-create-grid">
-              <CreateField
-                icon={Tag}
-                label="Fruit Name"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                placeholder="e.g. Persimmon"
-                required
-              />
-              <CreateField
-                icon={MapPin}
-                label="Region of Origin"
-                name="origin"
-                value={formData.origin}
-                onChange={handleInputChange}
-                placeholder="e.g. East Asia"
-              />
-              <CreateField
-                icon={Tag}
-                label="Flavor Profile"
-                name="flavor"
-                value={formData.flavor}
-                onChange={handleInputChange}
-                placeholder="e.g. Sweet and honey-like"
-              />
-              <CreateField
-                icon={Sparkles}
-                label="Texture"
-                name="texture"
-                value={formData.texture}
-                onChange={handleInputChange}
-                placeholder="e.g. Soft"
-              />
-              <CreateField
-                icon={Calendar}
-                label="Best Season"
-                name="season"
-                value={formData.season}
-                onChange={handleInputChange}
-                placeholder="e.g. Fall, Winter"
-              />
-              <CreateField
-                icon={Utensils}
-                label="Perfect For"
-                name="bestFor"
-                value={formData.bestFor}
-                onChange={handleInputChange}
-                placeholder="e.g. Baking and snacks"
-              />
-              <CreateField
-                icon={DollarSign}
-                label="Estimated Price"
-                name="price"
-                value={formData.price}
-                onChange={handleInputChange}
-                type="number"
-                step="0.01"
-                placeholder="2.50"
-              />
+            {/* Header */}
+            <div className="fruit-create-header">
+              <div className="fruit-create-title-group">
+                <h1 className="fruit-create-hero-title">{formData.name || "Add New Fruit"}</h1>
+                <span className="fruit-create-hero-subtitle">
+                  {formData.origin ? `Origin: ${formData.origin}` : "Create a new entry in the fruit directory"}
+                </span>
+                <div className="fruit-create-metadata">
+                  <span className="fruit-create-badge">New Profile</span>
+                </div>
+              </div>
+
+              <div className="fruit-create-actions">
+                <button
+                  type="button"
+                  onClick={() => navigate("/fruit")}
+                  className="fruit-create-btn-cancel"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="fruit-create-btn-save"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <span className="fruit-spinner"></span>
+                      Creating...
+                    </>
+                  ) : (
+                    <>
+                      <Check className="h-4 w-4" />
+                      Create Fruit
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
 
-            {/* ── Color pickers ───────────────────────────────────── */}
-            <div className="fruit-create-colors">
-              <ColorPicker
-                label="Outside Color (skin / peel)"
-                selected={outsideColors}
-                onChange={setOutsideColors}
-                max={3}
-              />
-              <ColorPicker
-                label="Inside Color (flesh / pulp)"
-                selected={insideColors}
-                onChange={setInsideColors}
-                max={3}
-              />
-            </div>
+            {/* Sections */}
+            <div className="fruit-create-sections-list">
+              {/* Section 1: Basic Information */}
+              <div className="fruit-create-section">
+                <div className="fruit-create-section-header">
+                  <Tag className="h-4.5 w-4.5 text-emerald-600" />
+                  <h2>Basic Information</h2>
+                </div>
+                <div className="fruit-create-section-divider"></div>
 
-            <div className="mt-12 flex flex-col md:flex-row gap-4 items-center justify-end relative z-10">
-              <button
-                type="button"
-                onClick={() => navigate("/fruit")}
-                className="btn-cancel-create w-full md:w-auto"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="btn-submit-create w-full md:w-auto flex items-center justify-center gap-2"
-              >
-                <Save />
-                {isSubmitting ? "Creating..." : "Create Fruit"}
-              </button>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  <div className="fruit-create-field-group">
+                    <label className="fruit-create-field-label" htmlFor="name">Fruit Name</label>
+                    <input
+                      id="name"
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      placeholder="e.g. Persimmon"
+                      className="fruit-create-input"
+                      required
+                    />
+                  </div>
+
+                  <div className="fruit-create-field-group">
+                    <label className="fruit-create-field-label" htmlFor="origin">Region of Origin</label>
+                    <input
+                      id="origin"
+                      type="text"
+                      name="origin"
+                      value={formData.origin}
+                      onChange={handleInputChange}
+                      placeholder="e.g. East Asia"
+                      className="fruit-create-input"
+                    />
+                  </div>
+
+                  <div className="fruit-create-field-group">
+                    <label className="fruit-create-field-label" htmlFor="price">Estimated Price ($)</label>
+                    <div className="fruit-create-price-wrapper">
+                      <DollarSign className="h-4 w-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      <input
+                        id="price"
+                        type="number"
+                        step="0.01"
+                        name="price"
+                        value={formData.price || ""}
+                        onChange={handleInputChange}
+                        placeholder="0.00"
+                        className="fruit-create-input price-input"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 2: Characteristics */}
+              <div className="fruit-create-section">
+                <div className="fruit-create-section-header">
+                  <Sparkles className="h-4.5 w-4.5 text-emerald-600" />
+                  <h2>Characteristics</h2>
+                </div>
+                <div className="fruit-create-section-divider"></div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="fruit-create-field-group">
+                    <label className="fruit-create-field-label" htmlFor="flavor">Flavor Profile</label>
+                    <input
+                      id="flavor"
+                      type="text"
+                      name="flavor"
+                      value={formData.flavor}
+                      onChange={handleInputChange}
+                      placeholder="e.g. Sweet and honey-like"
+                      className="fruit-create-input"
+                    />
+                  </div>
+
+                  <div className="fruit-create-field-group">
+                    <label className="fruit-create-field-label" htmlFor="texture">Texture</label>
+                    <input
+                      id="texture"
+                      type="text"
+                      name="texture"
+                      value={formData.texture}
+                      onChange={handleInputChange}
+                      placeholder="e.g. Soft or crispy"
+                      className="fruit-create-input"
+                    />
+                  </div>
+
+                  <div className="fruit-create-field-group">
+                    <label className="fruit-create-field-label" htmlFor="season">Best Season</label>
+                    <input
+                      id="season"
+                      type="text"
+                      name="season"
+                      value={formData.season}
+                      onChange={handleInputChange}
+                      placeholder="e.g. Autumn"
+                      className="fruit-create-input"
+                    />
+                  </div>
+
+                  <div className="fruit-create-field-group">
+                    <label className="fruit-create-field-label" htmlFor="bestFor">Perfect For</label>
+                    <input
+                      id="bestFor"
+                      type="text"
+                      name="bestFor"
+                      value={formData.bestFor}
+                      onChange={handleInputChange}
+                      placeholder="e.g. Eating fresh, baking"
+                      className="fruit-create-input"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 3: Appearance Colors */}
+              <div className="fruit-create-section">
+                <div className="fruit-create-section-header">
+                  <Utensils className="h-4.5 w-4.5 text-emerald-600" />
+                  <h2>Appearance Colors</h2>
+                </div>
+                <div className="fruit-create-section-divider"></div>
+
+                <div className="flex flex-col gap-6">
+                  <ColorPicker
+                    label="Outside Color (skin / peel)"
+                    selected={outsideColors}
+                    onChange={setOutsideColors}
+                    max={3}
+                  />
+                  <ColorPicker
+                    label="Inside Color (flesh / pulp)"
+                    selected={insideColors}
+                    onChange={setInsideColors}
+                    max={3}
+                  />
+                </div>
+              </div>
             </div>
           </form>
-
-          {/* Ambient Background Element */}
-          <div
-            className="absolute -right-20 -bottom-20 w-80 h-80 rounded-full blur-[100px] opacity-10 pointer-events-none"
-            style={{ backgroundColor: "#88a070" }}
-          />
         </div>
       </div>
     </main>
   );
 };
-
-const CreateField = ({ icon: Icon, label, name, value, onChange, placeholder, type = "text", step, required = false }) => (
-  <div className="fruit-create-field">
-    <label className="fruit-create-label" htmlFor={name}>
-      <Icon className="h-4 w-4" />
-      {label}
-    </label>
-    <input
-      id={name}
-      type={type}
-      name={name}
-      value={value}
-      onChange={onChange}
-      placeholder={placeholder}
-      className="fruit-create-input"
-      step={step}
-      required={required}
-    />
-  </div>
-);
 
 export default FruitCreatePage;

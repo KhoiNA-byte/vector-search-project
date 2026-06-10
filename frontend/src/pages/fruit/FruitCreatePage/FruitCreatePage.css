@@ -2,53 +2,163 @@
 @reference "../../../style.css";
 
 .fruit-create-container {
-    min-height: 100vh;
-    padding-top: 8rem;
-    padding-bottom: 3rem;
-    background: linear-gradient(
-      170deg,
+  min-height: 100vh;
+  padding-top: 8rem;
+  padding-bottom: 3rem;
+  background: linear-gradient(170deg,
       #d4f5e0 0%,
       #c8eecc 12%,
       #e8f5d0 28%,
       #f5f0d8 50%,
       #f7f3e8 68%,
       #edf2eb 84%,
-      #e8eeea 100%
-    );
+      #e8eeea 100%);
 }
 
-.fruit-create-card {
-    @apply bg-white rounded-[1.5rem] p-8 md:p-10 shadow-xl border border-lime-100 relative overflow-hidden;
+/* Back Button Pill styling */
+.back-pill-button {
+  @apply inline-flex items-center gap-2.5 px-5 py-2 rounded-full border border-white/60 bg-white/30 backdrop-blur-md text-green-950 text-sm font-semibold shadow-sm transition-all duration-300 mb-6 cursor-pointer;
 }
 
-.fruit-create-title {
-    @apply text-3xl md:text-4xl font-black text-lime-950 leading-tight mb-8 font-serif;
+.back-pill-button:hover {
+  @apply -translate-y-0.5 bg-white/50 border-white shadow-md text-emerald-950;
 }
 
-.fruit-create-grid {
-    @apply grid grid-cols-1 md:grid-cols-2 gap-5 relative z-10;
+.back-pill-button:hover svg {
+  @apply -translate-x-1;
 }
 
-.fruit-create-field {
-    @apply flex flex-col gap-2 p-5 rounded-2xl bg-lime-50 border border-lime-100 transition-all;
+.back-pill-button svg {
+  @apply transition-transform duration-300;
 }
 
-.fruit-create-field:focus-within {
-    @apply border-lime-500 shadow-sm ring-1 ring-lime-500/20;
+/* Create Card Container */
+.fruit-create-card-container {
+  @apply bg-white/20 backdrop-blur-xl rounded-[2rem] p-8 md:p-10 border border-white/70 shadow-2xl relative z-10;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08), 
+              0 0 40px rgba(0, 0, 0, 0.02);
 }
 
-.fruit-create-label {
-    @apply flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-widest text-lime-700;
+/* Header UI */
+.fruit-create-header {
+  @apply flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 pb-6 border-b border-stone-100;
+}
+
+.fruit-create-title-group {
+  @apply flex-1 flex flex-col gap-1.5;
+}
+
+.fruit-create-hero-title {
+  @apply text-3xl md:text-4xl font-extrabold text-green-950 font-serif tracking-tight leading-none;
+}
+
+.fruit-create-hero-subtitle {
+  @apply text-stone-500 font-semibold text-sm;
+}
+
+.fruit-create-metadata {
+  @apply flex items-center gap-2 mt-1.5;
+}
+
+.fruit-create-badge {
+  @apply px-2.5 py-0.5 text-[0.6875rem] font-bold tracking-wider uppercase rounded-full bg-emerald-100/70 text-emerald-800;
+}
+
+/* Actions UI */
+.fruit-create-actions {
+  @apply flex items-center gap-3 w-full md:w-auto;
+}
+
+.fruit-create-btn-cancel {
+  @apply flex-1 md:flex-initial inline-flex items-center justify-center font-semibold text-sm text-stone-600 bg-white/60 border border-white/80 rounded-full px-6 py-3 transition-all duration-200 cursor-pointer shadow-sm;
+}
+
+.fruit-create-btn-cancel:hover {
+  @apply bg-white/80 text-stone-800 border-white -translate-y-0.5 shadow;
+}
+
+.fruit-create-btn-cancel:active {
+  @apply translate-y-0;
+}
+
+.fruit-create-btn-save {
+  @apply flex-1 md:flex-initial inline-flex items-center justify-center gap-2 font-semibold text-sm text-white bg-gradient-to-r from-emerald-600 to-teal-500 border-none rounded-full px-6 py-3 transition-all duration-300 cursor-pointer shadow-lg shadow-emerald-600/10;
+}
+
+.fruit-create-btn-save:hover:not(:disabled) {
+  @apply -translate-y-0.5 brightness-105 shadow-xl shadow-emerald-600/20;
+}
+
+.fruit-create-btn-save:active {
+  @apply translate-y-0;
+}
+
+.fruit-create-btn-save:disabled {
+  @apply opacity-70 cursor-not-allowed;
+}
+
+.fruit-spinner {
+  @apply w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin;
+}
+
+/* Form Sections */
+.fruit-create-sections-list {
+  @apply flex flex-col gap-10;
+}
+
+.fruit-create-section {
+  @apply flex flex-col gap-4;
+}
+
+.fruit-create-section-header {
+  @apply flex items-center gap-2.5;
+}
+
+.fruit-create-section-header h2 {
+  @apply text-base font-bold text-stone-800 tracking-wide;
+}
+
+.fruit-create-section-divider {
+  @apply h-px w-full bg-stone-200/50;
+}
+
+/* Inputs & Labels */
+.fruit-create-field-group {
+  @apply flex flex-col gap-1.5;
+}
+
+.fruit-create-field-label {
+  @apply text-xs font-bold text-stone-400 uppercase tracking-wider;
 }
 
 .fruit-create-input {
-    @apply text-base font-semibold text-lime-950 bg-white rounded-lg px-4 py-2 outline-none border border-lime-200 transition-colors focus:border-lime-500;
+  @apply w-full h-11 px-4 border border-white/60 bg-white/70 backdrop-blur-sm rounded-xl text-stone-800 text-sm font-semibold outline-none transition-all duration-300;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
-.btn-submit-create {
-    @apply rounded-full text-white px-5 py-2.5 text-base transition-all shadow-lg hover:shadow-xl active:scale-95 border-none cursor-pointer bg-gradient-to-br from-emerald-700 to-lime-500;
+.fruit-create-input::placeholder {
+  @apply text-stone-400 font-normal;
 }
 
-.btn-cancel-create {
-    @apply rounded-full text-white px-5 py-2.5 text-base transition-all shadow-lg hover:shadow-xl active:scale-95 border-none cursor-pointer bg-gradient-to-br from-red-500 to-red-700;
+.fruit-create-input:focus {
+  @apply border-emerald-500 bg-white ring-4 ring-emerald-500/10;
+}
+
+/* Price specific wrapper */
+.fruit-create-price-wrapper {
+  @apply relative w-full;
+}
+
+.fruit-create-input.price-input {
+  padding-left: 2.5rem !important;
+}
+
+.fruit-create-price-wrapper input::-webkit-outer-spin-button,
+.fruit-create-price-wrapper input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.fruit-create-price-wrapper input[type=number] {
+  -moz-appearance: textfield;
 }

@@ -40,41 +40,48 @@ const ColorPicker = ({ label, selected = [], onChange, max = 3 }) => {
                 isSelected ? "color-picker-swatch--selected" : "",
                 isDisabled ? "color-picker-swatch--disabled" : "",
               ].filter(Boolean).join(" ")}
+              style={{
+                backgroundColor: COLOR_SWATCH[color],
+                "--selected-color-glow": `${COLOR_SWATCH[color]}55`,
+              }}
             >
-              {/* Color circle */}
-              <span
-                className="color-picker-circle"
-                style={{ backgroundColor: COLOR_SWATCH[color] }}
-              >
-                {isSelected && (
-                  <Check
-                    className="color-picker-check"
-                    strokeWidth={3}
-                    style={{ color: color === "white" || color === "yellow" ? "#374151" : "#fff" }}
-                  />
-                )}
-              </span>
-              {/* Label */}
-              <span className="color-picker-name">{color}</span>
+              {isSelected && (
+                <Check
+                  className="color-picker-check"
+                  strokeWidth={3.5}
+                  style={{ color: color === "white" || color === "yellow" ? "#1f2937" : "#ffffff" }}
+                />
+              )}
             </button>
           );
         })}
       </div>
 
-      {/* Selected preview strip */}
+      {/* Selected preview badge */}
       {selected.length > 0 && (
-        <div className="color-picker-preview">
-          {selected.map((c) => (
-            <span
-              key={c}
-              className="color-picker-chip"
-              style={{ backgroundColor: COLOR_SWATCH[c] }}
-              title={c}
-            />
-          ))}
-          <span className="color-picker-preview-label">
-            {selected.join(" / ")}
-          </span>
+        <div className="color-picker-preview-badge-container">
+          <span className="color-picker-badge-label">Selected:</span>
+          <div className="color-picker-badge-pills">
+            {selected.map((c) => (
+              <div 
+                key={c} 
+                className="color-picker-badge-pill"
+                style={{
+                  '--pill-glow': COLOR_SWATCH[c] + '33',
+                  border: `1px solid ${COLOR_SWATCH[c]}55`,
+                }}
+              >
+                <span 
+                  className="color-picker-badge-dot" 
+                  style={{ 
+                    backgroundColor: COLOR_SWATCH[c],
+                    boxShadow: `0 0 6px ${COLOR_SWATCH[c]}`
+                  }} 
+                />
+                <span className="color-picker-badge-name">{c}</span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
