@@ -90,7 +90,7 @@ const FruitPage = () => {
             <span className="h-2 w-2 rounded-full bg-primary-glow animate-pulse" />
             AI-powered semantic search
           </div>
-          <h1 className="fruit-hero-title">
+          <h1 className="fruit-hero-title pb-5">
             Find your perfect <span className="italic text-primary">fruit</span>.
           </h1>
           <p className="fruit-hero-subtitle">
@@ -129,7 +129,7 @@ const FruitPage = () => {
 
         {/* Suggestions */}
         <div className="flex flex-wrap items-center justify-center gap-2 mt-5 max-w-2xl mx-auto">
-          <span className="text-xs uppercase tracking-wider text-muted-foreground mr-1">Try:</span>
+          <span className="text-xs uppercase tracking-wider text-muted-foreground font-bold mr-1">Try:</span>
           {SUGGESTIONS.map((s) => (
             <button
               key={s}

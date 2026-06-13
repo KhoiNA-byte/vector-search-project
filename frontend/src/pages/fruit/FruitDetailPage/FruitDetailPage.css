@@ -128,8 +128,8 @@
 
 .fruit-edit-form-wrapper {
   @apply bg-white/20 backdrop-blur-xl rounded-[2rem] p-8 md:p-10 border border-white/70 shadow-2xl relative z-10;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08), 
-              0 0 40px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08),
+    0 0 40px rgba(0, 0, 0, 0.02);
 }
 
 /* Header UI */
@@ -201,9 +201,17 @@
 }
 
 @keyframes pulseSuccess {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .fruit-spinner {
@@ -276,7 +284,7 @@
 
 /* Entrance Animation */
 .animate-fade-in-up {
-  animation: fadeInUpFruit 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: fadeInUpFruit 2.2s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes fadeInUpFruit {
@@ -284,6 +292,7 @@
     opacity: 0;
     transform: translateY(16px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -293,14 +302,14 @@
 /* Custom Delete Modal styling */
 .custom-modal-overlay {
   @apply fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 backdrop-blur-md p-4;
-  animation: fadeInModal 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: fadeInModal 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .custom-modal-card {
   @apply bg-white rounded-[2rem] p-8 max-w-sm w-full shadow-2xl border border-stone-200/60 flex flex-col items-center text-center relative z-50;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 
-              0 0 50px rgba(0, 0, 0, 0.03);
-  animation: scaleInModal 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15),
+    0 0 50px rgba(0, 0, 0, 0.03);
+  animation: scaleInModal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 .custom-modal-icon-container {
@@ -348,8 +357,13 @@
 }
 
 @keyframes fadeInModal {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes scaleInModal {
@@ -357,6 +371,7 @@
     opacity: 0;
     transform: scale(0.92) translateY(12px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -365,20 +380,25 @@
 
 /* Custom Delete Modal & Edit Form closing animations */
 .custom-modal-overlay.is-closing {
-  animation: fadeOutModal 0.2s ease-in both;
+  animation: fadeOutModal 0.5s ease-in both;
 }
 
 .custom-modal-card.is-closing {
-  animation: scaleOutModal 0.25s cubic-bezier(0.3, 0.05, 0.24, 1) both;
+  animation: scaleOutModal 0.5s cubic-bezier(0.3, 0.05, 0.24, 1) both;
 }
 
 .fruit-edit-form-wrapper.is-closing {
-  animation: fadeOutUpFruit 0.25s cubic-bezier(0.3, 0.05, 0.24, 1) both;
+  animation: fadeOutUpFruit 0.6s cubic-bezier(0.3, 0.05, 0.24, 1) both;
 }
 
 @keyframes fadeOutModal {
-  from { opacity: 1; }
-  to { opacity: 0; }
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
 }
 
 @keyframes scaleOutModal {
@@ -386,6 +406,7 @@
     opacity: 1;
     transform: scale(1) translateY(0);
   }
+
   to {
     opacity: 0;
     transform: scale(0.95) translateY(8px);
@@ -397,6 +418,7 @@
     opacity: 1;
     transform: translateY(0);
   }
+
   to {
     opacity: 0;
     transform: translateY(-12px);

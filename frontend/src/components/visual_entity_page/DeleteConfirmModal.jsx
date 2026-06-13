@@ -28,7 +28,7 @@ const DeleteConfirmModal = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: 0.5 }}
           className="fixed inset-0 z-[1200] flex items-center justify-center p-4
                      bg-[rgba(4,4,14,0.88)] backdrop-blur-xl"
           onClick={onCancel}
@@ -38,7 +38,7 @@ const DeleteConfirmModal = ({
             initial={{ opacity: 0, scale: 0.9, y: 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 12 }}
-            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             onClick={(e) => e.stopPropagation()}
             className="w-full max-w-sm rounded-[20px] overflow-hidden
                        bg-[linear-gradient(160deg,rgba(22,20,40,0.98)_0%,rgba(14,14,26,0.99)_100%)]

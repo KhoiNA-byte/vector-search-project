@@ -1,7 +1,33 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import VisualEntityCard from "./VisualEntityCard.jsx";
 import { Button } from "../ui/Button.jsx";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+    }
+  }
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 24, scale: 0.96 },
+  show: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: "spring",
+      stiffness: 85,
+      damping: 14,
+      mass: 0.8
+    }
+  }
+};
 
 const VisualEntityResultsList = ({ results, loading, error, hasSearched, onEntityClick }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -46,16 +72,23 @@ const VisualEntityResultsList = ({ results, loading, error, hasSearched, onEntit
 
   return (
     <div className="space-y-12">
-      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      <motion.div
+        key={currentPage}
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+        className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3"
+      >
         {currentResults.map((item, idx) => (
-          <VisualEntityCard
-            key={item.id || startIndex + idx}
-            entity={item}
-            rank={startIndex + idx + 1}
-            onClick={onEntityClick}
-          />
+          <motion.div key={item.id || startIndex + idx} variants={cardVariants} layout>
+            <VisualEntityCard
+              entity={item}
+              rank={startIndex + idx + 1}
+              onClick={onEntityClick}
+            />
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-4 mt-12 relative z-30">

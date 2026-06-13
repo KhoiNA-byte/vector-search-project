@@ -22,8 +22,8 @@ function buildDetailBg(colorOutsideStr, colorInsideStr) {
   const inStop2 = inColors.length > 1 ? (COLOR_SWATCH[inColors[1]] || inStop1) : inStop1;
 
   // Layer a gentle gradient based ONLY on the inside color over a solid white background
-  return { 
-    background: `linear-gradient(135deg, ${inStop1}22 0%, ${inStop1}44 50%, ${inStop2}66 100%), #ffffff` 
+  return {
+    background: `linear-gradient(135deg, ${inStop1}22 0%, ${inStop1}44 50%, ${inStop2}66 100%), #ffffff`
   };
 }
 
@@ -78,7 +78,7 @@ const FruitDetailPage = () => {
         setOutsideColors(parseColors(fruit.colorOutside));
         setInsideColors(parseColors(fruit.colorInside));
       }
-    }, 250);
+    }, 450);
   };
 
   const closeDeleteModal = () => {
@@ -86,7 +86,7 @@ const FruitDetailPage = () => {
     setTimeout(() => {
       setShowDeleteModal(false);
       setIsClosingDelete(false);
-    }, 200);
+    }, 450);
   };
 
   const fetchFruit = async () => {
@@ -170,10 +170,10 @@ const FruitDetailPage = () => {
           <span>Back to Fruits</span>
         </button>
 
-        <div 
-          className={`fruit-detail-card ${isEditing ? "is-editing" : ""}`} 
+        <div
+          className={`fruit-detail-card ${isEditing ? "is-editing" : ""}`}
           style={buildDetailBg(
-            isEditing ? joinColors(outsideColors) : fruit.colorOutside, 
+            isEditing ? joinColors(outsideColors) : fruit.colorOutside,
             isEditing ? joinColors(insideColors) : fruit.colorInside
           )}
         >
@@ -429,12 +429,12 @@ const FruitDetailPage = () => {
           )}
 
           {/* Ambient Background Element */}
-          <div 
+          <div
             className="fruit-detail-ambient-bg"
-            style={{ 
-              backgroundColor: parseColors(fruit.colorInside).length > 0 
-                ? COLOR_SWATCH[parseColors(fruit.colorInside)[0]] 
-                : undefined 
+            style={{
+              backgroundColor: parseColors(fruit.colorInside).length > 0
+                ? COLOR_SWATCH[parseColors(fruit.colorInside)[0]]
+                : undefined
             }}
           />
         </div>
@@ -452,14 +452,14 @@ const FruitDetailPage = () => {
               Are you sure you want to delete this fruit? This action is permanent and cannot be undone.
             </p>
             <div className="custom-modal-actions">
-              <button 
+              <button
                 onClick={closeDeleteModal}
                 className="custom-modal-btn-cancel"
                 disabled={isDeleting}
               >
                 Cancel
               </button>
-              <button 
+              <button
                 onClick={handleConfirmDelete}
                 className="custom-modal-btn-delete"
                 disabled={isDeleting}

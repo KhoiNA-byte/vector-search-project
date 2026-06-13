@@ -282,7 +282,7 @@ const VisualEntityModal = ({ entity, onClose, onDelete }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
             className="fixed inset-0 z-[1000] flex items-center justify-center p-4
                        bg-[rgba(4,4,14,0.82)] backdrop-blur-xl"
             onClick={onClose}
@@ -293,7 +293,7 @@ const VisualEntityModal = ({ entity, onClose, onDelete }) => {
               initial={{ opacity: 0, scale: 0.92, y: 16 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.92, y: 16 }}
-              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
               onClick={(e) => e.stopPropagation()}
               className="relative flex flex-col overflow-hidden
                          max-w-[min(88vw,900px)] max-h-[92vh] rounded-[20px]

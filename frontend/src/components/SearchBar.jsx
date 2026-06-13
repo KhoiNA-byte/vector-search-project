@@ -15,7 +15,7 @@ const SearchBar = ({ value, onChange, onSearch, loading, placeholder, className,
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKey}
         placeholder={placeholder || "Search for fruits..."}
-        className="flex-1 bg-transparent border-none outline-none py-3 text-base text-current placeholder:text-muted-foreground focus:ring-0"
+        className="flex-1 bg-transparent border-none outline-none py-3 text-base font-bold text-current placeholder:text-muted-foreground placeholder:font-bold focus:ring-0"
       />
       <Button
         onClick={onSearch}

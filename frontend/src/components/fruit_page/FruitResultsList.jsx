@@ -1,7 +1,33 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import FruitCard from "./FruitCard.jsx";
 import { Button } from "../ui/Button.jsx";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+    }
+  }
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 24, scale: 0.96 },
+  show: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: "spring",
+      stiffness: 85,
+      damping: 14,
+      mass: 0.8
+    }
+  }
+};
 
 const SkeletonCard = () => (
   <div className="bg-card rounded-2xl p-6 shadow-soft border border-border/60 animate-pulse">
@@ -63,16 +89,23 @@ const FruitResultsList = ({ results, loading, error, hasSearched }) => {
 
   return (
     <div className="space-y-8">
-      <div className="grid gap-5 sm:grid-cols-2">
+      <motion.div
+        key={currentPage}
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+        className="grid gap-5 sm:grid-cols-2"
+      >
         {currentResults.map((fruit, idx) => (
-          <FruitCard
-            key={fruit.id || startIndex + idx}
-            fruit={fruit}
-            rank={startIndex + idx + 1}
-            similarity={fruit.similarity}
-          />
+          <motion.div key={fruit.id || startIndex + idx} variants={cardVariants} layout>
+            <FruitCard
+              fruit={fruit}
+              rank={startIndex + idx + 1}
+              similarity={fruit.similarity}
+            />
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-4 mt-8">
