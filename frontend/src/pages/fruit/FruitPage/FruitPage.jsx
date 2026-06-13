@@ -13,6 +13,8 @@ const SUGGESTIONS = [
   "exotic tropical fruit",
 ];
 
+import FruitFilterBar from "../../../components/fruit_page/FruitFilterBar.jsx";
+
 const FruitPage = () => {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
@@ -21,11 +23,14 @@ const FruitPage = () => {
   const [error, setError] = useState(null);
   const [hasSearched, setHasSearched] = useState(false);
 
+  const [sortBy, setSortBy] = useState("default");
+
   const fetchAllFruits = async () => {
     setLoading(true);
     setError(null);
     setHasSearched(true);
     setQuery("");
+    setSortBy("default");
 
     try {
       const data = await fruitService.getAllFruits();
@@ -46,6 +51,7 @@ const FruitPage = () => {
     setLoading(true);
     setError(null);
     setHasSearched(true);
+    setSortBy("default");
 
     try {
       const data = await fruitService.searchFruits(searchTerm);
@@ -57,6 +63,23 @@ const FruitPage = () => {
       setLoading(false);
     }
   };
+
+  // Sort locally
+  const sortedResults = [...results].sort((a, b) => {
+    if (sortBy === "priceAsc") {
+      return (a.price || 0) - (b.price || 0);
+    }
+    if (sortBy === "priceDesc") {
+      return (b.price || 0) - (a.price || 0);
+    }
+    if (sortBy === "nameAsc") {
+      return (a.name || "").localeCompare(b.name || "");
+    }
+    if (sortBy === "nameDesc") {
+      return (b.name || "").localeCompare(a.name || "");
+    }
+    return 0; // Default matches backend search order / original list order
+  });
 
   return (
     <main className="fruit-page-container">
@@ -120,7 +143,16 @@ const FruitPage = () => {
 
         {/* Results */}
         <section className="mt-14 max-w-7xl mx-auto">
-          <FruitResultsList results={results} loading={loading} error={error} hasSearched={hasSearched} />
+          {hasSearched && results.length > 0 && (
+            <FruitFilterBar
+              sortBy={sortBy}
+              setSortBy={setSortBy}
+              resultsCount={results.length}
+              hasSearchQuery={!!query.trim()}
+            />
+          )}
+
+          <FruitResultsList results={sortedResults} loading={loading} error={error} hasSearched={hasSearched} />
         </section>
       </div>
     </main>
