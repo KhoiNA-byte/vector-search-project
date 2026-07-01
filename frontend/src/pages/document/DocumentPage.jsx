@@ -4,9 +4,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   UploadCloud, FileText, Trash2, Loader2, Sparkles, 
   HelpCircle, CheckSquare, Square, Download, ExternalLink, X, Check,
-  ArrowUp, ArrowDown, ArrowUpDown
+  ArrowUp, ArrowDown, ArrowUpDown, ChevronLeft, ChevronRight, Trophy, ArrowRight
 } from "lucide-react";
 import SearchBar from "../../components/SearchBar.jsx";
+import SimilarityBar from "../../components/SimilarityBar.jsx";
 import { documentService } from "../../services/documentService.js";
 import { useToast } from "../../hooks/useToast.jsx";
 import "./DocumentPage.css";
@@ -47,6 +48,15 @@ const DocumentPage = () => {
   const [chunks, setChunks] = useState([]);
   const [searchingChunks, setSearchingChunks] = useState(false);
   const [hasSearchedChunks, setHasSearchedChunks] = useState(false);
+  const [currentChunkPage, setCurrentChunkPage] = useState(1);
+  const chunksPerPage = 6;
+  const [activeChunk, setActiveChunk] = useState(null);
+  const [activeChunkRank, setActiveChunkRank] = useState(null);
+
+  // Reset chunk page when new chunks load
+  useEffect(() => {
+    setCurrentChunkPage(1);
+  }, [chunks]);
 
   // Upload Modal State
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -54,7 +64,19 @@ const DocumentPage = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
 
-  // Note: we removed the useEffect calling exploreAllDocs on mount to hide results by default.
+  // Pre-load and select all documents on page load
+  useEffect(() => {
+    const initDocs = async () => {
+      try {
+        const data = await documentService.getDocuments();
+        setDocuments(data);
+        setSelectedDocs(data.map(d => d.name));
+      } catch (e) {
+        console.error("Failed to pre-load documents on mount:", e);
+      }
+    };
+    initDocs();
+  }, []);
 
   const exploreAllDocs = async () => {
     setSearchingDocs(true);
@@ -98,6 +120,12 @@ const DocumentPage = () => {
       setSemanticQuery(overrideQuery);
     }
 
+    if (selectedDocs.length === 0) {
+      toast.warning("Selection Required", "At least 1 document must be selected to run a deep search.");
+      setChunks([]);
+      return;
+    }
+
     if (!searchTerm) {
       toast.warning("Empty Query", "Please type a query to search inside documents.");
       return;
@@ -106,8 +134,7 @@ const DocumentPage = () => {
     setSearchingChunks(true);
     setHasSearchedChunks(true);
     try {
-      const queryScope = selectedDocs.length > 0 ? selectedDocs : documents.map(d => d.name);
-      const data = await documentService.semanticSearch(searchTerm, queryScope);
+      const data = await documentService.semanticSearch(searchTerm, selectedDocs);
       setChunks(data);
     } catch (e) {
       toast.error("Semantic search failed", e.message);
@@ -262,6 +289,10 @@ const DocumentPage = () => {
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
   };
 
+  const totalPages = Math.ceil(chunks.length / chunksPerPage);
+  const startIndex = (currentChunkPage - 1) * chunksPerPage;
+  const currentChunks = chunks.slice(startIndex, startIndex + chunksPerPage);
+
   return (
     <main className="doc-page-container">
       <div className="container mx-auto px-4 relative">
@@ -270,15 +301,14 @@ const DocumentPage = () => {
         <div className="doc-page-glow-blue" />
 
         {/* Hero Header */}
-        <header className="text-center max-w-4xl mx-auto mb-16 relative z-10">
+        <header className="text-center max-w-4xl mx-auto mb-8 relative z-10">
           <div className="doc-hero-badge">
             <span className="doc-hero-badge-dot" />
             Gemini + pgvector Semantic Retrieval Engine
           </div>
           
           <h1 className="doc-hero-title">
-            Search documents by <br />
-            <span className="doc-hero-vibe">content.</span>
+            Search documents by <span className="doc-hero-vibe">content.</span>
           </h1>
           
           <p className="doc-hero-subtitle">
@@ -287,14 +317,14 @@ const DocumentPage = () => {
         </header>
 
         {/* Modern Tabs Navigator */}
-        <div className="flex justify-center mb-16 relative z-20">
+        <div className="flex justify-center mb-2 relative z-20">
           <div className="doc-tabs-container">
             <button 
               onClick={() => setActiveTab("docSearch")}
               className={`doc-tab-btn ${activeTab === "docSearch" ? "active" : ""}`}
             >
               <FileText className="inline-block h-4 w-4 mr-2 -mt-0.5" />
-              Document Search
+              Documents
             </button>
             <button 
               onClick={() => setActiveTab("semanticSearch")}
@@ -324,7 +354,7 @@ const DocumentPage = () => {
                 className="space-y-8"
               >
                 {/* Searchbar using SearchBar component */}
-                <div className="max-w-3xl mx-auto mb-16 relative z-20">
+                <div className="max-w-3xl mx-auto mb-5 relative z-20">
                   <div className="flex flex-col gap-4">
                     <SearchBar 
                       value={docQuery} 
@@ -347,9 +377,9 @@ const DocumentPage = () => {
                       <button
                         onClick={() => setShowUploadModal(true)}
                         disabled={searchingDocs}
-                        className="doc-explore-btn text-xs font-semibold bg-white/5 border border-white/10 hover:bg-white/10"
+                        className="doc-explore-btn text-xs font-semibold overflow-hidden"
                       >
-                        <UploadCloud size={14} className="inline mr-1 text-cyan-400" />
+                        <UploadCloud size={14} className="text-white" />
                         Add Document
                       </button>
                     </div>
@@ -477,15 +507,9 @@ const DocumentPage = () => {
                               <div className="space-y-4">
                                 {/* Checkbox & Header */}
                                 <div className="flex items-start justify-between">
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      toggleSelectDoc(doc.name);
-                                    }}
-                                    className="text-purple-400 hover:text-purple-300 transition-colors mr-2 mt-0.5"
-                                  >
+                                  <div className="text-purple-400 transition-colors mr-2 mt-0.5">
                                     {isSelected ? <CheckSquare size={20} /> : <Square size={20} className="text-white/20" />}
-                                  </button>
+                                  </div>
                                   
                                   <div className="flex items-center gap-1.5">
                                     <span className="badge-page">{doc.fileType.toUpperCase()}</span>
@@ -507,7 +531,7 @@ const DocumentPage = () => {
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    navigate(`/document/${encodeURIComponent(doc.name)}`);
+                                    navigate(`/documents/${encodeURIComponent(doc.name)}`);
                                   }}
                                   className="flex items-center gap-1 text-[11px] font-bold text-cyan-400 hover:text-cyan-300 transition-colors"
                                 >
@@ -557,17 +581,6 @@ const DocumentPage = () => {
               >
                 {/* Deep Semantic Search Section */}
                 <section className="max-w-5xl mx-auto">
-                  <header className="mb-12 text-center">
-                    <h2 className="font-bold text-3xl flex items-center justify-center gap-2">
-                      <Sparkles size={26} className="text-purple-400" />
-                      Deep Semantic Search
-                    </h2>
-                    <p className="text-sm text-white/40 mt-2">
-                      {selectedDocs.length > 0 
-                        ? `Searching inside scope: ${selectedDocs.length} selected document(s).`
-                        : "Searching all documents (default). Go to Document Search tab to check specific scopes."}
-                    </p>
-                  </header>
 
                   <div className="max-w-3xl mx-auto mb-16 relative z-20">
                     <SearchBar 
@@ -597,11 +610,12 @@ const DocumentPage = () => {
 
                   {/* Chunk Results */}
                   {searchingChunks ? (
-                    <div className="space-y-4">
-                      {[1, 2].map(i => (
-                        <div key={i} className="glass-card animate-pulse h-28 space-y-3">
+                    <div className="grid gap-5 sm:grid-cols-2">
+                      {[1, 2, 3, 4].map(i => (
+                        <div key={i} className="glass-card animate-pulse h-56 space-y-4">
+                          <div className="h-5 bg-white/5 rounded w-1/3" />
                           <div className="h-4 bg-white/5 rounded w-1/4" />
-                          <div className="h-3 bg-white/5 rounded w-3/4" />
+                          <div className="h-20 bg-white/5 rounded w-full" />
                         </div>
                       ))}
                     </div>
@@ -611,49 +625,151 @@ const DocumentPage = () => {
                       <p className="text-sm text-white/40 font-light">No matching text blocks found. Try different keywords.</p>
                     </div>
                   ) : chunks.length > 0 ? (
-                    <div className="space-y-4">
-                      {chunks.map((chunk, index) => (
-                        <motion.div
-                          key={chunk.id}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.05 }}
-                          onClick={() => navigate(`/document/${encodeURIComponent(chunk.documentName)}?chunkId=${chunk.id}`)}
-                          className="glass-card bg-zinc-950/20 hover:bg-purple-500/5 hover:border-purple-500/20 border-white/5 cursor-pointer flex flex-col justify-between transition-all"
-                        >
-                          <div className="space-y-3">
-                            <div className="flex items-center justify-between flex-wrap gap-2 text-xs">
-                              <span className="badge-doc max-w-sm truncate" title={chunk.documentName}>
-                                <FileText size={12} className="inline mr-1 text-purple-400" />
-                                {chunk.documentName}
-                              </span>
-                              
-                              <div className="flex items-center gap-2">
-                                <span className="badge-page">Page {chunk.pageNumber}</span>
-                                <span className="badge-match">{chunk.similarity}% Match</span>
+                    <div className="space-y-8">
+                      <div className="grid gap-5 sm:grid-cols-2">
+                        {currentChunks.map((chunk, index) => {
+                          const isTopMatch = index === 0 && currentChunkPage === 1;
+                          return (
+                            <motion.div
+                              key={chunk.id}
+                              initial={{ opacity: 0, y: 24, scale: 0.96 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              transition={{ 
+                                type: "spring",
+                                stiffness: 85,
+                                damping: 14,
+                                mass: 0.8,
+                                delay: index * 0.05 
+                              }}
+                              onClick={() => {
+                                setActiveChunk(chunk);
+                                setActiveChunkRank(startIndex + index + 1);
+                              }}
+                              className={`group relative rounded-2xl p-6 pt-7 cursor-pointer select-none transition-all duration-300 ease-out hover:-translate-y-2 border ${
+                                isTopMatch 
+                                  ? "border-purple-500/40 bg-purple-950/10 shadow-[0_8px_32px_-6px_rgba(168,85,247,0.2)]" 
+                                  : "border-white/10 bg-zinc-950/20 hover:bg-purple-500/5 hover:border-purple-500/20"
+                              } backdrop-blur-md flex flex-col justify-between`}
+                            >
+                              {/* Rank badge */}
+                              <div
+                                className="absolute -top-3 -left-3 z-10 flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold"
+                                style={isTopMatch ? {
+                                  background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)",
+                                  color: "#fff",
+                                  boxShadow: "0 4px 14px -2px rgba(168, 85, 247, 0.45), 0 0 0 2px rgba(168, 85, 247, 0.25)",
+                                } : {
+                                  background: "rgba(255, 255, 255, 0.08)",
+                                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                                  color: "#c084fc",
+                                  boxShadow: "0 2px 8px -2px rgba(0, 0, 0, 0.15)",
+                                }}
+                              >
+                                {isTopMatch && <Trophy className="h-3 w-3" />}
+                                #{startIndex + index + 1}
                               </div>
-                            </div>
 
-                            <p className="text-sm text-white/80 leading-relaxed font-light whitespace-pre-wrap font-sans">
-                              {chunk.content}
-                            </p>
+                              <div className="space-y-4">
+                                {/* Header row */}
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="flex items-center gap-2 max-w-[70%]">
+                                    <FileText className="h-5 w-5 text-purple-400 shrink-0" />
+                                    <h3 className="font-semibold text-white/90 leading-tight truncate text-sm" title={chunk.documentName}>
+                                      {chunk.documentName}
+                                    </h3>
+                                  </div>
+                                  
+                                  <div className="flex items-center gap-2 shrink-0">
+                                    <span className="bg-white/5 border border-white/10 text-white/70 rounded-full px-2.5 py-1 text-[11px] font-semibold">
+                                      Page {chunk.pageNumber}
+                                    </span>
+                                    
+                                    {/* View Details slide-in */}
+                                    <div
+                                      className="flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-semibold bg-white/10 text-white shadow-md opacity-0 translate-x-3 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-out pointer-events-none"
+                                    >
+                                      View Source
+                                      <ArrowRight className="h-2.5 w-2.5" />
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Similarity bar */}
+                                <div className="mb-4 mt-2">
+                                  <div className="flex items-center justify-between mb-1.5">
+                                    <span className="text-[10px] uppercase tracking-wider font-semibold text-purple-400">
+                                      Match Relevance
+                                    </span>
+                                    <span className="text-xs font-bold text-white">
+                                      {chunk.similarity}%
+                                    </span>
+                                  </div>
+                                  <SimilarityBar
+                                    value={chunk.similarity}
+                                    highlight={isTopMatch}
+                                    gradient={
+                                      isTopMatch
+                                        ? "linear-gradient(90deg, #7c3aed 0%, #a855f7 50%, #ec4899 100%)"
+                                        : "linear-gradient(90deg, #6366f1 0%, #a855f7 100%)"
+                                    }
+                                    glowColor="rgba(168, 85, 247, 0.55)"
+                                    trackColor="rgba(255, 255, 255, 0.05)"
+                                  />
+                                </div>
+
+                                {/* Content block */}
+                                <p className="text-[13px] text-white/70 leading-relaxed font-light font-sans line-clamp-5 overflow-hidden">
+                                  {chunk.content}
+                                </p>
+                              </div>
+
+                              <div className="text-right text-[10px] text-white/30 pt-3 mt-4 border-t border-white/5 flex items-center justify-between">
+                                <span>Chunk ID: {chunk.id}</span>
+                                <span className="text-cyan-400 hover:underline">Click to scroll and view source →</span>
+                              </div>
+                            </motion.div>
+                          );
+                        })}
+                      </div>
+
+                      {/* Pagination Controls */}
+                      {totalPages > 1 && (
+                        <div className="flex items-center justify-center gap-4 mt-8">
+                          <button
+                            onClick={() => setCurrentChunkPage(p => Math.max(1, p - 1))}
+                            disabled={currentChunkPage === 1}
+                            className="flex items-center gap-2 rounded-full px-4 py-2 border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                          >
+                            <ChevronLeft className="h-4 w-4" /> Previous
+                          </button>
+
+                          <div className="flex items-center gap-2">
+                            {[...Array(totalPages)].map((_, i) => (
+                              <button
+                                key={i + 1}
+                                onClick={() => setCurrentChunkPage(i + 1)}
+                                className={`h-8 w-8 rounded-full text-sm font-medium transition-all cursor-pointer ${
+                                  currentChunkPage === i + 1
+                                    ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg"
+                                    : "bg-white/5 border border-white/10 hover:bg-white/10 text-white"
+                                }`}
+                              >
+                                {i + 1}
+                              </button>
+                            ))}
                           </div>
 
-                          <div className="text-right text-[10px] text-white/30 pt-3 mt-3 border-t border-white/5 flex items-center justify-between">
-                            <span>Chunk ID: {chunk.id}</span>
-                            <span className="text-cyan-400 hover:underline">Click to scroll and view source →</span>
-                          </div>
-                        </motion.div>
-                      ))}
+                          <button
+                            onClick={() => setCurrentChunkPage(p => Math.min(totalPages, p + 1))}
+                            disabled={currentChunkPage === totalPages}
+                            className="flex items-center gap-2 rounded-full px-4 py-2 border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                          >
+                            Next <ChevronRight className="h-4 w-4" />
+                          </button>
+                        </div>
+                      )}
                     </div>
-                  ) : (
-                    <div className="text-center py-16 border border-white/5 bg-white/2 rounded-2xl">
-                      <Sparkles className="h-8 w-8 text-purple-400/40 mx-auto mb-3" />
-                      <p className="text-sm text-white/40 font-light">
-                        Enter a query to search inside documents and extract matching text chunks.
-                      </p>
-                    </div>
-                  )}
+                  ) : null}
                 </section>
               </motion.div>
             )}
@@ -772,6 +888,82 @@ const DocumentPage = () => {
                     </>
                   )}
                 </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Chunk Detail Modal Overlay */}
+      <AnimatePresence>
+        {activeChunk && (
+          <div className="modal-overlay" onClick={() => setActiveChunk(null)}>
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="modal-content border border-purple-500/20 bg-zinc-950 max-w-4xl p-10 rounded-[2rem] relative shadow-2xl"
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between border-b border-white/5 pb-5 mb-6">
+                <div className="flex items-center gap-3">
+                  <FileText className="h-6 w-6 text-purple-400" />
+                  <div>
+                    <span className="text-xs uppercase tracking-widest text-white/40 font-bold">
+                      CHUNK #{activeChunkRank}
+                    </span>
+                    <h3 className="text-lg font-bold text-white max-w-xl truncate mt-1" title={activeChunk.documentName}>
+                      {activeChunk.documentName}
+                    </h3>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <span className="badge-page bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-3.5 py-1.5 text-xs font-bold rounded-full">
+                    Page {activeChunk.pageNumber}
+                  </span>
+                  <button
+                    onClick={() => setActiveChunk(null)}
+                    className="p-2 rounded-xl hover:bg-white/5 text-white/40 hover:text-white transition-colors cursor-pointer"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Modal Content */}
+              <div className="space-y-6 max-h-[55vh] overflow-y-auto pr-3 custom-scrollbar">
+                <p className="text-[17px] text-white/95 leading-relaxed font-sans whitespace-pre-wrap font-normal">
+                  {activeChunk.content}
+                </p>
+              </div>
+
+              {/* Modal Footer / Actions */}
+              <div className="flex justify-between items-center mt-8 pt-6 border-t border-white/5">
+                <div className="text-xs text-white/30">
+                  <span>Chunk ID: {activeChunk.id}</span>
+                  <span className="mx-2">•</span>
+                  <span>Match Relevance: {activeChunk.similarity}%</span>
+                </div>
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => setActiveChunk(null)}
+                    className="px-5 py-2.5 rounded-full border border-white/10 text-white/70 hover:bg-white/5 transition-all text-sm font-semibold cursor-pointer"
+                  >
+                    Close
+                  </button>
+                  <button
+                    onClick={() => {
+                      navigate(`/documents/${encodeURIComponent(activeChunk.documentName)}?chunkId=${activeChunk.id}`);
+                      setActiveChunk(null);
+                    }}
+                    className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 text-white font-semibold transition-all hover:opacity-90 shadow-lg cursor-pointer text-sm"
+                  >
+                    Go to detail
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
             </motion.div>
           </div>

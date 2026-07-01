@@ -32,12 +32,25 @@ func NewVisualEntityRepository(pool *pgxpool.Pool) VisualEntityRepository {
 
 func (r *visualEntityRepository) Migrate(ctx context.Context) error {
 	setupSQL := `
-	CREATE TABLE IF NOT EXISTS visual_entities (
-		id bigserial PRIMARY KEY,
-		image_url text,
-		embedding vector(3072)
-	);
-`
+		CREATE TABLE IF NOT EXISTS visual_entities (
+			id bigserial PRIMARY KEY,
+			image_url text,
+			embedding halfvec(3072)
+		);
+
+		DO $$ 
+		BEGIN 
+			IF EXISTS (
+				SELECT 1 FROM information_schema.columns 
+				WHERE table_name = 'visual_entities' AND column_name = 'embedding' AND udt_name = 'vector'
+			) THEN 
+				ALTER TABLE visual_entities ALTER COLUMN embedding TYPE halfvec(3072);
+			END IF;
+		END $$;
+
+		CREATE INDEX IF NOT EXISTS visual_entities_embedding_cosine_idx 
+		ON visual_entities USING hnsw (embedding halfvec_cosine_ops);
+	`
 	if _, err := r.pool.Exec(ctx, setupSQL); err != nil {
 		return fmt.Errorf("visual_entities table migration failed: %w", err)
 	}

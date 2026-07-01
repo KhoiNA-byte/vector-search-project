@@ -24,11 +24,21 @@ type storageService struct {
 }
 
 func NewStorageService() StorageService {
+	bucketName := os.Getenv("MINIO_BUCKET")
+	if bucketName == "" {
+		bucketName = "visual-entities"
+	}
+	publicURL := os.Getenv("MINIO_PUBLIC_URL")
+	if publicURL == "" {
+		publicURL = "http://localhost:9000/visual-entities"
+	}
+	return NewStorageServiceWithBucket(bucketName, publicURL)
+}
+
+func NewStorageServiceWithBucket(bucketName, publicURL string) StorageService {
 	endpoint := os.Getenv("MINIO_ENDPOINT")
 	accessKey := os.Getenv("MINIO_ACCESS_KEY")
 	secretKey := os.Getenv("MINIO_SECRET_KEY")
-	bucketName := os.Getenv("MINIO_BUCKET")
-	publicURL := os.Getenv("MINIO_PUBLIC_URL")
 	useSSLStr := os.Getenv("MINIO_USE_SSL")
 
 	useSSL := false
@@ -44,12 +54,6 @@ func NewStorageService() StorageService {
 	}
 	if secretKey == "" {
 		secretKey = "minioadmin"
-	}
-	if bucketName == "" {
-		bucketName = "visual-entities"
-	}
-	if publicURL == "" {
-		publicURL = "http://localhost:9000/visual-entities"
 	}
 
 	// Initialize MinIO client

@@ -37,25 +37,25 @@ function AnimatedRoutes() {
           </PageTransition>
         } />
         
-        <Route path="/visual-entity" element={
+        <Route path="/visuals" element={
           <PageTransition variant="fade-slide">
             <VisualEntityPage />
           </PageTransition>
         } />
         
-        <Route path="/visual-entity/create" element={
+        <Route path="/visuals/create" element={
           <PageTransition variant="scale-up">
             <VisualEntityCreatePage />
           </PageTransition>
         } />
 
-        <Route path="/document" element={
+        <Route path="/documents" element={
           <PageTransition variant="fade-slide">
             <DocumentPage />
           </PageTransition>
         } />
 
-        <Route path="/document/:name" element={
+        <Route path="/documents/:name" element={
           <PageTransition variant="fade-slide">
             <DocumentDetailPage />
           </PageTransition>

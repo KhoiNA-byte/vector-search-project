@@ -50,8 +50,21 @@ func (r *documentRepository) Migrate(ctx context.Context) error {
 			document_name text NOT NULL,
 			page_number   integer DEFAULT 1,
 			content       text NOT NULL,
-			embedding     vector(3072) NOT NULL
+			embedding     halfvec(3072) NOT NULL
 		);
+
+		DO $$ 
+		BEGIN 
+			IF EXISTS (
+				SELECT 1 FROM information_schema.columns 
+				WHERE table_name = 'document_chunks' AND column_name = 'embedding' AND udt_name = 'vector'
+			) THEN 
+				ALTER TABLE document_chunks ALTER COLUMN embedding TYPE halfvec(3072);
+			END IF;
+		END $$;
+
+		CREATE INDEX IF NOT EXISTS document_chunks_embedding_cosine_idx 
+		ON document_chunks USING hnsw (embedding halfvec_cosine_ops);
 	`
 	if _, err := r.pool.Exec(ctx, setupSQL); err != nil {
 		return fmt.Errorf("document database migration failed: %w", err)

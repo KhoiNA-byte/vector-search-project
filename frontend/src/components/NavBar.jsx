@@ -5,13 +5,13 @@ const NavBar = () => {
   const location = useLocation();
 
   const isFruitPage = location.pathname.startsWith("/fruit");
-  const isDocumentPage = location.pathname.startsWith("/document");
-  const isVisualPage = location.pathname.startsWith("/visual-entity");
+  const isDocumentPage = location.pathname.startsWith("/documents");
+  const isVisualPage = location.pathname.startsWith("/visuals");
 
   const navItems = [
     { name: "Fruits", path: "/fruit", icon: Apple },
-    { name: "Visual Feed", path: "/visual-entity", icon: ImageIcon },
-    { name: "Document Search", path: "/document", icon: FileText },
+    { name: "Visuals", path: "/visuals", icon: ImageIcon },
+    { name: "Documents", path: "/documents", icon: FileText },
   ];
 
   return (

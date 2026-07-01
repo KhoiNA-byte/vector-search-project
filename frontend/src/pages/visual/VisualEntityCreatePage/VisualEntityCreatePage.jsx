@@ -70,7 +70,7 @@ const VisualEntityCreatePage = () => {
         try {
             await visualEntityService.createVisualEntity(formData);
             toast.success("Visual Added", "Your image has been successfully added to the collection.");
-            setTimeout(() => navigate('/visual-entity'), 1500);
+            setTimeout(() => navigate('/visuals'), 1500);
         } catch (err) {
             console.error("Upload error:", err);
             toast.error("Upload Failed", "The image could not be uploaded. Please try again.");
@@ -136,7 +136,7 @@ const VisualEntityCreatePage = () => {
                                 type="button"
                                 variant="ghost"
                                 className="text-white/60 hover:text-white hover:bg-red-600"
-                                onClick={() => navigate('/visual-entity')}
+                                onClick={() => navigate('/visuals')}
                             >
                                 Cancel
                             </Button>

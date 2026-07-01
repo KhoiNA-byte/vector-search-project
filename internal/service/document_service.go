@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 	"strings"
 	"vector-search-project/internal/model"
 	"vector-search-project/internal/model/response"
@@ -36,10 +37,25 @@ type documentService struct {
 }
 
 func NewDocumentService(repo repository.DocumentRepository, embedSvc *EmbeddingService) DocumentService {
+	bucketName := os.Getenv("MINIO_DOCUMENT_BUCKET")
+	if bucketName == "" {
+		bucketName = "documents"
+	}
+
+	publicURL := os.Getenv("MINIO_DOCUMENT_PUBLIC_URL")
+	if publicURL == "" {
+		basePublicURL := os.Getenv("MINIO_PUBLIC_URL")
+		if basePublicURL != "" {
+			publicURL = strings.Replace(basePublicURL, "visual-entities", bucketName, 1)
+		} else {
+			publicURL = "http://localhost:9000/" + bucketName
+		}
+	}
+
 	return &documentService{
 		repo:       repo,
 		embedSvc:   embedSvc,
-		storageSvc: NewStorageService(),
+		storageSvc: NewStorageServiceWithBucket(bucketName, publicURL),
 	}
 }
 
@@ -58,7 +74,7 @@ func (s *documentService) Upload(ctx context.Context, filename string, r io.Read
 
 	// 2. Upload raw file to MinIO
 	sectionReader := io.NewSectionReader(r, 0, size)
-	err := s.storageSvc.Upload(ctx, "documents/"+filename, sectionReader, size, contentType)
+	err := s.storageSvc.Upload(ctx, filename, sectionReader, size, contentType)
 	if err != nil {
 		return fmt.Errorf("failed to upload file to MinIO: %w", err)
 	}
@@ -71,7 +87,7 @@ func (s *documentService) Upload(ctx context.Context, filename string, r io.Read
 	}
 	if err := s.repo.CreateDocument(ctx, doc); err != nil {
 		// Clean up MinIO on db save failure
-		_ = s.storageSvc.Delete(ctx, "documents/"+filename)
+		_ = s.storageSvc.Delete(ctx, filename)
 		return fmt.Errorf("failed to save document metadata: %w", err)
 	}
 
@@ -85,7 +101,7 @@ func (s *documentService) Upload(ctx context.Context, filename string, r io.Read
 
 	if err != nil {
 		// Clean up MinIO & document record on parse failure
-		_ = s.storageSvc.Delete(ctx, "documents/"+filename)
+		_ = s.storageSvc.Delete(ctx, filename)
 		_ = s.repo.DeleteDocument(ctx, filename)
 		return fmt.Errorf("failed to parse document: %w", err)
 	}
@@ -108,7 +124,7 @@ func (s *documentService) Upload(ctx context.Context, filename string, r io.Read
 			embedding, err := s.embedSvc.EmbedDescription(ctx, chunkTextContent)
 			if err != nil {
 				// Clean up on embedding error
-				_ = s.storageSvc.Delete(ctx, "documents/"+filename)
+				_ = s.storageSvc.Delete(ctx, filename)
 				_ = s.repo.DeleteDocument(ctx, filename)
 				return fmt.Errorf("failed to generate chunk embedding: %w", err)
 			}
@@ -121,7 +137,7 @@ func (s *documentService) Upload(ctx context.Context, filename string, r io.Read
 			}
 
 			if err := s.repo.CreateChunk(ctx, chunk); err != nil {
-				_ = s.storageSvc.Delete(ctx, "documents/"+filename)
+				_ = s.storageSvc.Delete(ctx, filename)
 				_ = s.repo.DeleteDocument(ctx, filename)
 				return fmt.Errorf("failed to create document chunk: %w", err)
 			}
@@ -149,7 +165,7 @@ func (s *documentService) SearchDocuments(ctx context.Context, query string) ([]
 
 	// Set public download URLs
 	for i := range docs {
-		docs[i].DownloadURL = s.storageSvc.GetPublicURL("documents/" + docs[i].Name)
+		docs[i].DownloadURL = s.storageSvc.GetPublicURL(docs[i].Name)
 	}
 	return docs, nil
 }
@@ -193,7 +209,7 @@ func (s *documentService) GetDocumentDetails(ctx context.Context, docName string
 		UploadDate:  docMetadata.CreatedAt,
 		FileSize:    docMetadata.FileSize,
 		ChunkCount:  int64(len(chunks)),
-		DownloadURL: s.storageSvc.GetPublicURL("documents/" + docMetadata.Name),
+		DownloadURL: s.storageSvc.GetPublicURL(docMetadata.Name),
 	}
 
 	return docRes, chunks, nil
@@ -220,7 +236,7 @@ func (s *documentService) DeleteChunk(ctx context.Context, id int64) error {
 
 func (s *documentService) DeleteDocument(ctx context.Context, name string) error {
 	// Remove from MinIO
-	err := s.storageSvc.Delete(ctx, "documents/"+name)
+	err := s.storageSvc.Delete(ctx, name)
 	if err != nil {
 		log.Printf("Warning: failed to delete file %s from MinIO: %v", name, err)
 	}
@@ -237,7 +253,7 @@ func (s *documentService) GetDocuments(ctx context.Context) ([]response.Document
 
 	// Set public download URLs
 	for i := range docs {
-		docs[i].DownloadURL = s.storageSvc.GetPublicURL("documents/" + docs[i].Name)
+		docs[i].DownloadURL = s.storageSvc.GetPublicURL(docs[i].Name)
 	}
 	return docs, nil
 }
@@ -258,14 +274,7 @@ func (s *documentService) parsePDF(r io.ReaderAt, size int64) (map[int]string, e
 			continue
 		}
 
-		fontNames := p.Fonts()
-		fonts := make(map[string]*pdf.Font)
-		for _, name := range fontNames {
-			font := p.Font(name)
-			fonts[name] = &font
-		}
-
-		text, err := p.GetPlainText(fonts)
+		text, err := p.GetPlainText(nil)
 		if err != nil {
 			continue
 		}
@@ -312,7 +321,10 @@ func (s *documentService) parseDOCX(r io.ReaderAt, size int64) (map[int]string, 
 	}
 	defer rc.Close()
 
-	var buf bytes.Buffer
+	extracted := make(map[int]string)
+	var currentBuf bytes.Buffer
+	currentPageNum := 1
+
 	decoder := xml.NewDecoder(rc)
 	for {
 		token, err := decoder.Token()
@@ -330,14 +342,29 @@ func (s *documentService) parseDOCX(r io.ReaderAt, size int64) (map[int]string, 
 				if err := decoder.DecodeElement(&t, &se); err != nil {
 					return nil, err
 				}
-				buf.WriteString(t)
+				currentBuf.WriteString(t)
 			} else if se.Name.Local == "p" {
-				buf.WriteString("\n")
+				currentBuf.WriteString("\n")
+			} else if se.Name.Local == "br" {
+				for _, attr := range se.Attr {
+					if attr.Name.Local == "type" && attr.Value == "page" {
+						extracted[currentPageNum] = currentBuf.String()
+						currentBuf.Reset()
+						currentPageNum++
+						break
+					}
+				}
+			} else if se.Name.Local == "lastRenderedPageBreak" || se.Name.Local == "pageBreakBefore" {
+				extracted[currentPageNum] = currentBuf.String()
+				currentBuf.Reset()
+				currentPageNum++
 			}
 		}
 	}
 
-	return map[int]string{1: buf.String()}, nil
+	extracted[currentPageNum] = currentBuf.String()
+
+	return extracted, nil
 }
 
 // chunkText splits string text into overlapping chunks

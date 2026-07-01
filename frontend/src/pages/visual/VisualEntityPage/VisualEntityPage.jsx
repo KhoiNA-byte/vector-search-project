@@ -118,7 +118,7 @@ const VisualEntityPage = () => {
                 Explore all available visuals
               </button>
               <button
-                onClick={() => navigate("/visual-entity/create")}
+                onClick={() => navigate("/visuals/create")}
                 disabled={loading}
                 className="visual-explore-btn"
               >

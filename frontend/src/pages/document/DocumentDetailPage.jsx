@@ -70,7 +70,7 @@ const DocumentDetailPage = () => {
     try {
       await documentService.deleteDocument(name);
       toast.success("Document Deleted", "Successfully removed metadata, chunks, and file storage.");
-      navigate("/document");
+      navigate("/documents");
     } catch (e) {
       toast.error("Deletion Failed", e.message);
     }
@@ -139,11 +139,11 @@ const DocumentDetailPage = () => {
 
         {/* Back navigation */}
         <button
-          onClick={() => navigate("/document")}
+          onClick={() => navigate("/documents")}
           className="flex items-center gap-2 text-sm text-white/60 hover:text-white mb-8 bg-white/5 hover:bg-white/10 px-4 py-2 rounded-xl border border-white/5 transition-all duration-300 active:scale-95"
         >
           <ArrowLeft size={16} />
-          Back to Document Search
+          Back to Documents
         </button>
 
         {loading ? (
@@ -155,7 +155,7 @@ const DocumentDetailPage = () => {
           <div className="glass-card text-center py-20 max-w-xl mx-auto border-red-500/20 bg-red-500/5">
             <h2 className="text-xl font-bold text-red-400 mb-2">Error Occurred</h2>
             <p className="text-white/60 mb-6">{error || "Document not found"}</p>
-            <button onClick={() => navigate("/document")} className="doc-tab-btn active">
+            <button onClick={() => navigate("/documents")} className="doc-tab-btn active">
               Back to Documents
             </button>
           </div>

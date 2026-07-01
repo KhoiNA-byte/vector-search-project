@@ -42,8 +42,21 @@ func (r *fruitRepository) Migrate(ctx context.Context) error {
 			color_outside text,
 			color_inside  text,
 			price         double precision,
-			embedding     vector(3072)
+			embedding     halfvec(3072)
 		);
+
+		DO $$ 
+		BEGIN 
+			IF EXISTS (
+				SELECT 1 FROM information_schema.columns 
+				WHERE table_name = 'fruits' AND column_name = 'embedding' AND udt_name = 'vector'
+			) THEN 
+				ALTER TABLE fruits ALTER COLUMN embedding TYPE halfvec(3072);
+			END IF;
+		END $$;
+
+		CREATE INDEX IF NOT EXISTS fruits_embedding_cosine_idx 
+		ON fruits USING hnsw (embedding halfvec_cosine_ops);
 	`
 	if _, err := r.pool.Exec(ctx, setupSQL); err != nil {
 		return fmt.Errorf("fruit migration failed: %w", err)

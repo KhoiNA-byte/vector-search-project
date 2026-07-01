@@ -31,6 +31,7 @@ services:
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
       - MINIO_BUCKET=visual-entities
+      - MINIO_DOCUMENT_BUCKET=documents
       - MINIO_USE_SSL=false
     env_file:
       - .env
