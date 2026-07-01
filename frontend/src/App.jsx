@@ -5,6 +5,7 @@ import FruitCreatePage from './pages/fruit/FruitCreatePage/FruitCreatePage.jsx'
 import FruitDetailPage from './pages/fruit/FruitDetailPage/FruitDetailPage.jsx'
 import VisualEntityPage from './pages/visual/VisualEntityPage/VisualEntityPage.jsx'
 import VisualEntityCreatePage from './pages/visual/VisualEntityCreatePage/VisualEntityCreatePage.jsx'
+import DocumentPage from './pages/document/DocumentPage.jsx'
 import NavBar from './components/NavBar.jsx'
 import PageTransition from './components/PageTransition.jsx'
 import { ToastProvider } from './hooks/useToast.jsx'
@@ -44,6 +45,12 @@ function AnimatedRoutes() {
         <Route path="/visual-entity/create" element={
           <PageTransition variant="scale-up">
             <VisualEntityCreatePage />
+          </PageTransition>
+        } />
+
+        <Route path="/document" element={
+          <PageTransition variant="fade-slide">
+            <DocumentPage />
           </PageTransition>
         } />
       </Routes>

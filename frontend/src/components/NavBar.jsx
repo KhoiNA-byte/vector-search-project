@@ -1,15 +1,17 @@
 import { Link, useLocation } from "react-router-dom";
-import { Apple, Image as ImageIcon } from "lucide-react";
+import { Apple, Image as ImageIcon, FileText } from "lucide-react";
 
 const NavBar = () => {
   const location = useLocation();
 
   const isFruitPage = location.pathname.startsWith("/fruit");
+  const isDocumentPage = location.pathname.startsWith("/document");
   const isVisualPage = location.pathname.startsWith("/visual-entity");
 
   const navItems = [
     { name: "Fruits", path: "/fruit", icon: Apple },
     { name: "Visual Feed", path: "/visual-entity", icon: ImageIcon },
+    { name: "Documents", path: "/document", icon: FileText },
   ];
 
   return (
@@ -36,6 +38,9 @@ const NavBar = () => {
                style={isFruitPage ? {
                  background: "linear-gradient(135deg, #1a5c35, #27ae60)",
                  boxShadow: "0 0 16px rgba(39, 174, 96, 0.35)",
+               } : isDocumentPage ? {
+                 background: "linear-gradient(135deg, #4f46e5, #7c3aed)",
+                 boxShadow: "0 0 20px rgba(99,102,241,0.35)",
                } : {
                  background: "linear-gradient(135deg, #22d3ee, #a855f7)",
                  boxShadow: "0 0 20px rgba(34,211,238,0.3)",
@@ -46,7 +51,7 @@ const NavBar = () => {
              <span className={`font-display font-black text-2xl tracking-tighter transition-colors duration-500 ${
                isFruitPage ? "text-[#0d3320]" : "text-white"
              }`}>
-                VECTOR<span className={isFruitPage ? "text-[#27ae60]" : "text-cyan-400"}>SEARCH</span>
+                VECTOR<span className={isFruitPage ? "text-[#27ae60]" : isDocumentPage ? "text-indigo-400" : "text-cyan-400"}>SEARCH</span>
              </span>
           </div>
 
@@ -67,6 +72,12 @@ const NavBar = () => {
                             color: "#fff",
                             boxShadow: "0 4px 16px -2px rgba(34,140,70,0.4), 0 0 0 2px rgba(82,192,65,0.2)",
                           }
+                        : isDocumentPage
+                        ? {
+                            background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 60%, #a855f7 100%)",
+                            color: "#fff",
+                            boxShadow: "0 4px 16px -2px rgba(99,102,241,0.4), 0 0 0 2px rgba(124,58,237,0.2)",
+                          }
                         : { background: "#fff", color: "#000", boxShadow: "0 0 30px rgba(255,255,255,0.1)" }
                       : isFruitPage
                         ? {}
@@ -80,7 +91,7 @@ const NavBar = () => {
                     style={
                       !isActive && isFruitPage
                         ? { color: "#4a7a5a" }
-                        : !isActive && !isFruitPage
+                      : !isActive && !isFruitPage
                         ? { color: "rgba(255,255,255,0.4)" }
                         : {}
                     }

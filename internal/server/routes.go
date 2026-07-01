@@ -10,7 +10,7 @@ import (
 	"vector-search-project/internal/controller"
 )
 
-func (s *Server) RegisterRoutes(fruitCtrl *controller.FruitController, visualEntityCtrl *controller.VisualEntityController) http.Handler {
+func (s *Server) RegisterRoutes(fruitCtrl *controller.FruitController, visualEntityCtrl *controller.VisualEntityController, docCtrl *controller.DocumentController) http.Handler {
 	r := mux.NewRouter()
 
 	// Apply CORS middleware
@@ -28,6 +28,15 @@ func (s *Server) RegisterRoutes(fruitCtrl *controller.FruitController, visualEnt
 	r.HandleFunc("/visual-entities/{id}", visualEntityCtrl.GetVisualEntity).Methods(http.MethodGet, http.MethodOptions)
 	r.HandleFunc("/visual-entities/create", visualEntityCtrl.Create).Methods(http.MethodPost, http.MethodOptions)
 	r.HandleFunc("/visual-entities/{id}", visualEntityCtrl.DeleteVisualEntity).Methods(http.MethodDelete, http.MethodOptions)
+
+	// Document routes
+	r.HandleFunc("/documents/upload", docCtrl.Upload).Methods(http.MethodPost, http.MethodOptions)
+	r.HandleFunc("/documents/search", docCtrl.Search).Methods(http.MethodGet, http.MethodOptions)
+	r.HandleFunc("/documents", docCtrl.GetDocuments).Methods(http.MethodGet, http.MethodOptions)
+	r.HandleFunc("/documents/chunks", docCtrl.GetChunks).Methods(http.MethodGet, http.MethodOptions)
+	r.HandleFunc("/documents/chunks/{id}", docCtrl.UpdateChunk).Methods(http.MethodPut, http.MethodOptions)
+	r.HandleFunc("/documents/chunks/{id}", docCtrl.DeleteChunk).Methods(http.MethodDelete, http.MethodOptions)
+	r.HandleFunc("/documents/{name}", docCtrl.DeleteDocument).Methods(http.MethodDelete, http.MethodOptions)
 
 	// Additional route configuration
 	r.PathPrefix("/public/").Handler(http.StripPrefix("/public", http.FileServer(http.Dir("./public"))))

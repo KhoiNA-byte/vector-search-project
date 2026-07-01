@@ -38,11 +38,16 @@ func NewServer() *http.Server {
 	// Initialize repositories and services
 	fruitRepo := repository.NewFruitRepository(db.Pool())
 	visualEntityRepo := repository.NewVisualEntityRepository(db.Pool())
+	documentRepo := repository.NewDocumentRepository(db.Pool())
+
 	embedSvc := service.NewEmbeddingService()
 	fruitSvc := service.NewFruitService(fruitRepo, embedSvc)
 	visualEntitySvc := service.NewVisualEntityService(visualEntityRepo)
+	documentSvc := service.NewDocumentService(documentRepo, embedSvc)
+
 	fruitCtrl := controller.NewFruitController(fruitSvc)
 	visualEntityCtrl := controller.NewVisualEntityController(visualEntitySvc)
+	documentCtrl := controller.NewDocumentController(documentSvc)
 
 	// Run migrations and seed data
 	if err := fruitRepo.Migrate(ctx); err != nil {
@@ -59,10 +64,14 @@ func NewServer() *http.Server {
 		log.Printf("seeding visual entities failed: %v", err)
 	}
 
+	if err := documentRepo.Migrate(ctx); err != nil {
+		log.Printf("migration documents failed: %v", err)
+	}
+
 	// Declare Server config
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", newServer.port),
-		Handler:      newServer.RegisterRoutes(fruitCtrl, visualEntityCtrl),
+		Handler:      newServer.RegisterRoutes(fruitCtrl, visualEntityCtrl, documentCtrl),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,
