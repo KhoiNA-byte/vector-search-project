@@ -11,7 +11,7 @@ const NavBar = () => {
   const navItems = [
     { name: "Fruits", path: "/fruit", icon: Apple },
     { name: "Visual Feed", path: "/visual-entity", icon: ImageIcon },
-    { name: "Documents", path: "/document", icon: FileText },
+    { name: "Document Search", path: "/document", icon: FileText },
   ];
 
   return (

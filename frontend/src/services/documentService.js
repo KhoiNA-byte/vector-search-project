@@ -1,9 +1,22 @@
 const API_BASE = import.meta.env.VITE_BASE_URL;
 
 export const documentService = {
-  async searchDocuments(query) {
+  async searchDocuments(query = "") {
     const res = await fetch(`${API_BASE}/documents/search?q=${encodeURIComponent(query)}`);
     if (!res.ok) throw new Error(`Search failed (${res.status})`);
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  },
+
+  async semanticSearch(query, scope = []) {
+    const res = await fetch(`${API_BASE}/documents/semantic-search`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ q: query, scope }),
+    });
+    if (!res.ok) throw new Error(`Semantic search failed (${res.status})`);
     const data = await res.json();
     return Array.isArray(data) ? data : [];
   },
@@ -13,6 +26,12 @@ export const documentService = {
     if (!res.ok) throw new Error(`Failed to fetch documents (${res.status})`);
     const data = await res.json();
     return Array.isArray(data) ? data : [];
+  },
+
+  async getDocumentDetails(name) {
+    const res = await fetch(`${API_BASE}/documents/${encodeURIComponent(name)}`);
+    if (!res.ok) throw new Error(`Failed to fetch document details (${res.status})`);
+    return await res.json();
   },
 
   async getChunks(documentName = "") {
@@ -25,9 +44,11 @@ export const documentService = {
     return Array.isArray(data) ? data : [];
   },
 
-  async uploadDocument(file) {
+  async uploadDocuments(files) {
     const formData = new FormData();
-    formData.append("file", file);
+    for (let i = 0; i < files.length; i++) {
+      formData.append("files", files[i]);
+    }
 
     const res = await fetch(`${API_BASE}/documents/upload`, {
       method: "POST",

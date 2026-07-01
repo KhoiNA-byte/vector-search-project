@@ -32,10 +32,12 @@ func (s *Server) RegisterRoutes(fruitCtrl *controller.FruitController, visualEnt
 	// Document routes
 	r.HandleFunc("/documents/upload", docCtrl.Upload).Methods(http.MethodPost, http.MethodOptions)
 	r.HandleFunc("/documents/search", docCtrl.Search).Methods(http.MethodGet, http.MethodOptions)
+	r.HandleFunc("/documents/semantic-search", docCtrl.SemanticSearch).Methods(http.MethodPost, http.MethodOptions)
 	r.HandleFunc("/documents", docCtrl.GetDocuments).Methods(http.MethodGet, http.MethodOptions)
 	r.HandleFunc("/documents/chunks", docCtrl.GetChunks).Methods(http.MethodGet, http.MethodOptions)
 	r.HandleFunc("/documents/chunks/{id}", docCtrl.UpdateChunk).Methods(http.MethodPut, http.MethodOptions)
 	r.HandleFunc("/documents/chunks/{id}", docCtrl.DeleteChunk).Methods(http.MethodDelete, http.MethodOptions)
+	r.HandleFunc("/documents/{name}", docCtrl.GetDocumentDetails).Methods(http.MethodGet, http.MethodOptions)
 	r.HandleFunc("/documents/{name}", docCtrl.DeleteDocument).Methods(http.MethodDelete, http.MethodOptions)
 
 	// Additional route configuration

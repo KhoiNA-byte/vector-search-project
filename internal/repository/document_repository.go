@@ -12,8 +12,12 @@ import (
 
 type DocumentRepository interface {
 	Migrate(ctx context.Context) error
+	CreateDocument(ctx context.Context, doc *model.Document) error
+	GetDocument(ctx context.Context, name string) (*model.Document, error)
 	CreateChunk(ctx context.Context, chunk *model.DocumentChunk) error
 	SearchChunks(ctx context.Context, embedding pgvector.Vector, limit int) ([]response.ChunkRes, error)
+	SearchChunksInScope(ctx context.Context, embedding pgvector.Vector, docScope []string, limit int) ([]response.ChunkRes, error)
+	SearchDocuments(ctx context.Context, embedding pgvector.Vector, limit int) ([]response.DocumentRes, error)
 	GetAllChunks(ctx context.Context) ([]response.ChunkRes, error)
 	GetChunksByDocument(ctx context.Context, docName string) ([]response.ChunkRes, error)
 	GetChunk(ctx context.Context, id int64) (*response.ChunkRes, error)
@@ -33,6 +37,14 @@ func NewDocumentRepository(pool *pgxpool.Pool) DocumentRepository {
 
 func (r *documentRepository) Migrate(ctx context.Context) error {
 	setupSQL := `
+		CREATE TABLE IF NOT EXISTS documents (
+			id            bigserial PRIMARY KEY,
+			name          text NOT NULL UNIQUE,
+			file_size     bigint NOT NULL,
+			file_type     text NOT NULL,
+			created_at    timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+		);
+
 		CREATE TABLE IF NOT EXISTS document_chunks (
 			id            bigserial PRIMARY KEY,
 			document_name text NOT NULL,
@@ -42,9 +54,39 @@ func (r *documentRepository) Migrate(ctx context.Context) error {
 		);
 	`
 	if _, err := r.pool.Exec(ctx, setupSQL); err != nil {
-		return fmt.Errorf("document_chunks migration failed: %w", err)
+		return fmt.Errorf("document database migration failed: %w", err)
 	}
 	return nil
+}
+
+func (r *documentRepository) CreateDocument(ctx context.Context, doc *model.Document) error {
+	query := `
+		INSERT INTO documents (name, file_size, file_type)
+		VALUES ($1, $2, $3)
+		ON CONFLICT (name) DO UPDATE 
+		SET file_size = EXCLUDED.file_size, file_type = EXCLUDED.file_type, created_at = CURRENT_TIMESTAMP
+		RETURNING id, created_at
+	`
+	err := r.pool.QueryRow(ctx, query, doc.Name, doc.FileSize, doc.FileType).Scan(&doc.ID, &doc.CreatedAt)
+	if err != nil {
+		return fmt.Errorf("create document failed: %w", err)
+	}
+	return nil
+}
+
+func (r *documentRepository) GetDocument(ctx context.Context, name string) (*model.Document, error) {
+	query := `
+		SELECT id, name, file_size, file_type, created_at
+		FROM documents
+		WHERE name = $1
+	`
+	row := r.pool.QueryRow(ctx, query, name)
+	var doc model.Document
+	err := row.Scan(&doc.ID, &doc.Name, &doc.FileSize, &doc.FileType, &doc.CreatedAt)
+	if err != nil {
+		return nil, fmt.Errorf("get document metadata failed: %w", err)
+	}
+	return &doc, nil
 }
 
 func (r *documentRepository) CreateChunk(ctx context.Context, chunk *model.DocumentChunk) error {
@@ -70,7 +112,7 @@ func (r *documentRepository) SearchChunks(ctx context.Context, embedding pgvecto
 	`
 	rows, err := r.pool.Query(ctx, query, embedding, limit)
 	if err != nil {
-		return nil, fmt.Errorf("document search failed: %w", err)
+		return nil, fmt.Errorf("document search chunks failed: %w", err)
 	}
 	defer rows.Close()
 
@@ -84,6 +126,82 @@ func (r *documentRepository) SearchChunks(ctx context.Context, embedding pgvecto
 		chunks = append(chunks, c)
 	}
 	return chunks, nil
+}
+
+func (r *documentRepository) SearchChunksInScope(ctx context.Context, embedding pgvector.Vector, docScope []string, limit int) ([]response.ChunkRes, error) {
+	var query string
+	var rows interface {
+		Close()
+		Next() bool
+		Scan(dest ...any) error
+	}
+	var err error
+
+	if len(docScope) > 0 {
+		query = `
+			SELECT id, document_name, page_number, content,
+			       ROUND((1 - (embedding <=> $1))::numeric * 100, 0) as similarity
+			FROM document_chunks
+			WHERE document_name = ANY($2)
+			ORDER BY embedding <=> $1
+			LIMIT $3
+		`
+		rows, err = r.pool.Query(ctx, query, embedding, docScope, limit)
+	} else {
+		query = `
+			SELECT id, document_name, page_number, content,
+			       ROUND((1 - (embedding <=> $1))::numeric * 100, 0) as similarity
+			FROM document_chunks
+			ORDER BY embedding <=> $1
+			LIMIT $2
+		`
+		rows, err = r.pool.Query(ctx, query, embedding, limit)
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("scoped semantic search failed: %w", err)
+	}
+	defer rows.Close()
+
+	var chunks []response.ChunkRes
+	for rows.Next() {
+		var c response.ChunkRes
+		err := rows.Scan(&c.ID, &c.DocumentName, &c.PageNumber, &c.Content, &c.Similarity)
+		if err != nil {
+			return nil, fmt.Errorf("scan document chunk failed: %w", err)
+		}
+		chunks = append(chunks, c)
+	}
+	return chunks, nil
+}
+
+func (r *documentRepository) SearchDocuments(ctx context.Context, embedding pgvector.Vector, limit int) ([]response.DocumentRes, error) {
+	query := `
+		SELECT d.name, d.file_type, d.created_at, d.file_size,
+		       COUNT(c.id) as chunk_count,
+		       COALESCE(MAX(ROUND((1 - (c.embedding <=> $1))::numeric * 100, 0)), 0) as max_similarity
+		FROM documents d
+		LEFT JOIN document_chunks c ON d.name = c.document_name
+		GROUP BY d.name, d.file_type, d.created_at, d.file_size
+		ORDER BY max_similarity DESC, d.created_at DESC
+		LIMIT $2
+	`
+	rows, err := r.pool.Query(ctx, query, embedding, limit)
+	if err != nil {
+		return nil, fmt.Errorf("document vector search failed: %w", err)
+	}
+	defer rows.Close()
+
+	var docs []response.DocumentRes
+	for rows.Next() {
+		var d response.DocumentRes
+		err := rows.Scan(&d.Name, &d.FileType, &d.UploadDate, &d.FileSize, &d.ChunkCount, &d.Similarity)
+		if err != nil {
+			return nil, fmt.Errorf("scan document res failed: %w", err)
+		}
+		docs = append(docs, d)
+	}
+	return docs, nil
 }
 
 func (r *documentRepository) GetAllChunks(ctx context.Context) ([]response.ChunkRes, error) {
@@ -176,23 +294,27 @@ func (r *documentRepository) DeleteChunk(ctx context.Context, id int64) error {
 }
 
 func (r *documentRepository) DeleteDocument(ctx context.Context, docName string) error {
-	query := `
-		DELETE FROM document_chunks
-		WHERE document_name = $1
-	`
-	_, err := r.pool.Exec(ctx, query, docName)
+	// Delete chunks
+	_, err := r.pool.Exec(ctx, "DELETE FROM document_chunks WHERE document_name = $1", docName)
 	if err != nil {
-		return fmt.Errorf("delete document failed: %w", err)
+		return fmt.Errorf("delete document chunks failed: %w", err)
+	}
+	// Delete metadata
+	_, err = r.pool.Exec(ctx, "DELETE FROM documents WHERE name = $1", docName)
+	if err != nil {
+		return fmt.Errorf("delete document metadata failed: %w", err)
 	}
 	return nil
 }
 
 func (r *documentRepository) GetDistinctDocuments(ctx context.Context) ([]response.DocumentRes, error) {
 	query := `
-		SELECT document_name, COUNT(*) as chunk_count
-		FROM document_chunks
-		GROUP BY document_name
-		ORDER BY document_name ASC
+		SELECT d.name, d.file_type, d.created_at, d.file_size,
+		       COUNT(c.id) as chunk_count
+		FROM documents d
+		LEFT JOIN document_chunks c ON d.name = c.document_name
+		GROUP BY d.name, d.file_type, d.created_at, d.file_size
+		ORDER BY d.created_at DESC
 	`
 	rows, err := r.pool.Query(ctx, query)
 	if err != nil {
@@ -203,7 +325,7 @@ func (r *documentRepository) GetDistinctDocuments(ctx context.Context) ([]respon
 	var docs []response.DocumentRes
 	for rows.Next() {
 		var d response.DocumentRes
-		err := rows.Scan(&d.Name, &d.ChunkCount)
+		err := rows.Scan(&d.Name, &d.FileType, &d.UploadDate, &d.FileSize, &d.ChunkCount)
 		if err != nil {
 			return nil, fmt.Errorf("scan distinct documents failed: %w", err)
 		}

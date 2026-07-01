@@ -1,17 +1,17 @@
 @import "tailwindcss";
 @reference "../../style.css";
 
-/* Scoped styles for Document Page */
+/* Scoped styles for Document Page, aligned with Visual Entity Page */
 .doc-page-container {
-  @apply min-h-screen pt-32 pb-12 overflow-x-hidden selection:bg-indigo-500/30 bg-zinc-950 text-white;
+  @apply min-h-screen pt-32 pb-12 overflow-x-hidden selection:bg-purple-500/30 bg-zinc-950 text-white;
 }
 
-.doc-page-glow-indigo {
-  @apply pointer-events-none absolute rounded-full blur-[120px] w-96 h-96 -top-48 -left-48 bg-indigo-600/15;
+.doc-page-glow-purple {
+  @apply pointer-events-none absolute rounded-full blur-[120px] w-96 h-96 -top-48 -left-48 bg-purple-500/20;
 }
 
-.doc-page-glow-violet {
-  @apply pointer-events-none absolute rounded-full blur-[120px] w-96 h-96 top-24 -right-48 bg-violet-600/15;
+.doc-page-glow-blue {
+  @apply pointer-events-none absolute rounded-full blur-[120px] w-96 h-96 top-24 -right-48 bg-blue-600/20;
 }
 
 @layer utilities {
@@ -20,41 +20,41 @@
   }
 
   .doc-hero-badge-dot {
-    @apply h-1.5 w-1.5 rounded-full bg-indigo-400 shadow-[0_0_8px_rgb(99_102_241_/0.8)];
+    @apply h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgb(34_211_238_/0.8)];
   }
 
   .doc-hero-title {
-    @apply text-5xl md:text-[76px] font-bold tracking-tight text-white leading-[0.95] mb-6 font-serif;
+    @apply text-6xl md:text-[88px] font-bold tracking-tight text-white leading-[0.95] mb-6 font-serif;
   }
 
   .doc-hero-vibe {
-    @apply italic bg-gradient-to-r from-indigo-400 via-violet-400 to-fuchsia-400 bg-clip-text text-transparent opacity-90;
+    @apply italic bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent opacity-90;
   }
 
   .doc-hero-subtitle {
-    @apply mt-6 text-lg text-white/50 max-w-2xl mx-auto leading-relaxed font-light;
+    @apply mt-8 text-xl text-white/50 max-w-2xl mx-auto leading-relaxed font-light;
   }
 
   /* Glassmorphic Tab Container */
   .doc-tabs-container {
-    @apply inline-flex p-1 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md mb-12;
+    @apply inline-flex p-1 bg-white/5 border border-white/10 rounded-full backdrop-blur-md mb-12;
   }
 
   .doc-tab-btn {
-    @apply px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 text-white/60 hover:text-white;
+    @apply px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 text-white/60 hover:text-white;
   }
 
   .doc-tab-btn.active {
-    @apply bg-gradient-to-r from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-500/20;
+    @apply bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/20;
   }
 
   /* Drag and Drop Card */
   .upload-dropzone {
-    @apply border-2 border-dashed border-white/10 hover:border-indigo-500/40 rounded-3xl p-10 text-center transition-all duration-300 bg-white/5 backdrop-blur-xl relative overflow-hidden cursor-pointer;
+    @apply border-2 border-dashed border-white/10 hover:border-purple-500/40 rounded-3xl p-10 text-center transition-all duration-300 bg-white/5 backdrop-blur-xl relative overflow-hidden cursor-pointer;
   }
 
   .upload-dropzone.dragging {
-    @apply border-indigo-500/60 bg-indigo-500/10 shadow-[0_0_30px_rgba(99,102,241,0.2)];
+    @apply border-purple-500/60 bg-purple-500/10 shadow-[0_0_30px_rgba(168,85,247,0.2)];
   }
 
   /* Glass Cards */
@@ -68,7 +68,16 @@
 
   /* Suggestion Buttons */
   .doc-suggestion-btn {
-    @apply text-[13px] font-medium px-4 py-2 rounded-full border border-white/10 text-white/70 transition-all duration-300 bg-white/5 hover:border-white/20 hover:bg-white/10;
+    @apply text-[13px] font-bold px-5 py-2.5 rounded-full border border-white/10 text-white/70 transition-all duration-300 bg-white/5 hover:border-white/20 hover:bg-white/10;
+  }
+
+  /* Buttons aligning with Visual */
+  .doc-explore-btn {
+    @apply flex items-center gap-2 text-[13px] px-5 py-2.5 rounded-full bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 text-white font-semibold transition-all shadow-lg;
+  }
+
+  .doc-explore-btn:hover {
+    @apply opacity-90 shadow-purple-500/20;
   }
 
   /* Tables */
@@ -88,17 +97,17 @@
     @apply border-b-0;
   }
 
-  /* Search input */
-  .doc-searchbar {
-    @apply flex items-center bg-white/5 border border-white/10 rounded-2xl px-4 py-3 backdrop-blur-xl transition-all duration-300;
+  /* Search input overrides to match SearchBar */
+  .visual-searchbar-container {
+    @apply bg-black/20 border border-white/20 text-white backdrop-blur-xl shadow-[0_8px_32px_-4px_rgb(0_0_0_/0.4)];
   }
 
-  .doc-searchbar:focus-within {
-    @apply border-indigo-500/50 shadow-[0_0_30px_rgba(99,102,241,0.15)];
+  .visual-searchbar-container input {
+    @apply text-white;
   }
 
-  .doc-search-btn {
-    @apply flex items-center justify-center h-11 w-11 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 text-white hover:opacity-90 transition-all active:scale-95;
+  .visual-searchbar-button {
+    @apply bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 text-white;
   }
 
   /* Interactive items */
@@ -107,12 +116,12 @@
   }
 
   .action-btn-primary {
-    @apply p-2 rounded-lg text-indigo-400/70 hover:text-indigo-400 hover:bg-indigo-500/10 transition-all active:scale-95;
+    @apply p-2 rounded-lg text-purple-400/70 hover:text-purple-400 hover:bg-purple-500/10 transition-all active:scale-95;
   }
 
   /* Badges */
   .badge-match {
-    @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20;
+    @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20;
   }
 
   .badge-doc {
@@ -120,6 +129,28 @@
   }
 
   .badge-page {
-    @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-violet-500/10 text-violet-400 border border-violet-500/20;
+    @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-cyan-500/10 text-cyan-400 border border-cyan-500/20;
   }
+}
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 0 0px rgba(168, 85, 247, 0.7);
+    border-color: rgba(168, 85, 247, 0.9);
+    background: rgba(168, 85, 247, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 25px 8px rgba(168, 85, 247, 0.5);
+    border-color: rgba(34, 211, 238, 0.9);
+    background: rgba(34, 211, 238, 0.25);
+  }
+  100% {
+    box-shadow: 0 0 0 0px rgba(168, 85, 247, 0);
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+.highlight-pulse {
+  animation: pulseGlow 3s ease-out forwards;
 }

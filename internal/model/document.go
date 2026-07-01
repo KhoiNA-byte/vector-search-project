@@ -1,6 +1,10 @@
 package model
 
-import "github.com/pgvector/pgvector-go"
+import (
+	"time"
+
+	"github.com/pgvector/pgvector-go"
+)
 
 type DocumentChunk struct {
 	ID           int64           `json:"id"`
@@ -11,6 +15,10 @@ type DocumentChunk struct {
 }
 
 type Document struct {
-	Name       string `json:"name"`
-	ChunkCount int64  `json:"chunkCount"`
+	ID          int64     `json:"id"`
+	Name        string    `json:"name"`
+	StoragePath string    `json:"storagePath"`
+	FileSize    int64     `json:"fileSize"`
+	FileType    string    `json:"fileType"`
+	CreatedAt   time.Time `json:"createdAt"`
 }

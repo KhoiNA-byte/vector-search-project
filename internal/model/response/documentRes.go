@@ -1,8 +1,16 @@
 package response
 
+import "time"
+
 type DocumentRes struct {
-	Name       string `json:"name"`
-	ChunkCount int64  `json:"chunkCount"`
+	Name         string    `json:"name"`
+	FileType     string    `json:"fileType"`
+	UploadDate   time.Time `json:"uploadDate"`
+	FileSize     int64     `json:"fileSize"`
+	StoragePath  string    `json:"storagePath"`
+	Similarity   float64   `json:"similarity"`
+	ChunkCount   int64     `json:"chunkCount"`
+	DownloadURL  string    `json:"downloadURL"`
 }
 
 type ChunkRes struct {
