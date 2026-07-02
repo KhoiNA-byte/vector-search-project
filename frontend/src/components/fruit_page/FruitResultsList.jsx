@@ -113,7 +113,7 @@ const FruitResultsList = ({ results, loading, error, hasSearched }) => {
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={currentPage === 1}
             variant="outline"
-            className="flex items-center gap-2 rounded-full px-4"
+            className="flex items-center gap-2 rounded-full px-5 py-2 border-fruit-emerald-100/60 bg-fruit-emerald-100 text-fruit-emerald-700 hover:bg-fruit-emerald-100/80 disabled:opacity-30"
           >
             <ChevronLeft className="h-4 w-4" /> Previous
           </Button>
@@ -123,9 +123,9 @@ const FruitResultsList = ({ results, loading, error, hasSearched }) => {
               <button
                 key={i + 1}
                 onClick={() => setCurrentPage(i + 1)}
-                className={`h-8 w-8 rounded-full text-sm font-medium transition-all ${currentPage === i + 1
-                    ? "bg-primary text-primary-foreground shadow-glow-fruit"
-                    : "bg-card border border-border hover:bg-accent"
+                className={`h-9 w-9 rounded-full text-sm font-medium transition-all ${currentPage === i + 1
+                    ? "bg-fruit-emerald-800 text-white shadow-md"
+                    : "bg-fruit-emerald-100 border border-fruit-emerald-100/60 text-fruit-emerald-700 hover:bg-fruit-emerald-100/80"
                   }`}
               >
                 {i + 1}
@@ -137,7 +137,7 @@ const FruitResultsList = ({ results, loading, error, hasSearched }) => {
             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
             variant="outline"
-            className="flex items-center gap-2 rounded-full px-4"
+            className="flex items-center gap-2 rounded-full px-5 py-2 border-fruit-emerald-100/60 bg-fruit-emerald-100 text-fruit-emerald-700 hover:bg-fruit-emerald-100/80 disabled:opacity-30"
           >
             Next <ChevronRight className="h-4 w-4" />
           </Button>

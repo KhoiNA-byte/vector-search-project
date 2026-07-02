@@ -3,83 +3,95 @@
 
 /* Scoped styles for Document Page, aligned with Visual Entity Page */
 .doc-page-container {
-  @apply min-h-screen pt-32 pb-12 overflow-x-hidden selection:bg-purple-500/30 bg-zinc-950 text-white;
+  @apply min-h-screen pt-32 pb-12 overflow-x-hidden selection:bg-doc-green-500/30 text-stone-900;
+  background: linear-gradient(
+    170deg,
+    var(--color-doc-stone-200) 0%,
+    var(--color-doc-ocean-50) 12%,
+    var(--color-doc-stone-100) 28%,
+    var(--color-doc-stone-50) 50%,
+    var(--color-doc-stone-100) 68%,
+    var(--color-doc-lime-100) 84%,
+    var(--color-doc-lime-300) 100%
+  );
 }
 
 .doc-page-glow-purple {
-  @apply pointer-events-none absolute rounded-full blur-[120px] w-96 h-96 -top-48 -left-48 bg-purple-500/20;
+  @apply pointer-events-none absolute rounded-full blur-[120px] w-96 h-96 -top-48 -left-48 bg-doc-ocean-800/10;
 }
 
 .doc-page-glow-blue {
-  @apply pointer-events-none absolute rounded-full blur-[120px] w-96 h-96 top-24 -right-48 bg-blue-600/20;
+  @apply pointer-events-none absolute rounded-full blur-[120px] w-96 h-96 top-24 -right-48 bg-doc-green-500/10;
 }
 
 @layer utilities {
   .doc-hero-badge {
-    @apply inline-flex items-center gap-2 border border-white/10 rounded-full px-4 py-1.5 text-xs font-medium text-white/60 backdrop-blur-md mb-8 bg-white/5;
+    @apply inline-flex items-center gap-2 border border-stone-300 rounded-full px-4 py-1.5 text-xs font-medium text-doc-ocean-800 mb-8 bg-white/75 backdrop-blur-md shadow-[0_2px_12px_-2px_rgba(9,60,93,0.12)];
   }
 
   .doc-hero-badge-dot {
-    @apply h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgb(34_211_238_/0.8)];
+    @apply h-1.5 w-1.5 rounded-full bg-doc-ocean-800 shadow-[0_0_8px_var(--color-doc-ocean-800)];
   }
 
   .doc-hero-title {
-    @apply text-6xl md:text-[88px] font-bold tracking-tight text-white leading-[0.95] mb-6 font-serif;
-  }
-
-  .doc-hero-vibe {
-    @apply italic bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent opacity-90;
+    @apply text-5xl md:text-7xl font-black tracking-tight leading-none font-serif bg-gradient-to-r from-doc-ocean-800 via-doc-stone-600 to-doc-green-500 bg-clip-text text-transparent mb-6;
   }
 
   .doc-hero-subtitle {
-    @apply mt-8 text-xl text-white/50 max-w-2xl mx-auto leading-relaxed font-light;
+    @apply mt-5 text-lg leading-relaxed font-medium text-stone-700 max-w-xl mx-auto;
   }
 
   /* Glassmorphic Tab Container */
   .doc-tabs-container {
-    @apply inline-flex p-1 bg-white/5 border border-white/10 rounded-full backdrop-blur-md mb-4;
+    @apply inline-flex p-1 bg-white/60 border border-stone-300 rounded-full backdrop-blur-md mb-8;
   }
 
   .doc-tab-btn {
-    @apply px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 text-white/60 hover:text-white;
+    @apply px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 text-stone-600 hover:text-stone-900 cursor-pointer;
   }
 
   .doc-tab-btn.active {
-    @apply bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/20;
+    @apply bg-doc-ocean-800 text-white shadow-md;
   }
 
   /* Drag and Drop Card */
   .upload-dropzone {
-    @apply block w-full border-2 border-dashed border-white/10 hover:border-purple-500/40 rounded-3xl p-10 text-center transition-all duration-300 bg-white/5 backdrop-blur-xl relative overflow-hidden cursor-pointer;
+    @apply block w-full border-2 border-dashed border-stone-300 hover:border-doc-ocean-800/40 rounded-3xl p-10 text-center transition-all duration-300 bg-white/40 backdrop-blur-xl relative overflow-hidden cursor-pointer;
   }
 
   .upload-dropzone.dragging {
-    @apply border-purple-500/60 bg-purple-500/10 shadow-[0_0_30px_rgba(168,85,247,0.2)];
+    @apply border-doc-ocean-800/60 bg-doc-ocean-800/10 shadow-[0_0_30px_rgba(9,60,93,0.15)];
   }
 
   /* Glass Cards */
   .glass-card {
-    @apply bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-md shadow-xl transition-all duration-300;
+    @apply bg-white/40 border border-stone-200 rounded-2xl p-6 backdrop-blur-md shadow-md transition-all duration-300;
   }
 
   .glass-card:hover {
-    @apply border-white/15 bg-white/10 shadow-2xl;
+    @apply border-stone-300 bg-white/60 shadow-xl;
   }
 
   /* Suggestion Buttons */
   .doc-suggestion-btn {
-    @apply text-[13px] font-bold px-5 py-2.5 rounded-full border border-white/10 text-white/70 transition-all duration-300 bg-white/5 hover:border-white/20 hover:bg-white/10;
+    @apply text-[13px] font-bold px-3.5 py-1.5 rounded-full border border-stone-300 text-doc-ocean-800 bg-doc-ocean-100 backdrop-blur-sm shadow-[0_1px_6px_-1px_rgba(9,60,93,0.1)] transition-all duration-200 cursor-pointer;
+  }
+
+  .doc-suggestion-btn:hover {
+    @apply bg-doc-ocean-100/80 border-doc-ocean-800/40 -translate-y-0.5 shadow-[0_3px_10px_-2px_rgba(9,60,93,0.18)];
   }
 
   /* Buttons aligning with Visual */
   .doc-explore-btn {
-    @apply flex items-center gap-2 text-[13px] px-5 py-2.5 rounded-full bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 text-white font-semibold transition-all shadow-lg;
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
+    @apply inline-flex items-center gap-2 text-sm px-6 py-2.5 rounded-full text-white font-semibold bg-doc-ocean-800 shadow-[0_4px_16px_-2px_rgba(9,60,93,0.35)] transition-all duration-200 cursor-pointer;
   }
 
   .doc-explore-btn:hover {
-    @apply opacity-90 shadow-purple-500/20;
+    @apply scale-105 -translate-y-0.5 bg-doc-stone-600 shadow-[0_8px_28px_-4px_rgba(9,60,93,0.45)] ring-4 ring-doc-ocean-800/15 text-white no-underline;
+  }
+
+  .doc-explore-btn:active {
+    @apply scale-98;
   }
 
   /* Tables */
@@ -88,11 +100,11 @@
   }
 
   .doc-table th {
-    @apply text-xs uppercase tracking-wider text-white/40 font-bold py-4 px-4 border-b border-white/10;
+    @apply text-xs uppercase tracking-wider text-stone-500 font-bold py-4 px-4 border-b border-stone-200;
   }
 
   .doc-table td {
-    @apply py-4 px-4 border-b border-white/5 text-sm text-white/80;
+    @apply py-4 px-4 border-b border-stone-100 text-sm text-stone-800;
   }
 
   .doc-table tr:last-child td {
@@ -101,54 +113,62 @@
 
   /* Search input overrides to match SearchBar */
   .doc-searchbar-container {
-    @apply bg-black/20 border border-white/20 text-white backdrop-blur-xl shadow-[0_8px_32px_-4px_rgb(0_0_0_/0.4)];
+    @apply bg-white/88 border border-stone-300 text-stone-900 rounded-full shadow-[0_4px_24px_-4px_rgba(9,60,93,0.14),0_1px_6px_0_rgba(9,60,93,0.08)] backdrop-blur-md transition-all duration-200;
   }
 
   .doc-searchbar-container input {
-    @apply text-white;
+    @apply text-stone-900;
   }
 
   .doc-searchbar-button {
-    @apply bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 text-white;
+    @apply !bg-doc-ocean-800 !text-white;
+    box-shadow: 0 2px 10px -1px rgba(9, 60, 93, 0.4);
+    transition: box-shadow 0.2s ease, transform 0.15s ease;
+  }
+
+  .doc-searchbar-button:hover:not(:disabled) {
+    box-shadow: 0 4px 18px -2px rgba(9, 60, 93, 0.55);
+    transform: scale(1.03);
+    @apply !bg-doc-stone-600;
   }
 
   /* Interactive items */
   .action-btn-danger {
-    @apply p-2 rounded-lg text-red-400/70 hover:text-red-400 hover:bg-red-500/10 transition-all active:scale-95;
+    @apply p-2 rounded-lg text-rose-600 hover:text-rose-700 hover:bg-rose-100/50 transition-all active:scale-95 cursor-pointer;
   }
 
   .action-btn-primary {
-    @apply p-2 rounded-lg text-purple-400/70 hover:text-purple-400 hover:bg-purple-500/10 transition-all active:scale-95;
+    @apply p-2 rounded-lg text-doc-ocean-800 hover:text-doc-ocean-700 hover:bg-doc-ocean-100/50 transition-all active:scale-95 cursor-pointer;
   }
 
   /* Badges */
   .badge-match {
-    @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20;
+    @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-doc-green-500/15 text-doc-ocean-800 border border-doc-green-500/30;
   }
 
   .badge-doc {
-    @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-white/5 text-white/70 border border-white/10 max-w-xs truncate;
+    @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-doc-ocean-100/50 text-doc-ocean-800 border border-doc-ocean-100 max-w-xs truncate;
   }
 
   .badge-page {
-    @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-cyan-500/10 text-cyan-400 border border-cyan-500/20;
+    @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-doc-ocean-100 text-doc-ocean-800 border border-doc-stone-200;
   }
 }
 
 @keyframes pulseGlow {
   0% {
-    box-shadow: 0 0 0 0px rgba(168, 85, 247, 0.7);
-    border-color: rgba(168, 85, 247, 0.9);
-    background: rgba(168, 85, 247, 0.2);
+    box-shadow: 0 0 0 0px rgba(9, 60, 93, 0.7);
+    border-color: rgba(9, 60, 93, 0.9);
+    background: rgba(9, 60, 93, 0.2);
   }
   50% {
-    box-shadow: 0 0 25px 8px rgba(168, 85, 247, 0.5);
-    border-color: rgba(34, 211, 238, 0.9);
-    background: rgba(34, 211, 238, 0.25);
+    box-shadow: 0 0 25px 8px rgba(92, 248, 216, 0.5);
+    border-color: rgba(92, 248, 216, 0.9);
+    background: rgba(92, 248, 216, 0.25);
   }
   100% {
-    box-shadow: 0 0 0 0px rgba(168, 85, 247, 0);
-    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 0 0px rgba(9, 60, 93, 0);
+    border-color: rgba(0, 0, 0, 0.1);
     background: rgba(255, 255, 255, 0.05);
   }
 }

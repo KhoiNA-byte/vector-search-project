@@ -2,26 +2,16 @@
 @reference "../../../style.css";
 
 .fruit-create-container {
-  min-height: 100vh;
-  padding-top: 8rem;
-  padding-bottom: 3rem;
-  background: linear-gradient(170deg,
-      #d4f5e0 0%,
-      #c8eecc 12%,
-      #e8f5d0 28%,
-      #f5f0d8 50%,
-      #f7f3e8 68%,
-      #edf2eb 84%,
-      #e8eeea 100%);
+  @apply min-h-screen pt-32 pb-12 bg-[linear-gradient(170deg,var(--color-fruit-lime-300)_0%,var(--color-fruit-lime-100)_12%,var(--color-fruit-emerald-50)_28%,var(--color-fruit-stone-50)_50%,var(--color-fruit-stone-100)_68%,var(--color-fruit-stone-100)_84%,var(--color-fruit-stone-200)_100%)];
 }
 
 /* Back Button Pill styling */
 .back-pill-button {
-  @apply inline-flex items-center gap-2.5 px-5 py-2 rounded-full border border-white/60 bg-white/30 backdrop-blur-md text-green-950 text-sm font-semibold shadow-sm transition-all duration-300 mb-6 cursor-pointer;
+  @apply inline-flex items-center gap-2.5 px-5 py-2 rounded-full border border-white/60 bg-white/30 backdrop-blur-md text-fruit-emerald-800 text-sm font-semibold shadow-sm transition-all duration-300 mb-6 cursor-pointer;
 }
 
 .back-pill-button:hover {
-  @apply -translate-y-0.5 bg-white/50 border-white shadow-md text-emerald-950;
+  @apply -translate-y-0.5 bg-white/50 border-white shadow-md text-fruit-emerald-700;
 }
 
 .back-pill-button:hover svg {
@@ -35,13 +25,11 @@
 /* Create Card Container */
 .fruit-create-card-container {
   @apply bg-white/20 backdrop-blur-xl rounded-[2rem] p-8 md:p-10 border border-white/70 shadow-2xl relative z-10;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08), 
-              0 0 40px rgba(0, 0, 0, 0.02);
 }
 
 /* Header UI */
 .fruit-create-header {
-  @apply flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 pb-6 border-b border-stone-100;
+  @apply flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 pb-6 border-b border-fruit-emerald-100/40;
 }
 
 .fruit-create-title-group {
@@ -49,11 +37,11 @@
 }
 
 .fruit-create-hero-title {
-  @apply text-3xl md:text-4xl font-extrabold text-green-950 font-serif tracking-tight leading-none;
+  @apply text-3xl md:text-4xl font-extrabold text-fruit-emerald-950 font-serif tracking-tight leading-none;
 }
 
 .fruit-create-hero-subtitle {
-  @apply text-stone-500 font-semibold text-sm;
+  @apply text-fruit-emerald-700/80 font-semibold text-sm;
 }
 
 .fruit-create-metadata {
@@ -61,7 +49,7 @@
 }
 
 .fruit-create-badge {
-  @apply px-2.5 py-0.5 text-[0.6875rem] font-bold tracking-wider uppercase rounded-full bg-emerald-100/70 text-emerald-800;
+  @apply px-2.5 py-0.5 text-[0.6875rem] font-bold tracking-wider uppercase rounded-full bg-fruit-emerald-100/70 text-fruit-emerald-700;
 }
 
 /* Actions UI */
@@ -70,11 +58,11 @@
 }
 
 .fruit-create-btn-cancel {
-  @apply flex-1 md:flex-initial inline-flex items-center justify-center font-semibold text-sm text-stone-600 bg-white/60 border border-white/80 rounded-full px-6 py-3 transition-all duration-200 cursor-pointer shadow-sm;
+  @apply flex-1 md:flex-initial inline-flex items-center justify-center font-semibold text-sm text-fruit-emerald-700 bg-white/60 border border-white/80 rounded-full px-6 py-3 transition-all duration-200 cursor-pointer shadow-sm;
 }
 
 .fruit-create-btn-cancel:hover {
-  @apply bg-white/80 text-stone-800 border-white -translate-y-0.5 shadow;
+  @apply bg-white/80 text-fruit-emerald-950 border-white -translate-y-0.5 shadow;
 }
 
 .fruit-create-btn-cancel:active {
@@ -82,11 +70,11 @@
 }
 
 .fruit-create-btn-save {
-  @apply flex-1 md:flex-initial inline-flex items-center justify-center gap-2 font-semibold text-sm text-white bg-gradient-to-r from-emerald-600 to-teal-500 border-none rounded-full px-6 py-3 transition-all duration-300 cursor-pointer shadow-lg shadow-emerald-600/10;
+  @apply flex-1 md:flex-initial inline-flex items-center justify-center gap-2 font-semibold text-sm text-white bg-fruit-emerald-800 border-none rounded-full px-6 py-3 transition-all duration-300 cursor-pointer shadow-lg shadow-fruit-emerald-800/10;
 }
 
 .fruit-create-btn-save:hover:not(:disabled) {
-  @apply -translate-y-0.5 brightness-105 shadow-xl shadow-emerald-600/20;
+  @apply -translate-y-0.5 bg-fruit-stone-600 shadow-xl shadow-fruit-emerald-800/20 ring-4 ring-fruit-emerald-800/15;
 }
 
 .fruit-create-btn-save:active {
@@ -115,11 +103,11 @@
 }
 
 .fruit-create-section-header h2 {
-  @apply text-base font-bold text-stone-800 tracking-wide;
+  @apply text-base font-bold text-fruit-emerald-950 tracking-wide;
 }
 
 .fruit-create-section-divider {
-  @apply h-px w-full bg-stone-200/50;
+  @apply h-px w-full bg-fruit-emerald-100/50;
 }
 
 /* Inputs & Labels */
@@ -128,20 +116,19 @@
 }
 
 .fruit-create-field-label {
-  @apply text-xs font-bold text-stone-400 uppercase tracking-wider;
+  @apply text-xs font-bold text-fruit-emerald-700/60 uppercase tracking-wider;
 }
 
 .fruit-create-input {
-  @apply w-full h-11 px-4 border border-white/60 bg-white/70 backdrop-blur-sm rounded-xl text-stone-800 text-sm font-semibold outline-none transition-all duration-300;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  @apply w-full h-11 px-4 border border-white/60 bg-white/70 backdrop-blur-sm rounded-xl text-fruit-emerald-950 text-sm font-semibold outline-none transition-all duration-300 shadow-sm;
 }
 
 .fruit-create-input::placeholder {
-  @apply text-stone-400 font-normal;
+  @apply text-fruit-emerald-700/40 font-normal;
 }
 
 .fruit-create-input:focus {
-  @apply border-emerald-500 bg-white ring-4 ring-emerald-500/10;
+  @apply border-fruit-emerald-700 bg-white ring-4 ring-fruit-emerald-800/10;
 }
 
 /* Price specific wrapper */

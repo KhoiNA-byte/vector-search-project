@@ -50,21 +50,69 @@
   --shadow-card: 0 10px 40px -6px rgb(20 83 45 / 0.12);
   --shadow-glow: 0 0 20px rgb(132 204 22 / 0.3);
 
-  /* Earth / Pistachio Palette Color Overrides */
+  /* ==========================================================================
+     UNIFIED THEME PALETTE MAPPING
+     Both pages enforce 1:1 color parity. The roles are mapped as follows:
+     
+     Role / Purpose               | Earth Palette (Visuals) | Pistachio Palette (Fruits) | Ocean Palette (Documents)
+     -----------------------------|-------------------------|----------------------------|--------------------------
+     1. Text / Active Button      | --color-amber-800       | --color-fruit-emerald-800  | --color-doc-ocean-800
+     2. Hover States / Grad Start | --color-amber-700       | --color-fruit-emerald-700  | --color-doc-ocean-700
+     3. Inactive Btn / Pills Bg   | --color-amber-100       | --color-fruit-emerald-100  | --color-doc-ocean-100
+     4. Gradient Center           | --color-amber-50        | --color-fruit-emerald-50   | --color-doc-ocean-50
+     5. Accent Highlight          | --color-lime-500        | --color-fruit-green-500    | --color-doc-green-500
+     6. Secondary Hover           | --color-stone-600       | --color-fruit-stone-600    | --color-doc-stone-600
+     7. Title Grad Center         | --color-stone-400       | --color-fruit-stone-400    | --color-doc-stone-400
+     8. Grad Stop 0% (Start)      | --color-stone-200       | --color-fruit-stone-200    | --color-doc-stone-200
+     9. Grad Stop 28%             | --color-stone-100       | --color-fruit-stone-100    | --color-doc-stone-100
+     10. Grad Stop 50% (Cream)    | --color-stone-50        | --color-fruit-stone-50     | --color-doc-stone-50
+     11. Grad Stop 84%            | --color-lime-100        | --color-fruit-lime-100     | --color-doc-lime-100
+     12. Grad Stop 100% (End)     | --color-lime-300        | --color-fruit-lime-300     | --color-doc-lime-300
+     ========================================================================== */
+
+  /* Earth / Pistachio Palette (Visuals Page) */
   --color-amber-800: #8a5f41;
   --color-amber-700: #a77f60;
   --color-amber-100: #f3e4c9;
   --color-amber-50: #eddcd2;
   --color-lime-500: #ccd67f;
-
   --color-stone-600: #a77f60;
   --color-stone-400: #a77f60;
-
   --color-stone-200: #e5d5c5;
   --color-stone-100: #f5ebe0;
   --color-stone-50: #fbf8f3;
   --color-lime-100: #dce7c4;
   --color-lime-300: #c7d99b;
+
+  /* Green / Cream Palette (Fruits Page) */
+  --color-fruit-emerald-800: #1a5c35;
+  --color-fruit-emerald-700: #2d6a3f;
+  --color-fruit-emerald-100: #bef0c8;
+  --color-fruit-emerald-50: #e8f5d0;
+  --color-fruit-green-500: #86d69b;
+  --color-fruit-stone-600: #2d6a3f;
+  --color-fruit-stone-400: #2e8b57;
+  --color-fruit-stone-200: #e8eeea;
+  --color-fruit-stone-100: #edf2eb;
+  --color-fruit-stone-50: #f5f0d8;
+  --color-fruit-lime-100: #c8eecc;
+  --color-fruit-lime-300: #d4f5e0;
+  --color-fruit-emerald-950: #0d3320;
+
+  /* Ocean / Aqua Palette (Documents Page) */
+  --color-doc-ocean-800: #093c5d;
+  --color-doc-ocean-700: #3b7597;
+  --color-doc-ocean-100: #cdeff2;
+  --color-doc-ocean-50: #edfbfd;
+  --color-doc-green-500: #5df8d8;
+  --color-doc-stone-600: #3b7597;
+  --color-doc-stone-400: #6fd1d7;
+  --color-doc-stone-200: #d1ecef;
+  --color-doc-stone-100: #e2f4f6;
+  --color-doc-stone-50: #f4fafb;
+  --color-doc-lime-100: #dbfaf5;
+  --color-doc-lime-300: #a7f9e9;
+  --color-doc-ocean-950: #051f30;
 }
 
 @layer base {

@@ -32,7 +32,7 @@ const FruitFilterBar = ({
   return (
     <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/20 backdrop-blur-xl rounded-2xl border border-white/70 shadow-md p-4 transition-all duration-300">
       {/* Result Count Summary */}
-      <span className="text-sm text-green-950 font-bold">
+      <span className="text-sm text-fruit-emerald-950 font-bold">
         Available fruits ({resultsCount})
       </span>
 
@@ -48,8 +48,8 @@ const FruitFilterBar = ({
             onClick={() => setSortBy("default")}
             className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full border text-xs font-bold transition-all duration-200 cursor-pointer shadow-sm ${
               sortBy === "default"
-                ? "bg-emerald-600 border-emerald-600 text-white shadow-emerald-600/10"
-                : "bg-white/60 border-white/80 hover:bg-white text-stone-700"
+                ? "bg-fruit-emerald-800 border-fruit-emerald-800 text-white shadow-fruit-emerald-800/10"
+                : "bg-white/60 border-white/80 hover:bg-white text-fruit-emerald-700"
             }`}
           >
             Best Match
@@ -61,8 +61,8 @@ const FruitFilterBar = ({
           onClick={handlePriceClick}
           className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full border text-xs font-bold transition-all duration-200 cursor-pointer shadow-sm ${
             isPriceActive
-              ? "bg-emerald-600 border-emerald-600 text-white shadow-emerald-600/10"
-              : "bg-white/60 border-white/80 hover:bg-white text-stone-700"
+              ? "bg-fruit-emerald-800 border-fruit-emerald-800 text-white shadow-fruit-emerald-800/10"
+              : "bg-white/60 border-white/80 hover:bg-white text-fruit-emerald-700"
           }`}
         >
           Price
@@ -76,8 +76,8 @@ const FruitFilterBar = ({
           onClick={handleNameClick}
           className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full border text-xs font-bold transition-all duration-200 cursor-pointer shadow-sm ${
             isNameActive
-              ? "bg-emerald-600 border-emerald-600 text-white shadow-emerald-600/10"
-              : "bg-white/60 border-white/80 hover:bg-white text-stone-700"
+              ? "bg-fruit-emerald-800 border-fruit-emerald-800 text-white shadow-fruit-emerald-800/10"
+              : "bg-white/60 border-white/80 hover:bg-white text-fruit-emerald-700"
           }`}
         >
           Name

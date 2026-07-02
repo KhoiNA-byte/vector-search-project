@@ -29,6 +29,12 @@ const NavBar = () => {
         WebkitBackdropFilter: "blur(20px) saturate(180%)",
         borderBottomColor: "rgba(167, 127, 96, 0.25)",
         boxShadow: "0 1px 24px -4px rgba(138, 95, 65, 0.08), 0 0 0 1px rgba(255,255,255,0.18) inset",
+      } : isDocumentPage ? {
+        background: "rgba(255, 255, 255, 0.45)",
+        backdropFilter: "blur(20px) saturate(180%)",
+        WebkitBackdropFilter: "blur(20px) saturate(180%)",
+        borderBottomColor: "rgba(111, 209, 215, 0.25)",
+        boxShadow: "0 1px 24px -4px rgba(9, 60, 93, 0.08), 0 0 0 1px rgba(255,255,255,0.18) inset",
       } : {
         background: "rgba(5, 5, 5, 0.60)",
         backdropFilter: "blur(20px)",
@@ -48,8 +54,8 @@ const NavBar = () => {
                  background: "linear-gradient(135deg, var(--color-amber-800), var(--color-lime-300))",
                  boxShadow: "0 0 20px rgba(138, 95, 65, 0.35)",
                } : isDocumentPage ? {
-                 background: "linear-gradient(135deg, #4f46e5, #7c3aed)",
-                 boxShadow: "0 0 20px rgba(99,102,241,0.35)",
+                 background: "linear-gradient(135deg, var(--color-doc-ocean-800), var(--color-doc-stone-400))",
+                 boxShadow: "0 0 20px rgba(9,60,93,0.35)",
                } : {
                  background: "linear-gradient(135deg, #22d3ee, #a855f7)",
                  boxShadow: "0 0 20px rgba(34,211,238,0.3)",
@@ -58,9 +64,9 @@ const NavBar = () => {
                 <span className="text-white font-bold text-xl italic drop-shadow-md">V</span>
              </div>
              <span className={`font-display font-black text-2xl tracking-tighter transition-colors duration-500 ${
-               isFruitPage ? "text-[#0d3320]" : isVisualPage ? "text-stone-900" : "text-white"
+               isFruitPage ? "text-[#0d3320]" : isVisualPage ? "text-stone-900" : isDocumentPage ? "text-doc-ocean-800" : "text-white"
              }`}>
-                VECTOR<span className={isFruitPage ? "text-[#27ae60]" : isVisualPage ? "text-amber-800" : isDocumentPage ? "text-indigo-400" : "text-cyan-400"}>SEARCH</span>
+                VECTOR<span className={isFruitPage ? "text-[#27ae60]" : isVisualPage ? "text-amber-800" : isDocumentPage ? "text-doc-ocean-700" : "text-cyan-400"}>SEARCH</span>
              </span>
           </div>
 
@@ -89,14 +95,19 @@ const NavBar = () => {
                           }
                         : isDocumentPage
                         ? {
-                            background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 60%, #a855f7 100%)",
+                            background: "linear-gradient(135deg, var(--color-doc-ocean-800) 0%, var(--color-doc-stone-400) 60%, var(--color-doc-lime-300) 100%)",
                             color: "#fff",
-                            boxShadow: "0 4px 16px -2px rgba(99,102,241,0.4), 0 0 0 2px rgba(124,58,237,0.2)",
+                            boxShadow: "0 4px 16px -2px rgba(9,60,93,0.3), 0 0 0 2px rgba(92,248,216,0.15)",
                           }
                         : { background: "#fff", color: "#000", boxShadow: "0 0 30px rgba(255,255,255,0.1)" }
-                      : {}
+                      : isFruitPage
+                      ? { color: "#4a7a5a" }
+                      : isVisualPage
+                      ? { color: "var(--color-amber-800)" }
+                      : isDocumentPage
+                      ? { color: "var(--color-doc-ocean-700)" }
+                      : { color: "rgba(255,255,255,0.4)" }
                   }
-                  data-inactive-fruit={!isActive && isFruitPage ? "true" : undefined}
                 >
                   <Icon className={`h-4 w-4 ${isActive ? "animate-pulse" : ""}`} />
                   <span
@@ -106,7 +117,9 @@ const NavBar = () => {
                         ? { color: "#4a7a5a" }
                       : !isActive && isVisualPage
                         ? { color: "var(--color-amber-800)" }
-                      : !isActive && !isFruitPage && !isVisualPage
+                      : !isActive && isDocumentPage
+                        ? { color: "var(--color-doc-ocean-700)" }
+                      : !isActive && !isFruitPage && !isVisualPage && !isDocumentPage
                         ? { color: "rgba(255,255,255,0.4)" }
                         : {}
                     }

@@ -34,46 +34,34 @@ const FruitCard = ({ fruit, rank, similarity }) => {
         "group relative rounded-2xl p-6 pt-7 cursor-pointer select-none",
         "transition-all duration-300 ease-out",
         "hover:-translate-y-2",
-        isTop ? "ring-2 ring-emerald-400/50" : "",
+        "border border-fruit-emerald-100/60 backdrop-blur-sm shadow-md hover:shadow-lg",
+        isTop ? "ring-2 ring-fruit-green-500/50" : "",
         bg,
         hoverBg,
       ]
         .filter(Boolean)
         .join(" ")}
-      style={{
-        border: "1px solid rgba(160, 215, 180, 0.45)",
-        boxShadow: isTop
-          ? "0 8px 32px -6px rgba(34, 130, 70, 0.22), 0 2px 8px -2px rgba(34, 130, 70, 0.12), 0 0 0 1px rgba(82, 192, 65, 0.15)"
-          : "0 4px 20px -4px rgba(34, 100, 60, 0.14), 0 1px 4px -1px rgba(34, 100, 60, 0.08)",
-        backdropFilter: "blur(4px)",
-      }}
     >
       {/* ── Rank badge ───────────────────────────────────────────── */}
       {hasSimilarity && (
         <div
-          className="absolute -top-3 -left-3 z-10 flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold"
-          style={isTop ? {
-            background: "linear-gradient(135deg, #1a5c35 0%, #27ae60 100%)",
-            color: "#fff",
-            boxShadow: "0 4px 14px -2px rgba(34, 140, 70, 0.45), 0 0 0 2px rgba(82, 192, 65, 0.25)",
-          } : {
-            background: "rgba(255,255,255,0.95)",
-            border: "1px solid rgba(160,215,180,0.5)",
-            color: "#2d5a3e",
-            boxShadow: "0 2px 8px -2px rgba(34, 100, 60, 0.15)",
-          }}
+          className={`absolute -top-3 -left-3 z-10 flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold ${
+            isTop
+              ? "bg-[linear-gradient(135deg,var(--color-fruit-emerald-800)_0%,var(--color-fruit-green-500)_100%)] text-white shadow-md shadow-fruit-emerald-800/20"
+              : "bg-white/95 border border-fruit-emerald-100/50 text-fruit-emerald-700 shadow-sm"
+          }`}
         >
           {isTop && <Trophy className="h-3 w-3" />}
           #{rank}
         </div>
       )}
-
+ 
       {/* ── Header row: name + price + slide-in button ───────────── */}
       <div className="flex items-start justify-between mb-2 gap-3">
         <h3 className="font-display text-2xl font-bold text-stone-900 leading-tight">
           {fruit.name}
         </h3>
-
+ 
         <div className="flex items-center gap-2 shrink-0">
           {/* Price badge */}
           {fruit.price !== undefined && (
@@ -81,7 +69,7 @@ const FruitCard = ({ fruit, rank, similarity }) => {
               ${fruit.price}
             </span>
           )}
-
+ 
           {/* View Details — slides in from the right on hover */}
           <div
             className={[
@@ -98,7 +86,7 @@ const FruitCard = ({ fruit, rank, similarity }) => {
           </div>
         </div>
       </div>
-
+ 
       {/* ── Color chips ───────────────────────────────────────────── */}
       <div className="flex items-center gap-3 mb-3 text-xs font-medium text-stone-500">
         {fruit.colorOutside && (
@@ -114,23 +102,21 @@ const FruitCard = ({ fruit, rank, similarity }) => {
           </div>
         )}
       </div>
-
-
+ 
+ 
       {/* ── Similarity bar ───────────────────────────────────────── */}
       {hasSimilarity && (
         <div className="mb-4">
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-xs uppercase tracking-wider font-semibold" style={{ color: "#4a8c62", letterSpacing: "0.08em" }}>
+            <span className="text-xs uppercase tracking-wider font-semibold text-fruit-emerald-700">
               Match
             </span>
             <span
-              className="text-sm font-black"
-              style={isTop ? {
-                background: "linear-gradient(135deg, #1a5c35, #27ae60)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              } : { color: "#2d5a3e" }}
+              className={`text-sm font-black ${
+                isTop
+                  ? "bg-[linear-gradient(135deg,var(--color-fruit-emerald-800),var(--color-fruit-green-500))] bg-clip-text text-transparent"
+                  : "text-fruit-emerald-700"
+              }`}
             >
               {similarity}%
             </span>
@@ -140,11 +126,11 @@ const FruitCard = ({ fruit, rank, similarity }) => {
             highlight={isTop}
             gradient={
               isTop
-                ? "linear-gradient(90deg, #1a5c35 0%, #27ae60 50%, #52c041 100%)"
-                : "linear-gradient(90deg, #2e8b57 0%, #4aad6a 60%, #7ed56a 100%)"
+                ? "linear-gradient(90deg, var(--color-fruit-emerald-800) 0%, var(--color-fruit-green-500) 100%)"
+                : "linear-gradient(90deg, var(--color-fruit-emerald-700) 0%, var(--color-fruit-green-500) 100%)"
             }
-            glowColor="rgba(82, 192, 65, 0.55)"
-            trackColor="rgba(160, 215, 180, 0.25)"
+            glowColor="var(--color-fruit-green-500)"
+            trackColor="var(--color-fruit-emerald-100)"
           />
         </div>
       )}

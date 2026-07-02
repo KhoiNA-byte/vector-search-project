@@ -4,16 +4,12 @@
 /* Inherit styles from VisualEntityPage.css via shared class names */
 
 .upload-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    position: relative;
-    z-index: 20;
+    @apply flex flex-col gap-6 relative z-20;
 }
 
 .dropzone {
     @apply bg-white/40 border border-dashed rounded-2xl p-8 text-center cursor-pointer backdrop-blur-xl transition-all duration-300 min-h-[400px] flex items-center justify-center overflow-hidden;
-    @apply border-stone-300 shadow-[0_8px_32px_-4px_var(--color-amber-800/0.08)];
+    @apply border-stone-300 shadow-md;
 }
 
 .dropzone:hover {

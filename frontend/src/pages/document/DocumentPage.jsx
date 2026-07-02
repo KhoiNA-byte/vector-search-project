@@ -308,7 +308,7 @@ const DocumentPage = () => {
           </div>
           
           <h1 className="doc-hero-title">
-            Search documents by <span className="doc-hero-vibe">content.</span>
+            Search documents by <span className="doc-hero-vibe text-doc-ocean-800">content.</span>
           </h1>
           
           <p className="doc-hero-subtitle">
@@ -333,7 +333,7 @@ const DocumentPage = () => {
               <Sparkles className="inline-block h-4 w-4 mr-2 -mt-0.5" />
               Deep Semantic Search
               {selectedDocs.length > 0 && (
-                <span className="ml-2 px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-cyan-400 text-black leading-none">
+                <span className="ml-2 px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-doc-green-500 text-doc-ocean-800 leading-none">
                   {selectedDocs.length}
                 </span>
               )}
@@ -387,7 +387,7 @@ const DocumentPage = () => {
 
                   {/* Suggestions tag row */}
                   <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-white/30 font-bold mr-2">Try:</span>
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-stone-500 font-bold mr-2">Try:</span>
                     {DOC_SUGGESTIONS.map((s) => (
                       <button
                         key={s}
@@ -405,16 +405,16 @@ const DocumentPage = () => {
                   <section className="mt-12">
                     {/* Matching documents bar styled after FruitFilterBar */}
                     {documents.length > 0 && (
-                      <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 shadow-md p-4 transition-all duration-300">
+                      <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/40 backdrop-blur-xl rounded-2xl border border-stone-200 shadow-md p-4 transition-all duration-300">
                         {/* Result Count Summary */}
-                        <span className="text-sm text-cyan-400 font-bold">
+                        <span className="text-sm text-doc-ocean-800 font-bold">
                           Available documents ({documents.length})
                         </span>
 
                         {/* Sort & Select Buttons */}
                         <div className="flex flex-wrap items-center gap-4 w-full sm:w-auto">
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-white/40 uppercase tracking-wider mr-1">
+                            <span className="text-xs font-bold text-stone-500 uppercase tracking-wider mr-1">
                               Sort by:
                             </span>
 
@@ -424,8 +424,8 @@ const DocumentPage = () => {
                                 onClick={() => setSortBy("default")}
                                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-bold transition-all duration-200 cursor-pointer shadow-sm ${
                                   sortBy === "default"
-                                    ? "bg-purple-600 border-purple-600 text-white"
-                                    : "bg-white/5 border-white/10 hover:bg-white/10 text-white/80"
+                                    ? "bg-doc-ocean-800 border-doc-ocean-800 text-white"
+                                    : "bg-white/60 border-white/80 hover:bg-white text-doc-ocean-800"
                                 }`}
                               >
                                 Best Match
@@ -437,8 +437,8 @@ const DocumentPage = () => {
                               onClick={handleNameClick}
                               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-bold transition-all duration-200 cursor-pointer shadow-sm ${
                                 isNameActive
-                                  ? "bg-purple-600 border-purple-600 text-white"
-                                  : "bg-white/5 border-white/10 hover:bg-white/10 text-white/80"
+                                  ? "bg-doc-ocean-800 border-doc-ocean-800 text-white"
+                                  : "bg-white/60 border-white/80 hover:bg-white text-doc-ocean-800"
                               }`}
                             >
                               Name
@@ -452,8 +452,8 @@ const DocumentPage = () => {
                               onClick={handleSizeClick}
                               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-bold transition-all duration-200 cursor-pointer shadow-sm ${
                                 isSizeActive
-                                  ? "bg-purple-600 border-purple-600 text-white"
-                                  : "bg-white/5 border-white/10 hover:bg-white/10 text-white/80"
+                                  ? "bg-doc-ocean-800 border-doc-ocean-800 text-white"
+                                  : "bg-white/60 border-white/80 hover:bg-white text-doc-ocean-800"
                               }`}
                             >
                               Size
@@ -465,7 +465,7 @@ const DocumentPage = () => {
 
                           <button
                             onClick={selectAllDocs}
-                            className="text-xs text-cyan-400 hover:text-cyan-300 font-bold transition-all ml-auto sm:ml-0"
+                            className="text-xs text-doc-ocean-800 hover:text-doc-ocean-700 font-bold transition-all ml-auto sm:ml-0 cursor-pointer"
                           >
                             {selectedDocs.length === documents.length ? "Deselect All" : "Select All"}
                           </button>
@@ -476,18 +476,18 @@ const DocumentPage = () => {
                     {searchingDocs ? (
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {[1, 2, 3].map(i => (
-                          <div key={i} className="glass-card animate-pulse h-40 space-y-4">
-                            <div className="h-4 bg-white/5 rounded w-2/3" />
-                            <div className="h-3 bg-white/5 rounded w-1/2" />
-                            <div className="h-3 bg-white/5 rounded w-1/3" />
+                          <div key={i} className="glass-card animate-pulse h-40 space-y-4 bg-white/20">
+                            <div className="h-4 bg-stone-200 rounded w-2/3" />
+                            <div className="h-3 bg-stone-200 rounded w-1/2" />
+                            <div className="h-3 bg-stone-200 rounded w-1/3" />
                           </div>
                         ))}
                       </div>
                     ) : documents.length === 0 ? (
-                      <div className="text-center py-20 glass-card border-white/5">
-                        <HelpCircle className="h-12 w-12 text-white/20 mx-auto mb-4" />
-                        <h3 className="text-lg font-bold">No Documents Found</h3>
-                        <p className="text-white/40 text-sm mt-1">Upload a PDF or DOCX file to start searching.</p>
+                      <div className="text-center py-20 glass-card border-stone-200">
+                        <HelpCircle className="h-12 w-12 text-stone-300 mx-auto mb-4" />
+                        <h3 className="text-lg font-bold text-stone-800">No Documents Found</h3>
+                        <p className="text-stone-500 text-sm mt-1">Upload a PDF or DOCX file to start searching.</p>
                       </div>
                     ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -500,15 +500,15 @@ const DocumentPage = () => {
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: idx * 0.05 }}
                               onClick={() => toggleSelectDoc(doc.name)}
-                              className={`glass-card relative flex flex-col justify-between overflow-hidden border-white/5 cursor-pointer hover:scale-[1.01] active:scale-[0.99] transition-all select-none ${
-                                isSelected ? "ring-1 ring-purple-500 bg-purple-500/5" : ""
+                              className={`glass-card relative flex flex-col justify-between overflow-hidden border-stone-200 cursor-pointer hover:scale-[1.01] active:scale-[0.99] transition-all select-none ${
+                                isSelected ? "ring-2 ring-doc-ocean-800 bg-doc-ocean-50/50" : ""
                               }`}
                             >
                               <div className="space-y-4">
                                 {/* Checkbox & Header */}
                                 <div className="flex items-start justify-between">
-                                  <div className="text-purple-400 transition-colors mr-2 mt-0.5">
-                                    {isSelected ? <CheckSquare size={20} /> : <Square size={20} className="text-white/20" />}
+                                  <div className="text-doc-ocean-800 transition-colors mr-2 mt-0.5">
+                                    {isSelected ? <CheckSquare size={20} /> : <Square size={20} className="text-stone-300" />}
                                   </div>
                                   
                                   <div className="flex items-center gap-1.5">
@@ -521,19 +521,19 @@ const DocumentPage = () => {
 
                                 {/* Doc Title */}
                                 <div className="space-y-1">
-                                  <h3 className="font-semibold text-sm leading-snug break-all text-white/95">{doc.name}</h3>
-                                  <p className="text-xs text-white/40">{formatBytes(doc.fileSize)} • {doc.chunkCount} chunks</p>
+                                  <h3 className="font-semibold text-sm leading-snug break-all text-stone-900">{doc.name}</h3>
+                                  <p className="text-xs text-stone-500">{formatBytes(doc.fileSize)} • {doc.chunkCount} chunks</p>
                                 </div>
                               </div>
 
                               {/* Actions */}
-                              <div className="flex items-center justify-between border-t border-white/5 pt-4 mt-6">
+                              <div className="flex items-center justify-between border-t border-stone-200 pt-4 mt-6">
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     navigate(`/documents/${encodeURIComponent(doc.name)}`);
                                   }}
-                                  className="flex items-center gap-1 text-[11px] font-bold text-cyan-400 hover:text-cyan-300 transition-colors"
+                                  className="flex items-center gap-1 text-[11px] font-bold text-doc-ocean-800 hover:text-doc-ocean-700 transition-colors"
                                 >
                                   <ExternalLink size={12} />
                                   View Detail
@@ -545,7 +545,7 @@ const DocumentPage = () => {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     onClick={(e) => e.stopPropagation()}
-                                    className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/5 transition-all"
+                                    className="p-1.5 rounded-lg text-stone-500 hover:text-stone-900 hover:bg-stone-100 transition-all"
                                     title="Download document"
                                   >
                                     <Download size={14} />
@@ -555,7 +555,7 @@ const DocumentPage = () => {
                                       e.stopPropagation();
                                       handleDeleteDoc(doc.name);
                                     }}
-                                    className="p-1.5 rounded-lg text-red-400/40 hover:text-red-400 hover:bg-red-500/5 transition-all"
+                                    className="p-1.5 rounded-lg text-rose-500/70 hover:text-rose-700 hover:bg-rose-50 transition-all"
                                     title="Delete document"
                                   >
                                     <Trash2 size={14} />
@@ -595,7 +595,7 @@ const DocumentPage = () => {
 
                     {/* Suggestions */}
                     <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
-                      <span className="text-[10px] uppercase tracking-[0.2em] text-white/30 font-bold mr-2">Try:</span>
+                      <span className="text-[10px] uppercase tracking-[0.2em] text-stone-500 font-bold mr-2">Try:</span>
                       {SEMANTIC_SUGGESTIONS.map((s) => (
                         <button
                           key={s}
@@ -612,17 +612,17 @@ const DocumentPage = () => {
                   {searchingChunks ? (
                     <div className="grid gap-5 sm:grid-cols-2">
                       {[1, 2, 3, 4].map(i => (
-                        <div key={i} className="glass-card animate-pulse h-56 space-y-4">
-                          <div className="h-5 bg-white/5 rounded w-1/3" />
-                          <div className="h-4 bg-white/5 rounded w-1/4" />
-                          <div className="h-20 bg-white/5 rounded w-full" />
+                        <div key={i} className="glass-card animate-pulse h-56 space-y-4 bg-white/20">
+                          <div className="h-5 bg-stone-200 rounded w-1/3" />
+                          <div className="h-4 bg-stone-200 rounded w-1/4" />
+                          <div className="h-20 bg-stone-200 rounded w-full" />
                         </div>
                       ))}
                     </div>
                   ) : hasSearchedChunks && chunks.length === 0 ? (
-                    <div className="text-center py-16 glass-card border-white/5">
-                      <HelpCircle className="h-10 w-10 text-white/20 mx-auto mb-3" />
-                      <p className="text-sm text-white/40 font-light">No matching text blocks found. Try different keywords.</p>
+                    <div className="text-center py-16 glass-card border-stone-200">
+                      <HelpCircle className="h-10 w-10 text-stone-300 mx-auto mb-3" />
+                      <p className="text-sm text-stone-500 font-light">No matching text blocks found. Try different keywords.</p>
                     </div>
                   ) : chunks.length > 0 ? (
                     <div className="space-y-8">
@@ -647,24 +647,24 @@ const DocumentPage = () => {
                               }}
                               className={`group relative rounded-2xl p-6 pt-7 cursor-pointer select-none transition-all duration-300 ease-out hover:-translate-y-2 border ${
                                 isTopMatch 
-                                  ? "border-purple-500/40 bg-purple-950/10 shadow-[0_8px_32px_-6px_rgba(168,85,247,0.2)]" 
-                                  : "border-white/10 bg-zinc-950/20 hover:bg-purple-500/5 hover:border-purple-500/20"
+                                  ? "border-doc-ocean-800/45 bg-doc-ocean-50/50 shadow-md" 
+                                  : "border-stone-200 bg-white/40 hover:bg-doc-ocean-50/20 hover:border-doc-ocean-800/20"
                               } backdrop-blur-md flex flex-col justify-between`}
                             >
                               {/* Rank badge */}
                               <div
-                                className="absolute -top-3 -left-3 z-10 flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold"
-                                style={isTopMatch ? {
-                                  background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)",
-                                  color: "#fff",
-                                  boxShadow: "0 4px 14px -2px rgba(168, 85, 247, 0.45), 0 0 0 2px rgba(168, 85, 247, 0.25)",
-                                } : {
-                                  background: "rgba(255, 255, 255, 0.08)",
-                                  border: "1px solid rgba(255, 255, 255, 0.1)",
-                                  color: "#c084fc",
-                                  boxShadow: "0 2px 8px -2px rgba(0, 0, 0, 0.15)",
-                                }}
-                              >
+                                  className="absolute -top-3 -left-3 z-10 flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold"
+                                  style={isTopMatch ? {
+                                    background: "linear-gradient(135deg, var(--color-doc-ocean-800) 0%, var(--color-doc-stone-400) 100%)",
+                                    color: "#fff",
+                                    boxShadow: "0 4px 14px -2px rgba(9, 60, 93, 0.45), 0 0 0 2px rgba(9, 60, 93, 0.25)",
+                                  } : {
+                                    background: "rgba(255, 255, 255, 0.8)",
+                                    border: "1px solid var(--color-doc-stone-200)",
+                                    color: "var(--color-doc-ocean-700)",
+                                    boxShadow: "0 2px 8px -2px rgba(0, 0, 0, 0.05)",
+                                  }}
+                                >
                                 {isTopMatch && <Trophy className="h-3 w-3" />}
                                 #{startIndex + index + 1}
                               </div>
@@ -673,20 +673,20 @@ const DocumentPage = () => {
                                 {/* Header row */}
                                 <div className="flex items-start justify-between gap-3">
                                   <div className="flex items-center gap-2 max-w-[70%]">
-                                    <FileText className="h-5 w-5 text-purple-400 shrink-0" />
-                                    <h3 className="font-semibold text-white/90 leading-tight truncate text-sm" title={chunk.documentName}>
+                                    <FileText className="h-5 w-5 text-doc-ocean-700 shrink-0" />
+                                    <h3 className="font-semibold text-stone-900 leading-tight truncate text-sm" title={chunk.documentName}>
                                       {chunk.documentName}
                                     </h3>
                                   </div>
                                   
                                   <div className="flex items-center gap-2 shrink-0">
-                                    <span className="bg-white/5 border border-white/10 text-white/70 rounded-full px-2.5 py-1 text-[11px] font-semibold">
+                                    <span className="bg-doc-ocean-100/50 border border-doc-ocean-200 text-doc-ocean-800 rounded-full px-2.5 py-1 text-[11px] font-semibold">
                                       Page {chunk.pageNumber}
                                     </span>
                                     
                                     {/* View Details slide-in */}
                                     <div
-                                      className="flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-semibold bg-white/10 text-white shadow-md opacity-0 translate-x-3 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-out pointer-events-none"
+                                      className="flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-semibold bg-doc-ocean-800 text-white shadow-md opacity-0 translate-x-3 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-out pointer-events-none"
                                     >
                                       View Source
                                       <ArrowRight className="h-2.5 w-2.5" />
@@ -697,10 +697,10 @@ const DocumentPage = () => {
                                 {/* Similarity bar */}
                                 <div className="mb-4 mt-2">
                                   <div className="flex items-center justify-between mb-1.5">
-                                    <span className="text-[10px] uppercase tracking-wider font-semibold text-purple-400">
+                                    <span className="text-[10px] uppercase tracking-wider font-semibold text-doc-ocean-700">
                                       Match Relevance
                                     </span>
-                                    <span className="text-xs font-bold text-white">
+                                    <span className="text-xs font-bold text-stone-900">
                                       {chunk.similarity}%
                                     </span>
                                   </div>
@@ -709,23 +709,23 @@ const DocumentPage = () => {
                                     highlight={isTopMatch}
                                     gradient={
                                       isTopMatch
-                                        ? "linear-gradient(90deg, #7c3aed 0%, #a855f7 50%, #ec4899 100%)"
-                                        : "linear-gradient(90deg, #6366f1 0%, #a855f7 100%)"
+                                        ? "linear-gradient(90deg, var(--color-doc-ocean-800) 0%, var(--color-doc-stone-400) 50%, var(--color-doc-green-500) 100%)"
+                                        : "linear-gradient(90deg, var(--color-doc-ocean-700) 0%, var(--color-doc-stone-400) 100%)"
                                     }
-                                    glowColor="rgba(168, 85, 247, 0.55)"
-                                    trackColor="rgba(255, 255, 255, 0.05)"
+                                    glowColor="rgba(9, 60, 93, 0.35)"
+                                    trackColor="rgba(0, 0, 0, 0.05)"
                                   />
                                 </div>
 
                                 {/* Content block */}
-                                <p className="text-[13px] text-white/70 leading-relaxed font-light font-sans line-clamp-5 overflow-hidden">
+                                <p className="text-[13px] text-stone-700 leading-relaxed font-light font-sans line-clamp-5 overflow-hidden">
                                   {chunk.content}
                                 </p>
                               </div>
 
-                              <div className="text-right text-[10px] text-white/30 pt-3 mt-4 border-t border-white/5 flex items-center justify-between">
+                              <div className="text-right text-[10px] text-stone-400 pt-3 mt-4 border-t border-stone-200 flex items-center justify-between">
                                 <span>Chunk ID: {chunk.id}</span>
-                                <span className="text-cyan-400 hover:underline">Click to scroll and view source →</span>
+                                <span className="text-doc-ocean-800 hover:underline">Click to scroll and view source →</span>
                               </div>
                             </motion.div>
                           );
@@ -738,7 +738,7 @@ const DocumentPage = () => {
                           <button
                             onClick={() => setCurrentChunkPage(p => Math.max(1, p - 1))}
                             disabled={currentChunkPage === 1}
-                            className="flex items-center gap-2 rounded-full px-4 py-2 border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                            className="flex items-center gap-2 rounded-full px-4 py-2 border border-stone-300 bg-white hover:bg-stone-50 text-stone-700 transition-all text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                           >
                             <ChevronLeft className="h-4 w-4" /> Previous
                           </button>
@@ -750,8 +750,8 @@ const DocumentPage = () => {
                                 onClick={() => setCurrentChunkPage(i + 1)}
                                 className={`h-8 w-8 rounded-full text-sm font-medium transition-all cursor-pointer ${
                                   currentChunkPage === i + 1
-                                    ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg"
-                                    : "bg-white/5 border border-white/10 hover:bg-white/10 text-white"
+                                    ? "bg-doc-ocean-800 text-white shadow-md"
+                                    : "bg-white border border-stone-300 hover:bg-stone-50 text-stone-700"
                                 }`}
                               >
                                 {i + 1}
@@ -762,7 +762,7 @@ const DocumentPage = () => {
                           <button
                             onClick={() => setCurrentChunkPage(p => Math.min(totalPages, p + 1))}
                             disabled={currentChunkPage === totalPages}
-                            className="flex items-center gap-2 rounded-full px-4 py-2 border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                            className="flex items-center gap-2 rounded-full px-4 py-2 border border-stone-300 bg-white hover:bg-stone-50 text-stone-700 transition-all text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                           >
                             Next <ChevronRight className="h-4 w-4" />
                           </button>
@@ -785,14 +785,14 @@ const DocumentPage = () => {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="modal-content border border-purple-500/20 bg-zinc-900 max-w-lg"
+              className="modal-content border border-stone-300 bg-white max-w-lg"
             >
-              <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
+              <div className="flex items-center justify-between border-b border-stone-200 pb-4 mb-6">
                 <div className="flex items-center gap-3">
-                  <UploadCloud className="h-6 w-6 text-purple-400" />
+                  <UploadCloud className="h-6 w-6 text-doc-ocean-800" />
                   <div>
-                    <h3 className="text-lg font-bold">Add Document</h3>
-                    <p className="text-xs text-white/40">Select one or multiple PDF / DOCX files</p>
+                    <h3 className="text-lg font-bold text-stone-900">Add Document</h3>
+                    <p className="text-xs text-stone-500">Select one or multiple PDF / DOCX files</p>
                   </div>
                 </div>
                 <button
@@ -800,7 +800,7 @@ const DocumentPage = () => {
                     setSelectedFiles([]);
                     setShowUploadModal(false);
                   }}
-                  className="p-1 rounded-lg hover:bg-white/5 text-white/40 hover:text-white transition-colors"
+                  className="p-1 rounded-lg hover:bg-stone-100 text-stone-500 hover:text-stone-900 transition-colors cursor-pointer"
                 >
                   <X size={18} />
                 </button>
@@ -823,32 +823,32 @@ const DocumentPage = () => {
                   />
                   
                   <div className="space-y-3">
-                    <UploadCloud className="h-10 w-10 text-white/30 mx-auto" />
-                    <p className="text-sm font-semibold">Click to browse or drag files here</p>
-                    <p className="text-xs text-white/30">Accepts PDF and DOCX only</p>
+                    <UploadCloud className="h-10 w-10 text-stone-400 mx-auto" />
+                    <p className="text-sm font-semibold text-stone-700">Click to browse or drag files here</p>
+                    <p className="text-xs text-stone-500">Accepts PDF and DOCX only</p>
                   </div>
                 </label>
 
                 {/* File list preview */}
                 {selectedFiles.length > 0 && (
                   <div className="space-y-2">
-                    <h4 className="text-xs font-bold text-white/40 uppercase tracking-wider">
+                    <h4 className="text-xs font-bold text-stone-500 uppercase tracking-wider">
                       Selected Files ({selectedFiles.length})
                     </h4>
                     <div className="max-h-[150px] overflow-y-auto space-y-1.5 pr-1">
                       {selectedFiles.map((file, idx) => (
                         <div 
                           key={idx}
-                          className="flex items-center justify-between p-2.5 rounded-lg bg-black/30 border border-white/5 text-xs"
+                          className="flex items-center justify-between p-2.5 rounded-lg bg-stone-50 border border-stone-200 text-xs"
                         >
                           <div className="flex items-center gap-2 min-w-0">
-                            <FileText size={14} className="text-purple-400 shrink-0" />
-                            <span className="truncate text-white/80" title={file.name}>{file.name}</span>
-                            <span className="text-white/30 shrink-0">({formatBytes(file.size)})</span>
+                            <FileText size={14} className="text-doc-ocean-700 shrink-0" />
+                            <span className="truncate text-stone-800" title={file.name}>{file.name}</span>
+                            <span className="text-stone-500 shrink-0">({formatBytes(file.size)})</span>
                           </div>
                           <button
                             onClick={() => removeSelectedFile(idx)}
-                            className="text-red-400/60 hover:text-red-400 p-0.5 hover:bg-white/5 rounded transition-colors"
+                            className="text-rose-500 hover:text-rose-700 p-0.5 hover:bg-stone-100 rounded transition-colors cursor-pointer"
                           >
                             <X size={14} />
                           </button>
@@ -860,25 +860,25 @@ const DocumentPage = () => {
               </div>
 
               {/* Upload Modal Actions */}
-              <div className="modal-actions mt-8 pt-4 border-t border-white/10">
+              <div className="modal-actions mt-8 pt-4 border-t border-stone-200">
                 <button
                   onClick={() => {
                     setSelectedFiles([]);
                     setShowUploadModal(false);
                   }}
                   disabled={uploading}
-                  className="px-5 py-2.5 rounded-full text-sm font-semibold border border-white/10 text-white/60 hover:text-white hover:bg-white/5 transition-all"
+                  className="px-5 py-2.5 rounded-full text-sm font-semibold border border-stone-300 text-stone-600 hover:bg-stone-100 transition-all cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleUploadSubmit}
                   disabled={uploading || selectedFiles.length === 0}
-                  className="px-5 py-2.5 rounded-full text-sm font-semibold bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 text-white hover:opacity-90 disabled:opacity-50 disabled:pointer-events-none transition-all flex items-center gap-2 shadow-lg"
+                  className="px-5 py-2.5 rounded-full text-sm font-semibold bg-doc-ocean-800 hover:bg-doc-stone-600 text-white disabled:opacity-50 disabled:pointer-events-none transition-all flex items-center gap-2 shadow-md cursor-pointer"
                 >
                   {uploading ? (
                     <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Loader2 className="h-4 w-4 animate-spin text-white" />
                       Parsing & Indexing...
                     </>
                   ) : (
@@ -903,29 +903,29 @@ const DocumentPage = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="modal-content border border-purple-500/20 bg-zinc-950 max-w-4xl p-10 rounded-[2rem] relative shadow-2xl"
+              className="modal-content border border-stone-300 bg-white max-w-4xl p-10 rounded-[2rem] relative shadow-2xl"
             >
               {/* Modal Header */}
-              <div className="flex items-center justify-between border-b border-white/5 pb-5 mb-6">
+              <div className="flex items-center justify-between border-b border-stone-200 pb-5 mb-6">
                 <div className="flex items-center gap-3">
-                  <FileText className="h-6 w-6 text-purple-400" />
+                  <FileText className="h-6 w-6 text-doc-ocean-800" />
                   <div>
-                    <span className="text-xs uppercase tracking-widest text-white/40 font-bold">
+                    <span className="text-xs uppercase tracking-widest text-stone-500 font-bold">
                       CHUNK #{activeChunkRank}
                     </span>
-                    <h3 className="text-lg font-bold text-white max-w-xl truncate mt-1" title={activeChunk.documentName}>
+                    <h3 className="text-lg font-bold text-stone-900 max-w-xl truncate mt-1" title={activeChunk.documentName}>
                       {activeChunk.documentName}
                     </h3>
                   </div>
                 </div>
                 
                 <div className="flex items-center gap-3">
-                  <span className="badge-page bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-3.5 py-1.5 text-xs font-bold rounded-full">
+                  <span className="badge-page bg-doc-ocean-100 text-doc-ocean-800 border border-doc-ocean-200 px-3.5 py-1.5 text-xs font-bold rounded-full">
                     Page {activeChunk.pageNumber}
                   </span>
                   <button
                     onClick={() => setActiveChunk(null)}
-                    className="p-2 rounded-xl hover:bg-white/5 text-white/40 hover:text-white transition-colors cursor-pointer"
+                    className="p-2 rounded-xl hover:bg-stone-100 text-stone-500 hover:text-stone-900 transition-colors cursor-pointer"
                   >
                     <X size={20} />
                   </button>
@@ -934,14 +934,14 @@ const DocumentPage = () => {
 
               {/* Modal Content */}
               <div className="space-y-6 max-h-[55vh] overflow-y-auto pr-3 custom-scrollbar">
-                <p className="text-[17px] text-white/95 leading-relaxed font-sans whitespace-pre-wrap font-normal">
+                <p className="text-[17px] text-stone-900 leading-relaxed font-sans whitespace-pre-wrap font-normal">
                   {activeChunk.content}
                 </p>
               </div>
 
               {/* Modal Footer / Actions */}
-              <div className="flex justify-between items-center mt-8 pt-6 border-t border-white/5">
-                <div className="text-xs text-white/30">
+              <div className="flex justify-between items-center mt-8 pt-6 border-t border-stone-200">
+                <div className="text-xs text-stone-500 font-medium">
                   <span>Chunk ID: {activeChunk.id}</span>
                   <span className="mx-2">•</span>
                   <span>Match Relevance: {activeChunk.similarity}%</span>
@@ -949,7 +949,7 @@ const DocumentPage = () => {
                 <div className="flex gap-4">
                   <button
                     onClick={() => setActiveChunk(null)}
-                    className="px-5 py-2.5 rounded-full border border-white/10 text-white/70 hover:bg-white/5 transition-all text-sm font-semibold cursor-pointer"
+                    className="px-5 py-2.5 rounded-full border border-stone-300 text-stone-600 hover:bg-stone-100 transition-all text-sm font-semibold cursor-pointer"
                   >
                     Close
                   </button>
@@ -958,7 +958,7 @@ const DocumentPage = () => {
                       navigate(`/documents/${encodeURIComponent(activeChunk.documentName)}?chunkId=${activeChunk.id}`);
                       setActiveChunk(null);
                     }}
-                    className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 text-white font-semibold transition-all hover:opacity-90 shadow-lg cursor-pointer text-sm"
+                    className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-doc-ocean-800 hover:bg-doc-stone-600 text-white font-semibold transition-all hover:opacity-90 shadow-lg cursor-pointer text-sm"
                   >
                     Go to detail
                     <ArrowRight className="h-4 w-4" />
