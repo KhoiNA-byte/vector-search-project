@@ -362,8 +362,8 @@ const DocumentPage = () => {
                       onSearch={() => handleDocSearch()} 
                       loading={searchingDocs} 
                       placeholder="Search related documents by topic or keywords..."
-                      className="visual-searchbar-container"
-                      buttonClassName="visual-searchbar-button"
+                      className="doc-searchbar-container"
+                      buttonClassName="doc-searchbar-button"
                     />
                     
                     <div className="flex justify-center gap-4">
@@ -589,8 +589,8 @@ const DocumentPage = () => {
                       onSearch={() => handleSemanticSearch()} 
                       loading={searchingChunks} 
                       placeholder="Search specific text chunks, clauses, or descriptions..."
-                      className="visual-searchbar-container"
-                      buttonClassName="visual-searchbar-button"
+                      className="doc-searchbar-container"
+                      buttonClassName="doc-searchbar-button"
                     />
 
                     {/* Suggestions */}

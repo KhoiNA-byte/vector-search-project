@@ -7,78 +7,177 @@
 }
 
 .visual-page-glow-purple {
-  @apply pointer-events-none absolute rounded-full blur-[120px] w-80 h-80 -top-40 -left-40 bg-purple-500/20;
+  @apply pointer-events-none absolute rounded-full blur-[120px] w-80 h-80 -top-40 -left-40 bg-amber-800/10;
 }
 
 .visual-page-glow-blue {
-  @apply pointer-events-none absolute rounded-full blur-[120px] w-80 h-80 top-20 -right-40 bg-blue-600/20;
+  @apply pointer-events-none absolute rounded-full blur-[120px] w-80 h-80 top-20 -right-40 bg-lime-300/10;
 }
 
 @layer utilities {
+  /* ── Page background: rich multi-stop gradient matching fruits page ── */
   .visual-page-container {
-    @apply min-h-screen pt-32 pb-12 overflow-x-hidden selection:bg-purple-500/30 bg-zinc-950;
+    min-height: 100vh;
+    padding-top: 8rem;
+    padding-bottom: 3rem;
+    background: linear-gradient(
+      170deg,
+      var(--color-stone-200) 0%,
+      var(--color-amber-50) 12%,
+      var(--color-stone-100) 28%,
+      var(--color-stone-50) 50%,
+      var(--color-stone-100) 68%,
+      var(--color-lime-100) 84%,
+      var(--color-lime-300) 100%
+    );
   }
 
+  /* ── Hero badge ────────────────────────────────────────────────── */
   .visual-hero-badge {
-    @apply inline-flex items-center gap-2 border border-white/10 rounded-full px-4 py-1.5 text-xs font-medium text-white/60 backdrop-blur-md mb-8 bg-white/5;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid var(--color-stone-300);
+    border-radius: 9999px;
+    padding: 0.375rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-amber-800);
+    margin-bottom: 1.5rem;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 12px -2px rgba(146, 64, 14, 0.12);
   }
 
   .visual-hero-badge-dot {
-    @apply h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgb(34_211_238_/0.8)];
+    @apply h-1.5 w-1.5 rounded-full bg-amber-800 shadow-[0_0_8px_var(--color-amber-800)];
   }
 
+  /* ── Hero title: gradient text ──────────────────────────────────── */
   .visual-hero-title {
-    @apply text-6xl md:text-[88px] font-bold tracking-tight text-white leading-[0.95] mb-6 font-serif;
+    font-size: clamp(2.75rem, 6vw, 4.5rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1.08;
+    font-family: 'Fraunces', Georgia, serif;
+    background: linear-gradient(160deg, var(--color-amber-800) 0%, var(--color-stone-600) 40%, var(--color-stone-400) 70%, var(--color-lime-500) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1.5rem;
   }
 
-  .visual-hero-vibe {
-    @apply italic bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent opacity-90;
-  }
-
+  /* ── Hero subtitle ──────────────────────────────────────────────── */
   .visual-hero-subtitle {
-    @apply mt-8 text-xl text-white/50 max-w-2xl mx-auto leading-relaxed font-light;
+    margin-top: 1.25rem;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    font-weight: 500;
+    color: var(--color-stone-700);
+    max-width: 38rem;
+    margin-left: auto;
+    margin-right: auto;
   }
 
-  .visual-searchbar-container {
-    @apply bg-black/20 border border-white/20 text-white backdrop-blur-xl shadow-[0_8px_32px_-4px_rgb(0_0_0_/0.4)];
-  }
-
-  .visual-searchbar-container input {
-    @apply text-white;
-  }
-
-  .visual-searchbar-button {
-    @apply bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 text-white;
-  }
-
-  .visual-suggestion-btn {
-    @apply text-[13px] font-bold px-5 py-2.5 rounded-full border border-white/10 text-white/70 transition-all duration-300 bg-white/5;
-  }
-
-  .visual-suggestion-btn:hover {
-    @apply border-white/20 bg-white/10;
-  }
-
+  /* ── Explore / Add Visual buttons (Solid, no gradient) ──────────── */
   .visual-explore-btn {
-    @apply flex items-center gap-2 text-[13px] px-5 py-2.5 rounded-full bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 text-white font-semibold transition-all shadow-lg;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    padding: 0.625rem 1.5rem;
+    border-radius: 9999px;
+    color: #fff;
+    font-weight: 600;
+    margin-left: 0.5rem;
+    background: var(--color-amber-800);
+    box-shadow:
+      0 4px 16px -2px rgba(146, 64, 14, 0.35),
+      0 0 0 0 rgba(146, 64, 14, 0);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
   }
 
   .visual-explore-btn:hover {
-    @apply opacity-90 shadow-purple-500/20;
+    transform: scale(1.05) translateY(-1px);
+    background-color: var(--color-stone-600);
+    box-shadow:
+      0 8px 28px -4px rgba(146, 64, 14, 0.45),
+      0 0 0 3px rgba(146, 64, 14, 0.15);
+    color: #fff;
+    text-decoration: none;
   }
 
-  .shadow-glow-visual {
-    @apply shadow-[0_0_20px_rgb(168_85_247_/0.4)];
+  .visual-explore-btn:active {
+    transform: scale(0.98);
+  }
+
+  /* ── Search bar: lifted with ambient glow ───────────────────────── */
+  .visual-searchbar-container {
+    background: rgba(255, 255, 255, 0.88);
+    border: 1.5px solid var(--color-stone-300);
+    color: var(--color-stone-900);
+    border-radius: 9999px;
+    box-shadow:
+      0 4px 24px -4px rgba(146, 64, 14, 0.14),
+      0 1px 6px 0 rgba(146, 64, 14, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+    transition: box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+
+  .visual-searchbar-container:focus-within {
+    box-shadow:
+      0 6px 32px -4px rgba(146, 64, 14, 0.22),
+      0 0 0 3px var(--color-amber-800/18);
+    border-color: var(--color-amber-800/60);
+  }
+
+  .visual-searchbar-container input {
+    color: var(--color-stone-900);
+  }
+
+  /* ── Search button: solid amber-800 ─────────────────────────────── */
+  .visual-searchbar-button {
+    @apply !bg-amber-800 !text-white;
+    box-shadow: 0 2px 10px -1px rgba(146, 64, 14, 0.4);
+    transition: box-shadow 0.2s ease, transform 0.15s ease;
+  }
+
+  .visual-searchbar-button:hover:not(:disabled) {
+    box-shadow: 0 4px 18px -2px rgba(146, 64, 14, 0.55);
+    transform: scale(1.03);
+    @apply !bg-stone-600;
+  }
+
+  /* ── Suggestion pills: solid amber-100 background ───────────────── */
+  .visual-suggestion-btn {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    padding: 0.375rem 0.875rem;
+    border-radius: 9999px;
+    border: 1px solid var(--color-stone-300);
+    color: var(--color-amber-800);
+    background: var(--color-amber-100);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 1px 6px -1px rgba(146, 64, 14, 0.1);
+    transition: all 0.2s ease;
+  }
+
+  .visual-suggestion-btn:hover {
+    background: rgba(243, 228, 201, 0.85); /* lighter amber-100 equivalent */
+    border-color: var(--color-amber-800/40);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px -2px rgba(146, 64, 14, 0.18);
   }
 }
 
 /* Modal Styles - Shared with Create Page */
 .modal-overlay {
-  @apply fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[1000];
+  @apply fixed inset-0 bg-stone-900/40 backdrop-blur-md flex items-center justify-center z-[1000];
 }
 
 .modal-content {
-  @apply bg-zinc-900 border border-white/10 p-8 rounded-[2rem] max-w-2xl w-[90%] shadow-2xl relative overflow-hidden;
+  @apply bg-white/90 backdrop-blur-xl border border-stone-300 p-8 rounded-[2rem] max-w-2xl w-[90%] shadow-2xl relative overflow-hidden text-stone-900;
 }
 
 .detail-view {
@@ -86,11 +185,11 @@
 }
 
 .detail-img {
-  @apply w-full max-h-[400px] object-contain rounded-xl bg-black/40 border border-white/5;
+  @apply w-full max-h-[400px] object-contain rounded-xl bg-white/40 border border-stone-200;
 }
 
 .entity-info p {
-  @apply m-1 text-white/50 text-sm font-light break-all;
+  @apply m-1 text-amber-800 text-sm font-semibold break-all;
 }
 
 .modal-actions {

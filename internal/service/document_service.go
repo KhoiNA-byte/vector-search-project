@@ -9,6 +9,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"sort"
 	"strings"
 	"vector-search-project/internal/model"
 	"vector-search-project/internal/model/response"
@@ -107,7 +108,22 @@ func (s *documentService) Upload(ctx context.Context, filename string, r io.Read
 	}
 
 	// 5. Chunk and embed text contents
-	for pageNum, text := range extractedText {
+	type pendingChunk struct {
+		PageNumber int
+		Content    string
+	}
+	var pendingList []pendingChunk
+	var rawTexts []string
+
+	// Sort page numbers so chunks are processed sequentially
+	var pageNums []int
+	for pageNum := range extractedText {
+		pageNums = append(pageNums, pageNum)
+	}
+	sort.Ints(pageNums)
+
+	for _, pageNum := range pageNums {
+		text := extractedText[pageNum]
 		trimmedText := strings.TrimSpace(text)
 		if trimmedText == "" {
 			continue
@@ -120,27 +136,39 @@ func (s *documentService) Upload(ctx context.Context, filename string, r io.Read
 				continue
 			}
 
-			// Generate embedding
-			embedding, err := s.embedSvc.EmbedDescription(ctx, chunkTextContent)
-			if err != nil {
-				// Clean up on embedding error
-				_ = s.storageSvc.Delete(ctx, filename)
-				_ = s.repo.DeleteDocument(ctx, filename)
-				return fmt.Errorf("failed to generate chunk embedding: %w", err)
-			}
+			pendingList = append(pendingList, pendingChunk{
+				PageNumber: pageNum,
+				Content:    chunkTextContent,
+			})
+			rawTexts = append(rawTexts, chunkTextContent)
+		}
+	}
 
-			chunk := &model.DocumentChunk{
+	if len(pendingList) > 0 {
+		// Generate all chunk embeddings in batch
+		embeddings, err := s.embedSvc.EmbedDescriptions(ctx, rawTexts)
+		if err != nil {
+			// Clean up on embedding error
+			_ = s.storageSvc.Delete(ctx, filename)
+			_ = s.repo.DeleteDocument(ctx, filename)
+			return fmt.Errorf("failed to generate chunk embeddings: %w", err)
+		}
+
+		dbChunks := make([]*model.DocumentChunk, len(pendingList))
+		for idx, p := range pendingList {
+			dbChunks[idx] = &model.DocumentChunk{
 				DocumentName: filename,
-				PageNumber:   pageNum,
-				Content:      chunkTextContent,
-				Embedding:    embedding,
+				PageNumber:   p.PageNumber,
+				Content:      p.Content,
+				Embedding:    embeddings[idx],
 			}
+		}
 
-			if err := s.repo.CreateChunk(ctx, chunk); err != nil {
-				_ = s.storageSvc.Delete(ctx, filename)
-				_ = s.repo.DeleteDocument(ctx, filename)
-				return fmt.Errorf("failed to create document chunk: %w", err)
-			}
+		// Bulk insert all chunks in one operation
+		if err := s.repo.CreateChunks(ctx, dbChunks); err != nil {
+			_ = s.storageSvc.Delete(ctx, filename)
+			_ = s.repo.DeleteDocument(ctx, filename)
+			return fmt.Errorf("failed to save document chunks: %w", err)
 		}
 	}
 

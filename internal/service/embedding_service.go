@@ -59,6 +59,51 @@ func (s *EmbeddingService) EmbedDescription(ctx context.Context, description str
 	return pgvector.NewVector(result.Embeddings[0].Values), nil
 }
 
+func (s *EmbeddingService) EmbedDescriptions(ctx context.Context, descriptions []string) ([]pgvector.Vector, error) {
+	if len(descriptions) == 0 {
+		return nil, nil
+	}
+
+	modelName := os.Getenv("GEMINI_EMBEDDING_MODEL")
+	const batchSize = 100
+	var allVectors []pgvector.Vector
+
+	for i := 0; i < len(descriptions); i += batchSize {
+		end := i + batchSize
+		if end > len(descriptions) {
+			end = len(descriptions)
+		}
+		batch := descriptions[i:end]
+
+		contents := make([]*genai.Content, len(batch))
+		for j, desc := range batch {
+			contents[j] = genai.NewContentFromText(desc, "user")
+		}
+
+		result, err := s.client.Models.EmbedContent(ctx,
+			modelName,
+			contents,
+			nil,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("gemini batch embedding failed at offset %d: %w", i, err)
+		}
+
+		if len(result.Embeddings) != len(batch) {
+			return nil, fmt.Errorf("gemini batch embedding returned mismatching size at offset %d: expected %d, got %d", i, len(batch), len(result.Embeddings))
+		}
+
+		for j, emb := range result.Embeddings {
+			if len(emb.Values) == 0 {
+				return nil, fmt.Errorf("no values in embedding at index %d", i+j)
+			}
+			allVectors = append(allVectors, pgvector.NewVector(emb.Values))
+		}
+	}
+
+	return allVectors, nil
+}
+
 func (s *EmbeddingService) EmbedFruit(ctx context.Context, f *model.Fruit) (pgvector.Vector, error) {
 	description := fmt.Sprintf("A %s (outside) and %s (inside) %s fruit from %s, available during %s. Best for %s. It has a %s texture and a %s flavor profile.", f.ColorOutside, f.ColorInside, f.Name, f.Origin, f.Season, f.BestFor, f.Texture, f.Flavor)
 	return s.EmbedDescription(ctx, description)

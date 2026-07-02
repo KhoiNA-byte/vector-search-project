@@ -89,7 +89,7 @@ const VisualEntityPage = () => {
           
           <h1 className="visual-hero-title">
             Search images by <br />
-            <span className="visual-hero-vibe">vibe.</span>
+            <span className="italic">vibe.</span>
           </h1>
           
           <p className="visual-hero-subtitle">

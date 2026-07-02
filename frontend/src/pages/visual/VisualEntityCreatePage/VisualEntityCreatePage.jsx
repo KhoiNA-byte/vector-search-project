@@ -135,7 +135,7 @@ const VisualEntityCreatePage = () => {
                             <Button
                                 type="button"
                                 variant="ghost"
-                                className="text-white/60 hover:text-white hover:bg-red-600"
+                                className="visual-create-btn-cancel"
                                 onClick={() => navigate('/visuals')}
                             >
                                 Cancel

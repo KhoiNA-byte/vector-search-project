@@ -15,10 +15,10 @@ const GlassButton = ({ onClick, title, children, danger = false, className = "" 
     className={`
       relative w-10 h-10 rounded-full flex items-center justify-center
       backdrop-blur-md border transition-colors duration-200 cursor-pointer
-      shadow-[0_4px_16px_rgba(0,0,0,0.3)]
+      shadow-sm
       ${danger
-        ? "bg-rose-500/15 border-rose-400/25 text-rose-300 hover:bg-rose-500/30 hover:text-rose-200 hover:border-rose-400/50"
-        : "bg-white/10 border-white/15 text-white/70 hover:bg-indigo-500/25 hover:text-indigo-200 hover:border-indigo-400/40"
+        ? "bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 hover:text-rose-700"
+        : "bg-white/80 border border-amber-700/20 text-amber-900 hover:bg-stone-100 hover:text-stone-900 hover:border-amber-700"
       }
       ${className}
     `}
@@ -284,7 +284,7 @@ const VisualEntityModal = ({ entity, onClose, onDelete }) => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="fixed inset-0 z-[1000] flex items-center justify-center p-4
-                       bg-[rgba(4,4,14,0.82)] backdrop-blur-xl"
+                       bg-[rgba(78,50,35,0.25)] backdrop-blur-xl"
             onClick={onClose}
           >
             {/* Modal Card */}
@@ -297,17 +297,16 @@ const VisualEntityModal = ({ entity, onClose, onDelete }) => {
               onClick={(e) => e.stopPropagation()}
               className="relative flex flex-col overflow-hidden
                          max-w-[min(88vw,900px)] max-h-[92vh] rounded-[20px]
-                         bg-[linear-gradient(160deg,rgba(22,20,40,0.97)_0%,rgba(14,14,26,0.98)_100%)]
-                         border border-indigo-500/[0.18]
-                         shadow-[0_32px_80px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.04),inset_0_1px_0_rgba(255,255,255,0.06)]"
+                         bg-white/90 border border-[#a37a5c]/40 backdrop-blur-xl
+                         shadow-[0_32px_80px_rgba(112,76,56,0.15),0_0_0_1px_rgba(163,122,92,0.05)]"
             >
               {/* ── Top Action Toolbar ── */}
               <div className="flex items-center justify-between px-4 py-3 shrink-0
-                              bg-white/[0.03] border-b border-white/[0.06]">
+                              bg-white/40 border-b border-[#a37a5c]/20">
                 {/* Left: decorative label */}
                 <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-[linear-gradient(135deg,#818cf8,#22d3ee)]" />
-                  <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-indigo-400/70">
+                  <div className="h-2 w-2 rounded-full bg-[linear-gradient(135deg,#704c38,#c7d99b)]" />
+                  <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#704c38]">
                     Preview
                   </span>
                 </div>
@@ -331,7 +330,7 @@ const VisualEntityModal = ({ entity, onClose, onDelete }) => {
 
               {/* ── Image Container ── */}
               <div className="relative flex items-center justify-center overflow-hidden
-                              bg-black/40 shrink min-h-0">
+                              bg-[#fbf8f3]/30 shrink min-h-0">
                 {/* Skeleton shimmer */}
                 <AnimatePresence>
                   {!imageLoaded && (
@@ -360,15 +359,15 @@ const VisualEntityModal = ({ entity, onClose, onDelete }) => {
                 <motion.div
                   className="absolute inset-0 flex items-center justify-center
                              opacity-0 hover:opacity-100 transition-opacity duration-300
-                             cursor-pointer hover:bg-black/25"
+                             cursor-pointer hover:bg-black/10"
                   onClick={() => setIsFullscreen(true)}
                 >
                   <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     whileHover={{ scale: 1, opacity: 1 }}
                     className="flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md
-                               border border-indigo-500/40 bg-indigo-500/20 text-indigo-200/95
-                               shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
+                               border border-[#a37a5c]/40 bg-white/80 text-[#704c38]
+                               shadow-[0_8px_32px_rgba(112,76,56,0.1)]"
                   >
                     <Maximize2 size={14} />
                     <span className="text-xs font-semibold tracking-wide">Immersive View</span>
@@ -379,16 +378,16 @@ const VisualEntityModal = ({ entity, onClose, onDelete }) => {
               {/* ── Info Section (only if data exists) ── */}
               {(entity.title || entity.description || entity.date) && (
                 <div className="px-6 py-5 shrink-0
-                                border-t border-white/[0.06]
-                                bg-[linear-gradient(180deg,rgba(99,102,241,0.04)_0%,transparent_100%)]">
+                                border-t border-[#a37a5c]/20
+                                bg-[#fbf8f3]/40">
                   {entity.title && (
-                    <h3 className="text-lg font-semibold text-white mb-1">{entity.title}</h3>
+                    <h3 className="text-lg font-semibold text-[#4e3223] mb-1">{entity.title}</h3>
                   )}
                   {entity.date && (
-                    <p className="text-xs mb-2 text-slate-400/60">{entity.date}</p>
+                    <p className="text-xs mb-2 text-[#a37a5c]/80">{entity.date}</p>
                   )}
                   {entity.description && (
-                    <p className="text-sm leading-relaxed text-slate-300/75">{entity.description}</p>
+                    <p className="text-sm leading-relaxed text-[#704c38]">{entity.description}</p>
                   )}
                 </div>
               )}

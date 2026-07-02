@@ -30,7 +30,7 @@ const DeleteConfirmModal = ({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
           className="fixed inset-0 z-[1200] flex items-center justify-center p-4
-                     bg-[rgba(4,4,14,0.88)] backdrop-blur-xl"
+                     bg-stone-900/25 backdrop-blur-xl"
           onClick={onCancel}
         >
           <motion.div
@@ -41,23 +41,22 @@ const DeleteConfirmModal = ({
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             onClick={(e) => e.stopPropagation()}
             className="w-full max-w-sm rounded-[20px] overflow-hidden
-                       bg-[linear-gradient(160deg,rgba(22,20,40,0.98)_0%,rgba(14,14,26,0.99)_100%)]
-                       border border-rose-500/[0.16]
-                       shadow-[0_32px_80px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.04),inset_0_1px_0_rgba(255,255,255,0.05)]"
+                       bg-white border border-amber-700/40
+                       shadow-2xl shadow-amber-900/15"
           >
             {/* Header bar */}
             <div className="flex items-center justify-between px-5 py-3.5
-                            bg-white/[0.03] border-b border-white/[0.06]">
+                            bg-white/40 border-b border-amber-700/20">
               <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-rose-400/70" />
-                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-rose-400/60">
+                <div className="h-2 w-2 rounded-full bg-rose-500" />
+                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-rose-600">
                   Confirm Action
                 </span>
               </div>
               <button
                 onClick={onCancel}
                 className="w-6 h-6 flex items-center justify-center rounded-full
-                           text-white/30 hover:text-white/70 hover:bg-white/10
+                           text-amber-900/60 hover:text-stone-900 hover:bg-amber-700/10
                            transition-colors cursor-pointer"
               >
                 <X size={13} />
@@ -69,14 +68,14 @@ const DeleteConfirmModal = ({
               {/* Warning icon */}
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-2xl flex items-center justify-center
-                                bg-rose-500/10 border border-rose-500/20 shrink-0">
-                  <AlertTriangle size={18} className="text-rose-400" />
+                                bg-rose-50 border border-rose-100 shrink-0">
+                  <AlertTriangle size={18} className="text-rose-500" />
                 </div>
                 <div>
-                  <h2 className="text-base font-semibold text-white leading-snug">
+                  <h2 className="text-base font-semibold text-stone-900 leading-snug">
                     Delete Visual?
                   </h2>
-                  <p className="text-xs text-white/40 mt-0.5">
+                  <p className="text-xs text-amber-700 mt-0.5">
                     This action cannot be undone.
                   </p>
                 </div>
@@ -84,8 +83,8 @@ const DeleteConfirmModal = ({
 
               {/* Thumbnail preview */}
               {imageSrc && (
-                <div className="rounded-xl overflow-hidden border border-white/[0.07] mb-4
-                                bg-black/30 aspect-[16/9] flex items-center justify-center">
+                <div className="rounded-xl overflow-hidden border border-amber-700/20 mb-4
+                                bg-white/40 aspect-[16/9] flex items-center justify-center">
                   <img
                     src={imageSrc}
                     alt={imageName || "Visual to delete"}
@@ -95,10 +94,10 @@ const DeleteConfirmModal = ({
               )}
 
               {/* Description */}
-              <p className="text-sm text-white/50 leading-relaxed mb-5">
+              <p className="text-sm text-amber-900 leading-relaxed mb-5">
                 The visual
                 {imageName ? (
-                  <span className="text-white/75 font-medium"> "{imageName}" </span>
+                  <span className="text-stone-900 font-semibold"> "{imageName}" </span>
                 ) : (
                   " "
                 )}
@@ -112,8 +111,8 @@ const DeleteConfirmModal = ({
                   onClick={onCancel}
                   disabled={isLoading}
                   className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium
-                             bg-white/[0.06] border border-white/[0.08] text-white/60
-                             hover:bg-white/[0.1] hover:text-white/90
+                             bg-stone-100/80 border border-amber-700/30 text-amber-900
+                             hover:bg-amber-100 hover:text-stone-900
                              transition-all duration-200 cursor-pointer
                              disabled:opacity-40 disabled:cursor-not-allowed"
                 >
@@ -128,14 +127,14 @@ const DeleteConfirmModal = ({
                   whileTap={!isLoading ? { scale: 0.97 } : {}}
                   className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold
                              flex items-center justify-center gap-2
-                             bg-rose-500/15 border border-rose-400/25 text-rose-300
-                             hover:bg-rose-500/25 hover:border-rose-400/40 hover:text-rose-200
+                             bg-rose-50 border border-rose-200 text-rose-600
+                             hover:bg-rose-100 hover:text-rose-700
                              transition-all duration-200 cursor-pointer
                              disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? (
                     <>
-                      <svg className="animate-spin h-3.5 w-3.5 text-rose-300" viewBox="0 0 24 24" fill="none">
+                      <svg className="animate-spin h-3.5 w-3.5 text-rose-500" viewBox="0 0 24 24" fill="none">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                       </svg>

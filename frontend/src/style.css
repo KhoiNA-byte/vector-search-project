@@ -43,12 +43,28 @@
   --radius-sm: calc(var(--radius) - 4px);
 
   --background-image-gradient-fruit: linear-gradient(135deg, hsl(142 55% 32%), hsl(88 65% 50%));
-  --background-image-gradient-visual: linear-gradient(135deg, #22d3ee, #a855f7, #ec4899);
+  --background-image-gradient-visual: linear-gradient(135deg, var(--color-amber-800), var(--color-stone-400), var(--color-lime-300));
   --background-image-gradient-gray: linear-gradient(90deg, #94a3b8, #cbd5e1);
 
   --shadow-soft: 0 4px 20px -4px rgb(20 83 45 / 0.08);
   --shadow-card: 0 10px 40px -6px rgb(20 83 45 / 0.12);
   --shadow-glow: 0 0 20px rgb(132 204 22 / 0.3);
+
+  /* Earth / Pistachio Palette Color Overrides */
+  --color-amber-800: #8a5f41;
+  --color-amber-700: #a77f60;
+  --color-amber-100: #f3e4c9;
+  --color-amber-50: #eddcd2;
+  --color-lime-500: #ccd67f;
+
+  --color-stone-600: #a77f60;
+  --color-stone-400: #a77f60;
+
+  --color-stone-200: #e5d5c5;
+  --color-stone-100: #f5ebe0;
+  --color-stone-50: #fbf8f3;
+  --color-lime-100: #dce7c4;
+  --color-lime-300: #c7d99b;
 }
 
 @layer base {

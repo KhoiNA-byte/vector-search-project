@@ -96,7 +96,7 @@ const VisualEntityResultsList = ({ results, loading, error, hasSearched, onEntit
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={currentPage === 1}
             variant="outline"
-            className="flex items-center gap-2 rounded-full px-5 py-2 border-white/10 bg-black-600 text-white/70 hover:bg-white/5 hover:text-white disabled:opacity-30"
+            className="flex items-center gap-2 rounded-full px-5 py-2 border-stone-200/60 bg-amber-100 text-amber-800 hover:bg-amber-100/80 disabled:opacity-30"
           >
             <ChevronLeft className="h-4 w-4" /> Previous
           </Button>
@@ -108,8 +108,8 @@ const VisualEntityResultsList = ({ results, loading, error, hasSearched, onEntit
                 onClick={() => setCurrentPage(i + 1)}
                 className={`h-9 w-9 rounded-full text-sm font-medium transition-all ${
                   currentPage === i + 1 
-                    ? "bg-gradient-visual text-white shadow-glow-visual" 
-                    : "bg-white/5 border border-white/10 text-white/50 hover:border-white/20 hover:text-white"
+                    ? "bg-amber-800 text-white shadow-md" 
+                    : "bg-amber-100 border border-stone-200/60 text-amber-800 hover:bg-amber-100/80"
                 }`}
               >
                 {i + 1}
@@ -121,7 +121,7 @@ const VisualEntityResultsList = ({ results, loading, error, hasSearched, onEntit
             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
             variant="outline"
-            className="flex items-center gap-2 rounded-full px-5 py-2 border-white/10 bg-black-600 text-white/70 hover:bg-white/5 hover:text-white disabled:opacity-30"
+            className="flex items-center gap-2 rounded-full px-5 py-2 border-stone-200/60 bg-amber-100 text-amber-800 hover:bg-amber-100/80 disabled:opacity-30"
           >
             Next <ChevronRight className="h-4 w-4" />
           </Button>

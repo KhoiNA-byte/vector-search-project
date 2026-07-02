@@ -100,15 +100,15 @@
   }
 
   /* Search input overrides to match SearchBar */
-  .visual-searchbar-container {
+  .doc-searchbar-container {
     @apply bg-black/20 border border-white/20 text-white backdrop-blur-xl shadow-[0_8px_32px_-4px_rgb(0_0_0_/0.4)];
   }
 
-  .visual-searchbar-container input {
+  .doc-searchbar-container input {
     @apply text-white;
   }
 
-  .visual-searchbar-button {
+  .doc-searchbar-button {
     @apply bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 text-white;
   }
 

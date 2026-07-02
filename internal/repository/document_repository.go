@@ -6,6 +6,7 @@ import (
 	"vector-search-project/internal/model"
 	"vector-search-project/internal/model/response"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/pgvector/pgvector-go"
 )
@@ -15,6 +16,7 @@ type DocumentRepository interface {
 	CreateDocument(ctx context.Context, doc *model.Document) error
 	GetDocument(ctx context.Context, name string) (*model.Document, error)
 	CreateChunk(ctx context.Context, chunk *model.DocumentChunk) error
+	CreateChunks(ctx context.Context, chunks []*model.DocumentChunk) error
 	SearchChunks(ctx context.Context, embedding pgvector.Vector, limit int) ([]response.ChunkRes, error)
 	SearchChunksInScope(ctx context.Context, embedding pgvector.Vector, docScope []string, limit int) ([]response.ChunkRes, error)
 	SearchDocuments(ctx context.Context, embedding pgvector.Vector, limit int) ([]response.DocumentRes, error)
@@ -111,6 +113,30 @@ func (r *documentRepository) CreateChunk(ctx context.Context, chunk *model.Docum
 	err := r.pool.QueryRow(ctx, query, chunk.DocumentName, chunk.PageNumber, chunk.Content, chunk.Embedding).Scan(&chunk.ID)
 	if err != nil {
 		return fmt.Errorf("create document chunk failed: %w", err)
+	}
+	return nil
+}
+
+func (r *documentRepository) CreateChunks(ctx context.Context, chunks []*model.DocumentChunk) error {
+	if len(chunks) == 0 {
+		return nil
+	}
+
+	_, err := r.pool.CopyFrom(
+		ctx,
+		pgx.Identifier{"document_chunks"},
+		[]string{"document_name", "page_number", "content", "embedding"},
+		pgx.CopyFromSlice(len(chunks), func(i int) ([]any, error) {
+			return []any{
+				chunks[i].DocumentName,
+				chunks[i].PageNumber,
+				chunks[i].Content,
+				chunks[i].Embedding,
+			}, nil
+		}),
+	)
+	if err != nil {
+		return fmt.Errorf("create document chunks batch failed: %w", err)
 	}
 	return nil
 }
