@@ -718,9 +718,21 @@ const DocumentPage = () => {
                                 </div>
 
                                 {/* Content block */}
-                                <p className="text-[13px] text-stone-700 leading-relaxed font-light font-sans line-clamp-5 overflow-hidden">
-                                  {chunk.content}
-                                </p>
+                                <div 
+                                  className="text-[13px] text-stone-700 leading-relaxed font-light font-sans line-clamp-6 overflow-hidden pr-1 mb-2"
+                                  dangerouslySetInnerHTML={{ __html: chunk.content }}
+                                />
+
+                                {/* Image Preview */}
+                                {chunk.imageUrl && (
+                                  <div className="mt-3 overflow-hidden rounded-xl border border-stone-200/60 max-h-48 flex justify-center bg-stone-50/50">
+                                    <img 
+                                      src={chunk.imageUrl} 
+                                      alt="Extracted visual" 
+                                      className="w-full object-cover transition-transform duration-500 hover:scale-105"
+                                    />
+                                  </div>
+                                )}
                               </div>
 
                               <div className="text-right text-[10px] text-stone-400 pt-3 mt-4 border-t border-stone-200 flex items-center justify-between">
@@ -933,10 +945,24 @@ const DocumentPage = () => {
               </div>
 
               {/* Modal Content */}
-              <div className="space-y-6 max-h-[55vh] overflow-y-auto pr-3 custom-scrollbar">
-                <p className="text-[17px] text-stone-900 leading-relaxed font-sans whitespace-pre-wrap font-normal">
-                  {activeChunk.content}
-                </p>
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 max-h-[55vh] overflow-y-auto pr-3 custom-scrollbar">
+                <div className={`${activeChunk.imageUrl ? "md:col-span-7" : "md:col-span-12"} space-y-4`}>
+                  <div 
+                    className="text-[16px] text-stone-900 leading-relaxed font-sans font-normal"
+                    dangerouslySetInnerHTML={{ __html: activeChunk.content }}
+                  />
+                </div>
+                {activeChunk.imageUrl && (
+                  <div className="md:col-span-5 flex flex-col justify-start">
+                    <div className="rounded-2xl border border-stone-200 overflow-hidden shadow-sm bg-stone-50">
+                      <img 
+                        src={activeChunk.imageUrl} 
+                        alt="Extracted page visual" 
+                        className="w-full h-auto object-contain max-h-[45vh]"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Modal Footer / Actions */}

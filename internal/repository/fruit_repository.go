@@ -42,7 +42,7 @@ func (r *fruitRepository) Migrate(ctx context.Context) error {
 			color_outside text,
 			color_inside  text,
 			price         double precision,
-			embedding     halfvec(3072)
+			embedding     halfvec(384)
 		);
 
 		DO $$ 
@@ -51,7 +51,7 @@ func (r *fruitRepository) Migrate(ctx context.Context) error {
 				SELECT 1 FROM information_schema.columns 
 				WHERE table_name = 'fruits' AND column_name = 'embedding' AND udt_name = 'vector'
 			) THEN 
-				ALTER TABLE fruits ALTER COLUMN embedding TYPE halfvec(3072);
+				ALTER TABLE fruits ALTER COLUMN embedding TYPE halfvec(384);
 			END IF;
 		END $$;
 

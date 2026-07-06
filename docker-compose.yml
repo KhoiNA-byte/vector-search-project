@@ -16,6 +16,19 @@ services:
       timeout: 5s
       retries: 5
 
+  embedding-service:
+    build:
+      context: ./embedding_service
+      dockerfile: Dockerfile
+    container_name: vector_embedding_service
+    ports:
+      - "5000:5000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   backend:
     build:
       context: .
@@ -33,12 +46,15 @@ services:
       - MINIO_BUCKET=visual-entities
       - MINIO_DOCUMENT_BUCKET=documents
       - MINIO_USE_SSL=false
+      - EMBEDDING_SERVICE_URL=http://embedding-service:5000
     env_file:
       - .env
     depends_on:
       db:
         condition: service_healthy
       minio:
+        condition: service_healthy
+      embedding-service:
         condition: service_healthy
 
   frontend:

@@ -301,9 +301,25 @@ const DocumentDetailPage = () => {
                           </div>
                         ) : (
                           <div className="space-y-4">
-                            <p className="text-sm text-stone-800 leading-relaxed font-light whitespace-pre-wrap">
-                              {chunk.content}
-                            </p>
+                            <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                              <div className={`${chunk.imageUrl ? "md:col-span-8" : "md:col-span-12"} space-y-2`}>
+                                <div 
+                                  className="text-sm text-stone-800 leading-relaxed font-light"
+                                  dangerouslySetInnerHTML={{ __html: chunk.content }}
+                                />
+                              </div>
+                              {chunk.imageUrl && (
+                                <div className="md:col-span-4 flex flex-col justify-start">
+                                  <div className="rounded-xl border border-stone-200 overflow-hidden shadow-sm bg-stone-50">
+                                    <img 
+                                      src={chunk.imageUrl} 
+                                      alt="Page visual" 
+                                      className="w-full h-auto object-contain max-h-40"
+                                    />
+                                  </div>
+                                </div>
+                              )}
+                            </div>
                             <div className="flex items-center gap-2 pt-2">
                               <button
                                 onClick={() => handleStartEdit(chunk)}

@@ -153,7 +153,7 @@ func (s *visualEntityService) Search(ctx context.Context, query string) ([]respo
 	}
 
 	fmt.Printf("Searching for: '%s'\n", query)
-	promptEmbedding, err := s.embedSvc.EmbedDescription(ctx, query)
+	promptEmbedding, err := s.embedSvc.EmbedVisualEntity(ctx, nil, "", query)
 	if err != nil {
 		return nil, fmt.Errorf("failed to embed search query: %w", err)
 	}

@@ -52,8 +52,11 @@ func (r *documentRepository) Migrate(ctx context.Context) error {
 			document_name text NOT NULL,
 			page_number   integer DEFAULT 1,
 			content       text NOT NULL,
-			embedding     halfvec(3072) NOT NULL
+			embedding     halfvec(384) NOT NULL,
+			image_url     text
 		);
+
+		ALTER TABLE document_chunks ADD COLUMN IF NOT EXISTS image_url text;
 
 		DO $$ 
 		BEGIN 
@@ -61,7 +64,7 @@ func (r *documentRepository) Migrate(ctx context.Context) error {
 				SELECT 1 FROM information_schema.columns 
 				WHERE table_name = 'document_chunks' AND column_name = 'embedding' AND udt_name = 'vector'
 			) THEN 
-				ALTER TABLE document_chunks ALTER COLUMN embedding TYPE halfvec(3072);
+				ALTER TABLE document_chunks ALTER COLUMN embedding TYPE halfvec(384);
 			END IF;
 		END $$;
 
@@ -106,11 +109,11 @@ func (r *documentRepository) GetDocument(ctx context.Context, name string) (*mod
 
 func (r *documentRepository) CreateChunk(ctx context.Context, chunk *model.DocumentChunk) error {
 	query := `
-		INSERT INTO document_chunks (document_name, page_number, content, embedding)
-		VALUES ($1, $2, $3, $4)
+		INSERT INTO document_chunks (document_name, page_number, content, embedding, image_url)
+		VALUES ($1, $2, $3, $4, $5)
 		RETURNING id
 	`
-	err := r.pool.QueryRow(ctx, query, chunk.DocumentName, chunk.PageNumber, chunk.Content, chunk.Embedding).Scan(&chunk.ID)
+	err := r.pool.QueryRow(ctx, query, chunk.DocumentName, chunk.PageNumber, chunk.Content, chunk.Embedding, chunk.ImageURL).Scan(&chunk.ID)
 	if err != nil {
 		return fmt.Errorf("create document chunk failed: %w", err)
 	}
@@ -125,13 +128,14 @@ func (r *documentRepository) CreateChunks(ctx context.Context, chunks []*model.D
 	_, err := r.pool.CopyFrom(
 		ctx,
 		pgx.Identifier{"document_chunks"},
-		[]string{"document_name", "page_number", "content", "embedding"},
+		[]string{"document_name", "page_number", "content", "embedding", "image_url"},
 		pgx.CopyFromSlice(len(chunks), func(i int) ([]any, error) {
 			return []any{
 				chunks[i].DocumentName,
 				chunks[i].PageNumber,
 				chunks[i].Content,
 				chunks[i].Embedding,
+				chunks[i].ImageURL,
 			}, nil
 		}),
 	)
@@ -143,7 +147,7 @@ func (r *documentRepository) CreateChunks(ctx context.Context, chunks []*model.D
 
 func (r *documentRepository) SearchChunks(ctx context.Context, embedding pgvector.Vector, limit int) ([]response.ChunkRes, error) {
 	query := `
-		SELECT id, document_name, page_number, content,
+		SELECT id, document_name, page_number, content, image_url,
 		       ROUND((1 - (embedding <=> $1))::numeric * 100, 0) as similarity
 		FROM document_chunks
 		ORDER BY embedding <=> $1
@@ -158,9 +162,13 @@ func (r *documentRepository) SearchChunks(ctx context.Context, embedding pgvecto
 	var chunks []response.ChunkRes
 	for rows.Next() {
 		var c response.ChunkRes
-		err := rows.Scan(&c.ID, &c.DocumentName, &c.PageNumber, &c.Content, &c.Similarity)
+		var imgURL *string
+		err := rows.Scan(&c.ID, &c.DocumentName, &c.PageNumber, &c.Content, &imgURL, &c.Similarity)
 		if err != nil {
 			return nil, fmt.Errorf("scan document chunk failed: %w", err)
+		}
+		if imgURL != nil {
+			c.ImageURL = *imgURL
 		}
 		chunks = append(chunks, c)
 	}
@@ -178,7 +186,7 @@ func (r *documentRepository) SearchChunksInScope(ctx context.Context, embedding 
 
 	if len(docScope) > 0 {
 		query = `
-			SELECT id, document_name, page_number, content,
+			SELECT id, document_name, page_number, content, image_url,
 			       ROUND((1 - (embedding <=> $1))::numeric * 100, 0) as similarity
 			FROM document_chunks
 			WHERE document_name = ANY($2)
@@ -188,7 +196,7 @@ func (r *documentRepository) SearchChunksInScope(ctx context.Context, embedding 
 		rows, err = r.pool.Query(ctx, query, embedding, docScope, limit)
 	} else {
 		query = `
-			SELECT id, document_name, page_number, content,
+			SELECT id, document_name, page_number, content, image_url,
 			       ROUND((1 - (embedding <=> $1))::numeric * 100, 0) as similarity
 			FROM document_chunks
 			ORDER BY embedding <=> $1
@@ -205,9 +213,13 @@ func (r *documentRepository) SearchChunksInScope(ctx context.Context, embedding 
 	var chunks []response.ChunkRes
 	for rows.Next() {
 		var c response.ChunkRes
-		err := rows.Scan(&c.ID, &c.DocumentName, &c.PageNumber, &c.Content, &c.Similarity)
+		var imgURL *string
+		err := rows.Scan(&c.ID, &c.DocumentName, &c.PageNumber, &c.Content, &imgURL, &c.Similarity)
 		if err != nil {
 			return nil, fmt.Errorf("scan document chunk failed: %w", err)
+		}
+		if imgURL != nil {
+			c.ImageURL = *imgURL
 		}
 		chunks = append(chunks, c)
 	}
@@ -245,7 +257,7 @@ func (r *documentRepository) SearchDocuments(ctx context.Context, embedding pgve
 
 func (r *documentRepository) GetAllChunks(ctx context.Context) ([]response.ChunkRes, error) {
 	query := `
-		SELECT id, document_name, page_number, content
+		SELECT id, document_name, page_number, content, image_url
 		FROM document_chunks
 		ORDER BY id ASC
 	`
@@ -258,9 +270,13 @@ func (r *documentRepository) GetAllChunks(ctx context.Context) ([]response.Chunk
 	var chunks []response.ChunkRes
 	for rows.Next() {
 		var c response.ChunkRes
-		err := rows.Scan(&c.ID, &c.DocumentName, &c.PageNumber, &c.Content)
+		var imgURL *string
+		err := rows.Scan(&c.ID, &c.DocumentName, &c.PageNumber, &c.Content, &imgURL)
 		if err != nil {
 			return nil, fmt.Errorf("scan document chunk failed: %w", err)
+		}
+		if imgURL != nil {
+			c.ImageURL = *imgURL
 		}
 		chunks = append(chunks, c)
 	}
@@ -269,7 +285,7 @@ func (r *documentRepository) GetAllChunks(ctx context.Context) ([]response.Chunk
 
 func (r *documentRepository) GetChunksByDocument(ctx context.Context, docName string) ([]response.ChunkRes, error) {
 	query := `
-		SELECT id, document_name, page_number, content
+		SELECT id, document_name, page_number, content, image_url
 		FROM document_chunks
 		WHERE document_name = $1
 		ORDER BY id ASC
@@ -283,9 +299,13 @@ func (r *documentRepository) GetChunksByDocument(ctx context.Context, docName st
 	var chunks []response.ChunkRes
 	for rows.Next() {
 		var c response.ChunkRes
-		err := rows.Scan(&c.ID, &c.DocumentName, &c.PageNumber, &c.Content)
+		var imgURL *string
+		err := rows.Scan(&c.ID, &c.DocumentName, &c.PageNumber, &c.Content, &imgURL)
 		if err != nil {
 			return nil, fmt.Errorf("scan document chunk failed: %w", err)
+		}
+		if imgURL != nil {
+			c.ImageURL = *imgURL
 		}
 		chunks = append(chunks, c)
 	}
@@ -294,15 +314,19 @@ func (r *documentRepository) GetChunksByDocument(ctx context.Context, docName st
 
 func (r *documentRepository) GetChunk(ctx context.Context, id int64) (*response.ChunkRes, error) {
 	query := `
-		SELECT id, document_name, page_number, content
+		SELECT id, document_name, page_number, content, image_url
 		FROM document_chunks
 		WHERE id = $1
 	`
 	row := r.pool.QueryRow(ctx, query, id)
 	var c response.ChunkRes
-	err := row.Scan(&c.ID, &c.DocumentName, &c.PageNumber, &c.Content)
+	var imgURL *string
+	err := row.Scan(&c.ID, &c.DocumentName, &c.PageNumber, &c.Content, &imgURL)
 	if err != nil {
 		return nil, fmt.Errorf("get chunk failed: %w", err)
+	}
+	if imgURL != nil {
+		c.ImageURL = *imgURL
 	}
 	return &c, nil
 }

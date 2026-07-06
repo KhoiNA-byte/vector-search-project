@@ -19,4 +19,5 @@ type ChunkRes struct {
 	PageNumber   int     `json:"pageNumber"`
 	Content      string  `json:"content"`
 	Similarity   float64 `json:"similarity"`
+	ImageURL     string  `json:"imageUrl,omitempty"`
 }

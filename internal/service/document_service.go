@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/xml"
 	"fmt"
 	"io"
@@ -92,83 +93,157 @@ func (s *documentService) Upload(ctx context.Context, filename string, r io.Read
 		return fmt.Errorf("failed to save document metadata: %w", err)
 	}
 
-	// 4. Parse text contents
-	var extractedText map[int]string
+	var dbChunks []*model.DocumentChunk
+
 	if fileType == "pdf" {
-		extractedText, err = s.parsePDF(r, size)
-	} else {
-		extractedText, err = s.parseDOCX(r, size)
-	}
-
-	if err != nil {
-		// Clean up MinIO & document record on parse failure
-		_ = s.storageSvc.Delete(ctx, filename)
-		_ = s.repo.DeleteDocument(ctx, filename)
-		return fmt.Errorf("failed to parse document: %w", err)
-	}
-
-	// 5. Chunk and embed text contents
-	type pendingChunk struct {
-		PageNumber int
-		Content    string
-	}
-	var pendingList []pendingChunk
-	var rawTexts []string
-
-	// Sort page numbers so chunks are processed sequentially
-	var pageNums []int
-	for pageNum := range extractedText {
-		pageNums = append(pageNums, pageNum)
-	}
-	sort.Ints(pageNums)
-
-	for _, pageNum := range pageNums {
-		text := extractedText[pageNum]
-		trimmedText := strings.TrimSpace(text)
-		if trimmedText == "" {
-			continue
+		// 4. Extract rich content and images via local Python service
+		sectionReader := io.NewSectionReader(r, 0, size)
+		extractRes, err := s.embedSvc.ExtractPDF(ctx, sectionReader, filename)
+		if err != nil {
+			// Clean up MinIO & document record on parse failure
+			_ = s.storageSvc.Delete(ctx, filename)
+			_ = s.repo.DeleteDocument(ctx, filename)
+			return fmt.Errorf("failed to parse PDF document: %w", err)
 		}
 
-		chunks := chunkText(trimmedText, 600, 60)
-		for _, chunkTextContent := range chunks {
-			chunkTextContent = strings.TrimSpace(chunkTextContent)
-			if chunkTextContent == "" {
+		var rawTexts []string
+		for _, page := range extractRes.Pages {
+			trimmedPlain := strings.TrimSpace(page.PlainText)
+			trimmedHTML := strings.TrimSpace(page.HTMLContent)
+			if trimmedPlain == "" && trimmedHTML == "" {
 				continue
 			}
 
-			pendingList = append(pendingList, pendingChunk{
-				PageNumber: pageNum,
-				Content:    chunkTextContent,
-			})
-			rawTexts = append(rawTexts, chunkTextContent)
-		}
-	}
+			// Upload images if present
+			var imageURL string
+			for imgIdx, img := range page.Images {
+				dec, err := base64.StdEncoding.DecodeString(img.Data)
+				if err != nil {
+					continue
+				}
 
-	if len(pendingList) > 0 {
-		// Generate all chunk embeddings in batch
-		embeddings, err := s.embedSvc.EmbedDescriptions(ctx, rawTexts)
+				imgKey := fmt.Sprintf("doc_images/%s/page_%d_%d.%s", filename, page.Page, imgIdx, img.Ext)
+				mimeType := "image/png"
+				if img.Ext == "jpg" || img.Ext == "jpeg" {
+					mimeType = "image/jpeg"
+				} else if img.Ext == "gif" {
+					mimeType = "image/gif"
+				}
+
+				err = s.storageSvc.Upload(ctx, imgKey, bytes.NewReader(dec), int64(len(dec)), mimeType)
+				if err != nil {
+					log.Printf("Warning: failed to upload PDF page image: %v", err)
+					continue
+				}
+
+				if imgIdx == 0 {
+					imageURL = imgKey
+				}
+			}
+
+			// If HTML content is empty, fallback to plain text wrapped in div
+			htmlContent := page.HTMLContent
+			if htmlContent == "" {
+				htmlContent = fmt.Sprintf("<div>%s</div>", strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(page.PlainText, "&", "&amp;"), "<", "&lt;"), ">", "&gt;"))
+			}
+
+			chunk := &model.DocumentChunk{
+				DocumentName: filename,
+				PageNumber:   page.Page,
+				Content:      htmlContent,
+				ImageURL:     imageURL,
+			}
+			dbChunks = append(dbChunks, chunk)
+			rawTexts = append(rawTexts, trimmedPlain)
+		}
+
+		if len(dbChunks) > 0 {
+			// Batch embed all clean plain texts
+			embeddings, err := s.embedSvc.EmbedDescriptions(ctx, rawTexts)
+			if err != nil {
+				_ = s.storageSvc.Delete(ctx, filename)
+				_ = s.repo.DeleteDocument(ctx, filename)
+				return fmt.Errorf("failed to generate page embeddings: %w", err)
+			}
+
+			for idx, chunk := range dbChunks {
+				chunk.Embedding = embeddings[idx]
+			}
+
+			// Save to database
+			if err := s.repo.CreateChunks(ctx, dbChunks); err != nil {
+				_ = s.storageSvc.Delete(ctx, filename)
+				_ = s.repo.DeleteDocument(ctx, filename)
+				return fmt.Errorf("failed to save PDF document chunks: %w", err)
+			}
+		}
+	} else {
+		// DOCX text-only processing
+		extractedText, err := s.parseDOCX(r, size)
 		if err != nil {
-			// Clean up on embedding error
 			_ = s.storageSvc.Delete(ctx, filename)
 			_ = s.repo.DeleteDocument(ctx, filename)
-			return fmt.Errorf("failed to generate chunk embeddings: %w", err)
+			return fmt.Errorf("failed to parse DOCX document: %w", err)
 		}
 
-		dbChunks := make([]*model.DocumentChunk, len(pendingList))
-		for idx, p := range pendingList {
-			dbChunks[idx] = &model.DocumentChunk{
-				DocumentName: filename,
-				PageNumber:   p.PageNumber,
-				Content:      p.Content,
-				Embedding:    embeddings[idx],
+		type pendingChunk struct {
+			PageNumber int
+			Content    string
+		}
+		var pendingList []pendingChunk
+		var rawTexts []string
+
+		var pageNums []int
+		for pageNum := range extractedText {
+			pageNums = append(pageNums, pageNum)
+		}
+		sort.Ints(pageNums)
+
+		for _, pageNum := range pageNums {
+			text := extractedText[pageNum]
+			trimmedText := strings.TrimSpace(text)
+			if trimmedText == "" {
+				continue
+			}
+
+			chunks := chunkText(trimmedText, 600, 60)
+			for _, chunkTextContent := range chunks {
+				chunkTextContent = strings.TrimSpace(chunkTextContent)
+				if chunkTextContent == "" {
+					continue
+				}
+
+				pendingList = append(pendingList, pendingChunk{
+					PageNumber: pageNum,
+					Content:    chunkTextContent,
+				})
+				rawTexts = append(rawTexts, chunkTextContent)
 			}
 		}
 
-		// Bulk insert all chunks in one operation
-		if err := s.repo.CreateChunks(ctx, dbChunks); err != nil {
-			_ = s.storageSvc.Delete(ctx, filename)
-			_ = s.repo.DeleteDocument(ctx, filename)
-			return fmt.Errorf("failed to save document chunks: %w", err)
+		if len(pendingList) > 0 {
+			embeddings, err := s.embedSvc.EmbedDescriptions(ctx, rawTexts)
+			if err != nil {
+				_ = s.storageSvc.Delete(ctx, filename)
+				_ = s.repo.DeleteDocument(ctx, filename)
+				return fmt.Errorf("failed to generate DOCX embeddings: %w", err)
+			}
+
+			dbChunks = make([]*model.DocumentChunk, len(pendingList))
+			for idx, p := range pendingList {
+				dbChunks[idx] = &model.DocumentChunk{
+					DocumentName: filename,
+					PageNumber:   p.PageNumber,
+					Content:      p.Content,
+					Embedding:    embeddings[idx],
+				}
+			}
+
+			if err := s.repo.CreateChunks(ctx, dbChunks); err != nil {
+				_ = s.storageSvc.Delete(ctx, filename)
+				_ = s.repo.DeleteDocument(ctx, filename)
+				return fmt.Errorf("failed to save DOCX document chunks: %w", err)
+			}
 		}
 	}
 
@@ -209,15 +284,43 @@ func (s *documentService) SemanticSearch(ctx context.Context, query string, scop
 		return nil, fmt.Errorf("failed to embed query: %w", err)
 	}
 
-	return s.repo.SearchChunksInScope(ctx, queryEmbedding, scope, 15)
+	chunks, err := s.repo.SearchChunksInScope(ctx, queryEmbedding, scope, 15)
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range chunks {
+		if chunks[i].ImageURL != "" {
+			chunks[i].ImageURL = s.storageSvc.GetPublicURL(chunks[i].ImageURL)
+		}
+	}
+	return chunks, nil
 }
 
 func (s *documentService) GetAllChunks(ctx context.Context) ([]response.ChunkRes, error) {
-	return s.repo.GetAllChunks(ctx)
+	chunks, err := s.repo.GetAllChunks(ctx)
+	if err != nil {
+		return nil, err
+	}
+	for i := range chunks {
+		if chunks[i].ImageURL != "" {
+			chunks[i].ImageURL = s.storageSvc.GetPublicURL(chunks[i].ImageURL)
+		}
+	}
+	return chunks, nil
 }
 
 func (s *documentService) GetChunksByDocument(ctx context.Context, docName string) ([]response.ChunkRes, error) {
-	return s.repo.GetChunksByDocument(ctx, docName)
+	chunks, err := s.repo.GetChunksByDocument(ctx, docName)
+	if err != nil {
+		return nil, err
+	}
+	for i := range chunks {
+		if chunks[i].ImageURL != "" {
+			chunks[i].ImageURL = s.storageSvc.GetPublicURL(chunks[i].ImageURL)
+		}
+	}
+	return chunks, nil
 }
 
 func (s *documentService) GetDocumentDetails(ctx context.Context, docName string) (*response.DocumentRes, []response.ChunkRes, error) {
@@ -229,6 +332,12 @@ func (s *documentService) GetDocumentDetails(ctx context.Context, docName string
 	chunks, err := s.repo.GetChunksByDocument(ctx, docName)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to load document chunks: %w", err)
+	}
+
+	for i := range chunks {
+		if chunks[i].ImageURL != "" {
+			chunks[i].ImageURL = s.storageSvc.GetPublicURL(chunks[i].ImageURL)
+		}
 	}
 
 	docRes := &response.DocumentRes{

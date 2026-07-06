@@ -12,6 +12,7 @@ type DocumentChunk struct {
 	PageNumber   int             `json:"pageNumber"`
 	Content      string          `json:"content"`
 	Embedding    pgvector.Vector `json:"embedding,omitempty"`
+	ImageURL     string          `json:"imageUrl,omitempty"`
 }
 
 type Document struct {

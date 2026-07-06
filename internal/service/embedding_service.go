@@ -1,62 +1,105 @@
 package service
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
+	"mime/multipart"
+	"net/http"
+	"net/textproto"
 	"os"
+	"strings"
 	"vector-search-project/internal/model"
 
 	"github.com/pgvector/pgvector-go"
-	"google.golang.org/genai"
 )
 
+type textRequest struct {
+	Text *string `json:"text,omitempty"`
+}
+
+type textsRequest struct {
+	Texts []string `json:"texts"`
+}
+
+type textResponse struct {
+	Embedding []float32 `json:"embedding"`
+}
+
+type textsResponse struct {
+	Embeddings [][]float32 `json:"embeddings"`
+}
+
 type EmbeddingService struct {
-	client *genai.Client
+	baseURL string
+	client  *http.Client
+}
+
+type ExtractedPageImage struct {
+	Data string `json:"data"` // base64
+	Ext  string `json:"ext"`
+}
+
+type ExtractedPage struct {
+	Page        int                  `json:"page"`
+	PlainText   string               `json:"plain_text"`
+	HTMLContent string               `json:"html_content"`
+	Images      []ExtractedPageImage `json:"images"`
+}
+
+type ExtractPDFResponse struct {
+	Pages []ExtractedPage `json:"pages"`
 }
 
 func NewEmbeddingService() *EmbeddingService {
-	apiKey := os.Getenv("GEMINI_API_KEY")
-	ctx := context.Background()
-
-	// Create client using the new SDK pattern
-	client, err := genai.NewClient(ctx, &genai.ClientConfig{
-		APIKey:  apiKey,
-		Backend: genai.BackendGeminiAPI,
-	})
-
-	if err != nil {
-		fmt.Printf("Failed to create Gemini client: %v\n", err)
-		return nil
+	baseURL := os.Getenv("EMBEDDING_SERVICE_URL")
+	if baseURL == "" {
+		baseURL = "http://localhost:5000"
 	}
+	baseURL = strings.TrimSuffix(baseURL, "/")
+
 	return &EmbeddingService{
-		client: client,
+		baseURL: baseURL,
+		client:  &http.Client{},
 	}
 }
 
 func (s *EmbeddingService) EmbedDescription(ctx context.Context, description string) (pgvector.Vector, error) {
-	modelName := os.Getenv("GEMINI_EMBEDDING_MODEL")
-
-	// Follow the result pattern from your snippet
-	contents := []*genai.Content{
-		genai.NewContentFromText(description, "user"),
-	}
-
-	result, err := s.client.Models.EmbedContent(ctx,
-		modelName,
-		contents,
-		nil,
-	)
-
+	reqBody := textRequest{Text: &description}
+	jsonBytes, err := json.Marshal(reqBody)
 	if err != nil {
-		return pgvector.Vector{}, fmt.Errorf("gemini embedding failed: %w", err)
+		return pgvector.Vector{}, fmt.Errorf("failed to marshal request: %w", err)
 	}
 
-	// Extract values from the embeddings in the result
-	if len(result.Embeddings) == 0 || len(result.Embeddings[0].Values) == 0 {
-		return pgvector.Vector{}, fmt.Errorf("no embeddings returned")
+	req, err := http.NewRequestWithContext(ctx, "POST", s.baseURL+"/embed/text", bytes.NewBuffer(jsonBytes))
+	if err != nil {
+		return pgvector.Vector{}, fmt.Errorf("failed to create request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return pgvector.Vector{}, fmt.Errorf("local embedding service request failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		return pgvector.Vector{}, fmt.Errorf("local embedding service returned status %d: %s", resp.StatusCode, string(bodyBytes))
 	}
 
-	return pgvector.NewVector(result.Embeddings[0].Values), nil
+	var res textResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return pgvector.Vector{}, fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	if len(res.Embedding) == 0 {
+		return pgvector.Vector{}, fmt.Errorf("received empty embedding")
+	}
+
+	return pgvector.NewVector(res.Embedding), nil
 }
 
 func (s *EmbeddingService) EmbedDescriptions(ctx context.Context, descriptions []string) ([]pgvector.Vector, error) {
@@ -64,44 +107,44 @@ func (s *EmbeddingService) EmbedDescriptions(ctx context.Context, descriptions [
 		return nil, nil
 	}
 
-	modelName := os.Getenv("GEMINI_EMBEDDING_MODEL")
-	const batchSize = 100
-	var allVectors []pgvector.Vector
-
-	for i := 0; i < len(descriptions); i += batchSize {
-		end := i + batchSize
-		if end > len(descriptions) {
-			end = len(descriptions)
-		}
-		batch := descriptions[i:end]
-
-		contents := make([]*genai.Content, len(batch))
-		for j, desc := range batch {
-			contents[j] = genai.NewContentFromText(desc, "user")
-		}
-
-		result, err := s.client.Models.EmbedContent(ctx,
-			modelName,
-			contents,
-			nil,
-		)
-		if err != nil {
-			return nil, fmt.Errorf("gemini batch embedding failed at offset %d: %w", i, err)
-		}
-
-		if len(result.Embeddings) != len(batch) {
-			return nil, fmt.Errorf("gemini batch embedding returned mismatching size at offset %d: expected %d, got %d", i, len(batch), len(result.Embeddings))
-		}
-
-		for j, emb := range result.Embeddings {
-			if len(emb.Values) == 0 {
-				return nil, fmt.Errorf("no values in embedding at index %d", i+j)
-			}
-			allVectors = append(allVectors, pgvector.NewVector(emb.Values))
-		}
+	reqBody := textsRequest{Texts: descriptions}
+	jsonBytes, err := json.Marshal(reqBody)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal request: %w", err)
 	}
 
-	return allVectors, nil
+	req, err := http.NewRequestWithContext(ctx, "POST", s.baseURL+"/embed/text", bytes.NewBuffer(jsonBytes))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("local batch embedding service request failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("local batch embedding service returned status %d: %s", resp.StatusCode, string(bodyBytes))
+	}
+
+	var res textsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	if len(res.Embeddings) != len(descriptions) {
+		return nil, fmt.Errorf("returned embedding size mismatch: expected %d, got %d", len(descriptions), len(res.Embeddings))
+	}
+
+	vectors := make([]pgvector.Vector, len(res.Embeddings))
+	for i, emb := range res.Embeddings {
+		vectors[i] = pgvector.NewVector(emb)
+	}
+
+	return vectors, nil
 }
 
 func (s *EmbeddingService) EmbedFruit(ctx context.Context, f *model.Fruit) (pgvector.Vector, error) {
@@ -110,28 +153,111 @@ func (s *EmbeddingService) EmbedFruit(ctx context.Context, f *model.Fruit) (pgve
 }
 
 func (s *EmbeddingService) EmbedVisualEntity(ctx context.Context, imageData []byte, mimeType string, description string) (pgvector.Vector, error) {
-	modelName := os.Getenv("GEMINI_EMBEDDING_MODEL")
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
 
-	contents := []*genai.Content{
-		genai.NewContentFromParts([]*genai.Part{
-			genai.NewPartFromText(description),
-			genai.NewPartFromBytes(imageData, mimeType),
-		}, genai.RoleUser),
+	// Add image if present
+	if len(imageData) > 0 {
+		ext := "png"
+		if strings.Contains(mimeType, "jpeg") || strings.Contains(mimeType, "jpg") {
+			ext = "jpg"
+		} else if strings.Contains(mimeType, "webp") {
+			ext = "webp"
+		}
+
+		h := make(textproto.MIMEHeader)
+		h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="image"; filename="image.%s"`, ext))
+		h.Set("Content-Type", mimeType)
+
+		part, err := writer.CreatePart(h)
+		if err != nil {
+			return pgvector.Vector{}, fmt.Errorf("failed to create image part: %w", err)
+		}
+		if _, err := io.Copy(part, bytes.NewReader(imageData)); err != nil {
+			return pgvector.Vector{}, fmt.Errorf("failed to write image data: %w", err)
+		}
 	}
 
-	result, err := s.client.Models.EmbedContent(ctx,
-		modelName,
-		contents,
-		nil,
-	)
+	// Add description if present
+	if description != "" {
+		if err := writer.WriteField("description", description); err != nil {
+			return pgvector.Vector{}, fmt.Errorf("failed to write description field: %w", err)
+		}
+	}
 
+	if err := writer.Close(); err != nil {
+		return pgvector.Vector{}, fmt.Errorf("failed to close multipart writer: %w", err)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "POST", s.baseURL+"/embed/multimodal", body)
 	if err != nil {
-		return pgvector.Vector{}, fmt.Errorf("gemini multimodal embedding failed: %w", err)
+		return pgvector.Vector{}, fmt.Errorf("failed to create request: %w", err)
+	}
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return pgvector.Vector{}, fmt.Errorf("local multimodal embedding service request failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		return pgvector.Vector{}, fmt.Errorf("local multimodal embedding service returned status %d: %s", resp.StatusCode, string(bodyBytes))
 	}
 
-	if len(result.Embeddings) == 0 || len(result.Embeddings[0].Values) == 0 {
-		return pgvector.Vector{}, fmt.Errorf("no embeddings returned")
+	var res textResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return pgvector.Vector{}, fmt.Errorf("failed to decode response: %w", err)
 	}
 
-	return pgvector.NewVector(result.Embeddings[0].Values), nil
+	if len(res.Embedding) == 0 {
+		return pgvector.Vector{}, fmt.Errorf("received empty embedding")
+	}
+
+	return pgvector.NewVector(res.Embedding), nil
+}
+
+func (s *EmbeddingService) ExtractPDF(ctx context.Context, fileReader io.Reader, filename string) (*ExtractPDFResponse, error) {
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+
+	h := make(textproto.MIMEHeader)
+	h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="file"; filename="%s"`, filename))
+	h.Set("Content-Type", "application/pdf")
+
+	part, err := writer.CreatePart(h)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create file part: %w", err)
+	}
+	if _, err := io.Copy(part, fileReader); err != nil {
+		return nil, fmt.Errorf("failed to copy file reader: %w", err)
+	}
+
+	if err := writer.Close(); err != nil {
+		return nil, fmt.Errorf("failed to close multipart writer: %w", err)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "POST", s.baseURL+"/extract/pdf", body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("local PDF extraction service request failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("local PDF extraction service returned status %d: %s", resp.StatusCode, string(bodyBytes))
+	}
+
+	var res ExtractPDFResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, fmt.Errorf("failed to decode PDF extraction response: %w", err)
+	}
+	return &res, nil
 }

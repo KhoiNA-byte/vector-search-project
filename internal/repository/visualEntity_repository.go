@@ -35,7 +35,7 @@ func (r *visualEntityRepository) Migrate(ctx context.Context) error {
 		CREATE TABLE IF NOT EXISTS visual_entities (
 			id bigserial PRIMARY KEY,
 			image_url text,
-			embedding halfvec(3072)
+			embedding halfvec(512)
 		);
 
 		DO $$ 
@@ -44,7 +44,7 @@ func (r *visualEntityRepository) Migrate(ctx context.Context) error {
 				SELECT 1 FROM information_schema.columns 
 				WHERE table_name = 'visual_entities' AND column_name = 'embedding' AND udt_name = 'vector'
 			) THEN 
-				ALTER TABLE visual_entities ALTER COLUMN embedding TYPE halfvec(3072);
+				ALTER TABLE visual_entities ALTER COLUMN embedding TYPE halfvec(512);
 			END IF;
 		END $$;
 
