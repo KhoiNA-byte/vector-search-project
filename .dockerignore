@@ -2,3 +2,7 @@ tmp
 api.exe
 .idea
 .git
+node_modules
+frontend/node_modules
+frontend/dist
+embedding_service/venv
